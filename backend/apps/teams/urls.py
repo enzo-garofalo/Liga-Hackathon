@@ -6,9 +6,11 @@ from .views import (
     AdminTeamRejectView,
     TeamCreateView,
     TeamDetailView,
+    health_check,
 )
 
 urlpatterns = [
+    path('health/', health_check, name='health'),
     path('teams/', TeamCreateView.as_view(), name='team-create'),
     path('teams/<uuid:pk>/', TeamDetailView.as_view(), name='team-detail'),
     path('admin/teams/', AdminTeamListView.as_view(), name='admin-team-list'),

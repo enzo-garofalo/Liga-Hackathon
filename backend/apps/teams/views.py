@@ -3,15 +3,23 @@ import logging
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .emails import send_approval_email, send_rejection_email
 from .models import Team
 from .serializers import TeamSerializer
 
 logger = logging.getLogger(__name__)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def health_check(request):
+    return Response({'status': 'ok'})
 
 
 class TeamCreateView(generics.CreateAPIView):
@@ -27,6 +35,7 @@ class TeamDetailView(generics.RetrieveAPIView):
 
 class AdminTeamListView(generics.ListAPIView):
     serializer_class = TeamSerializer
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -38,6 +47,7 @@ class AdminTeamListView(generics.ListAPIView):
 
 
 class AdminTeamApproveView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk):
@@ -69,6 +79,7 @@ class AdminTeamApproveView(APIView):
 
 
 class AdminTeamRejectView(APIView):
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, pk):

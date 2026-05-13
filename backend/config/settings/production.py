@@ -8,6 +8,7 @@ from core.settings import *  # noqa: F401, F403
 SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
 DEBUG = False
 ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '').split(',') if h.strip()]
+ALLOWED_HOSTS.append('healthcheck.railway.app')
 
 # ── Database ──────────────────────────────────────────────────────
 DATABASES = {

@@ -3,7 +3,21 @@ set -e
 
 export DJANGO_SETTINGS_MODULE=config.settings.production
 
+# ── Validate required env vars ────────────────────────────────────
+MISSING=""
+for var in DJANGO_SECRET_KEY DATABASE_URL DJANGO_ADMIN_USERNAME DJANGO_ADMIN_PASSWORD; do
+    if [ -z "${!var}" ]; then
+        MISSING="$MISSING $var"
+    fi
+done
+if [ -n "$MISSING" ]; then
+    echo "ERROR: missing required environment variables:$MISSING" >&2
+    exit 1
+fi
+
+# ── Wait for database (max 60 s) ──────────────────────────────────
 echo "==> Waiting for database..."
+RETRIES=30
 until python - <<'PY' 2>/dev/null
 import os, dj_database_url, psycopg2
 c = dj_database_url.config(env='DATABASE_URL')
@@ -13,11 +27,17 @@ psycopg2.connect(
 ).close()
 PY
 do
-    echo "    Database not ready — retrying in 2s..."
+    RETRIES=$((RETRIES - 1))
+    if [ "$RETRIES" -le 0 ]; then
+        echo "ERROR: database did not become ready in time." >&2
+        exit 1
+    fi
+    echo "    Database not ready — retrying in 2s... ($RETRIES attempts left)"
     sleep 2
 done
 echo "==> Database ready."
 
+# ── Django setup ──────────────────────────────────────────────────
 echo "==> Running migrations..."
 python manage.py migrate --noinput
 
@@ -39,7 +59,8 @@ else:
     print(f'Superuser {username} ja existe.')
 "
 
-echo "==> Starting gunicorn..."
+# ── Start server ──────────────────────────────────────────────────
+echo "==> Starting gunicorn on port ${PORT:-8000}..."
 exec gunicorn config.wsgi:application \
     --bind "0.0.0.0:${PORT:-8000}" \
     --workers 2 \

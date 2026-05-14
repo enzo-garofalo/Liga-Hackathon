@@ -5,7 +5,8 @@ from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import Participant
+from .models import Participant, Team, TeamMembership
+from .services.teams import assert_deadline_not_passed
 
 User = get_user_model()
 
@@ -57,6 +58,82 @@ class ParticipantListSerializer(serializers.ModelSerializer):
         model = Participant
         fields = ['id', 'full_name', 'course', 'semester', 'bio', 'github', 'linkedin']
         read_only_fields = fields
+
+
+class TeamSerializer(serializers.ModelSerializer):
+    leader = ParticipantListSerializer(read_only=True)
+    members = serializers.SerializerMethodField()
+    member_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Team
+        fields = [
+            'id',
+            'name',
+            'leader',
+            'members',
+            'member_count',
+            'is_open',
+            'status',
+            'submitted_at',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = fields
+
+    def get_members(self, obj):
+        memberships = obj.memberships.select_related('participant').order_by('joined_at')
+        return ParticipantListSerializer(
+            [m.participant for m in memberships], many=True
+        ).data
+
+    def get_member_count(self, obj):
+        return obj.memberships.count()
+
+
+class TeamCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = ['name', 'is_open']
+
+    def validate(self, attrs):
+        creator = self.context['request'].user.participant
+        if creator.has_team:
+            raise serializers.ValidationError(
+                'Você já está em uma equipe.'
+            )
+        assert_deadline_not_passed()
+        return attrs
+
+    @transaction.atomic
+    def create(self, validated_data):
+        creator = self.context['request'].user.participant
+        try:
+            team = Team.objects.create(leader=creator, **validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError(
+                {'name': 'Já existe uma equipe com este nome.'}
+            )
+        TeamMembership.objects.create(team=team, participant=creator)
+        return team
+
+
+class TeamUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Team
+        fields = ['name', 'is_open']
+        extra_kwargs = {
+            'name': {'required': False},
+            'is_open': {'required': False},
+        }
+
+    def update(self, instance, validated_data):
+        try:
+            return super().update(instance, validated_data)
+        except IntegrityError:
+            raise serializers.ValidationError(
+                {'name': 'Já existe uma equipe com este nome.'}
+            )
 
 
 class RegisterSerializer(serializers.Serializer):

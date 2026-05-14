@@ -5,7 +5,14 @@ from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-from .models import Participant, Team, TeamMembership
+from .models import (
+    InviteStatus,
+    JoinRequest,
+    Participant,
+    Team,
+    TeamInvite,
+    TeamMembership,
+)
 from .services.teams import assert_deadline_not_passed
 
 User = get_user_model()
@@ -134,6 +141,116 @@ class TeamUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {'name': 'Já existe uma equipe com este nome.'}
             )
+
+
+class TeamMinimalSerializer(serializers.ModelSerializer):
+    member_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Team
+        fields = ['id', 'name', 'is_open', 'status', 'member_count']
+        read_only_fields = fields
+
+    def get_member_count(self, obj):
+        return obj.memberships.count()
+
+
+class TeamInviteSerializer(serializers.ModelSerializer):
+    team = TeamMinimalSerializer(read_only=True)
+    invitee = ParticipantListSerializer(read_only=True)
+    invited_by = ParticipantListSerializer(read_only=True)
+
+    class Meta:
+        model = TeamInvite
+        fields = ['id', 'team', 'invitee', 'invited_by', 'status', 'created_at']
+        read_only_fields = fields
+
+
+class TeamInviteCreateSerializer(serializers.Serializer):
+    invitee_id = serializers.UUIDField(write_only=True)
+
+    def validate(self, attrs):
+        team = self.context['team']
+
+        if team.status != Team.STATUS_FORMING:
+            raise serializers.ValidationError(
+                'A equipe não aceita mais convites.'
+            )
+        if team.memberships.count() >= 4:
+            raise serializers.ValidationError('A equipe já tem 4 membros.')
+
+        try:
+            invitee = Participant.objects.get(pk=attrs['invitee_id'])
+        except Participant.DoesNotExist:
+            raise serializers.ValidationError(
+                {'invitee_id': 'Participante não encontrado.'}
+            )
+        if invitee.has_team:
+            raise serializers.ValidationError(
+                {'invitee_id': 'Este participante já está em uma equipe.'}
+            )
+        if TeamInvite.objects.filter(
+            team=team, invitee=invitee, status=InviteStatus.PENDING
+        ).exists():
+            raise serializers.ValidationError(
+                {'invitee_id': 'Já existe um convite pendente para este participante.'}
+            )
+
+        attrs['invitee'] = invitee
+        return attrs
+
+    def create(self, validated_data):
+        team = self.context['team']
+        invited_by = self.context['invited_by']
+        return TeamInvite.objects.create(
+            team=team,
+            invitee=validated_data['invitee'],
+            invited_by=invited_by,
+            status=InviteStatus.PENDING,
+        )
+
+
+class JoinRequestSerializer(serializers.ModelSerializer):
+    team = TeamMinimalSerializer(read_only=True)
+    requester = ParticipantListSerializer(read_only=True)
+
+    class Meta:
+        model = JoinRequest
+        fields = ['id', 'team', 'requester', 'status', 'created_at']
+        read_only_fields = fields
+
+
+class JoinRequestCreateSerializer(serializers.Serializer):
+    def validate(self, attrs):
+        team = self.context['team']
+        requester = self.context['requester']
+
+        if requester.has_team:
+            raise serializers.ValidationError('Você já está em uma equipe.')
+        if team.status != Team.STATUS_FORMING:
+            raise serializers.ValidationError(
+                'A equipe não aceita mais pedidos.'
+            )
+        if not team.is_open:
+            raise serializers.ValidationError(
+                'A equipe não está aberta para pedidos.'
+            )
+        if team.memberships.count() >= 4:
+            raise serializers.ValidationError('A equipe já tem 4 membros.')
+        if JoinRequest.objects.filter(
+            team=team, requester=requester, status=InviteStatus.PENDING
+        ).exists():
+            raise serializers.ValidationError(
+                'Você já enviou um pedido pendente para esta equipe.'
+            )
+        return attrs
+
+    def create(self, validated_data):
+        return JoinRequest.objects.create(
+            team=self.context['team'],
+            requester=self.context['requester'],
+            status=InviteStatus.PENDING,
+        )
 
 
 class RegisterSerializer(serializers.Serializer):

@@ -3,7 +3,14 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
-from apps.teams.models import Participant, Team, TeamMembership
+from apps.teams.models import (
+    InviteStatus,
+    JoinRequest,
+    Participant,
+    Team,
+    TeamInvite,
+    TeamMembership,
+)
 
 
 def deadline_passed():
@@ -102,3 +109,82 @@ def remove_member(team, participant):
         raise ValidationError('Este participante não é membro da equipe.')
 
     membership.delete()
+
+
+def _cancel_other_pending(participant, exclude_invite_id=None, exclude_request_id=None):
+    """Marca como declined todos os invites + join_requests pendentes do participante."""
+    invites = TeamInvite.objects.filter(
+        invitee=participant, status=InviteStatus.PENDING
+    )
+    if exclude_invite_id:
+        invites = invites.exclude(pk=exclude_invite_id)
+    invites.update(status=InviteStatus.DECLINED)
+
+    requests = JoinRequest.objects.filter(
+        requester=participant, status=InviteStatus.PENDING
+    )
+    if exclude_request_id:
+        requests = requests.exclude(pk=exclude_request_id)
+    requests.update(status=InviteStatus.DECLINED)
+
+
+@transaction.atomic
+def accept_invite(invite, participant):
+    if invite.invitee_id != participant.id:
+        raise PermissionDenied('Este convite não é seu.')
+    if invite.status != InviteStatus.PENDING:
+        raise ValidationError('Este convite não está mais pendente.')
+
+    team = Team.objects.select_for_update().get(pk=invite.team_id)
+    assert_team_forming(team)
+    if team.memberships.count() >= 4:
+        raise ValidationError('A equipe já tem 4 membros.')
+    if participant.has_team:
+        raise ValidationError('Você já está em uma equipe.')
+
+    membership = TeamMembership.objects.create(team=team, participant=participant)
+    invite.status = InviteStatus.ACCEPTED
+    invite.save(update_fields=['status'])
+    _cancel_other_pending(participant, exclude_invite_id=invite.pk)
+    return membership
+
+
+@transaction.atomic
+def decline_invite(invite, participant):
+    if invite.invitee_id != participant.id:
+        raise PermissionDenied('Este convite não é seu.')
+    if invite.status != InviteStatus.PENDING:
+        raise ValidationError('Este convite não está mais pendente.')
+    invite.status = InviteStatus.DECLINED
+    invite.save(update_fields=['status'])
+
+
+@transaction.atomic
+def accept_join_request(req, leader):
+    team = Team.objects.select_for_update().get(pk=req.team_id)
+    assert_is_leader(team, leader)
+    if req.status != InviteStatus.PENDING:
+        raise ValidationError('Este pedido não está mais pendente.')
+    assert_team_forming(team)
+    if team.memberships.count() >= 4:
+        raise ValidationError('A equipe já tem 4 membros.')
+
+    requester = req.requester
+    if requester.has_team:
+        raise ValidationError('O participante já entrou em outra equipe.')
+
+    membership = TeamMembership.objects.create(team=team, participant=requester)
+    req.status = InviteStatus.ACCEPTED
+    req.save(update_fields=['status'])
+    _cancel_other_pending(requester, exclude_request_id=req.pk)
+    return membership
+
+
+@transaction.atomic
+def decline_join_request(req, leader):
+    team = Team.objects.select_for_update().get(pk=req.team_id)
+    assert_is_leader(team, leader)
+    if req.status != InviteStatus.PENDING:
+        raise ValidationError('Este pedido não está mais pendente.')
+    req.status = InviteStatus.DECLINED
+    req.save(update_fields=['status'])

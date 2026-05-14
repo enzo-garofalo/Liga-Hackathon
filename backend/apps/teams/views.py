@@ -1,12 +1,16 @@
+from django.http import Http404
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from .models import Participant
 from .serializers import (
     AdminTokenObtainPairSerializer,
     EmailTokenObtainPairSerializer,
+    MeSerializer,
+    ParticipantListSerializer,
     ParticipantPublicSerializer,
     RegisterSerializer,
 )
@@ -38,3 +42,25 @@ class EmailTokenObtainPairView(TokenObtainPairView):
 
 class AdminTokenObtainPairView(TokenObtainPairView):
     serializer_class = AdminTokenObtainPairSerializer
+
+
+class MeView(generics.RetrieveUpdateAPIView):
+    serializer_class = MeSerializer
+    http_method_names = ['get', 'patch', 'head', 'options']
+
+    def get_object(self):
+        try:
+            return self.request.user.participant
+        except Participant.DoesNotExist:
+            raise Http404('Usuário autenticado não possui perfil de participante.')
+
+
+class ParticipantListView(generics.ListAPIView):
+    serializer_class = ParticipantListSerializer
+
+    def get_queryset(self):
+        queryset = Participant.objects.filter(memberships__isnull=True)
+        search = self.request.query_params.get('search')
+        if search:
+            queryset = queryset.filter(full_name__icontains=search)
+        return queryset

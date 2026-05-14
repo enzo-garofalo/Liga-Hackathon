@@ -30,6 +30,35 @@ class ParticipantPublicSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class MeSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source='user.email', read_only=True)
+    has_team = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = Participant
+        fields = [
+            'id',
+            'email',
+            'full_name',
+            'course',
+            'semester',
+            'bio',
+            'github',
+            'linkedin',
+            'has_team',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = ['id', 'email', 'has_team', 'created_at', 'updated_at']
+
+
+class ParticipantListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Participant
+        fields = ['id', 'full_name', 'course', 'semester', 'bio', 'github', 'linkedin']
+        read_only_fields = fields
+
+
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8, max_length=128)

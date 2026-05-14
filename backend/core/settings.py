@@ -1,4 +1,5 @@
 import os
+from datetime import date
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -12,6 +13,8 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-secret-key-not-for-product
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
+
+TEAM_DEADLINE = date.fromisoformat(os.environ.get('TEAM_DEADLINE', '2026-05-30'))
 
 INSTALLED_APPS = [
     'django.contrib.admin',

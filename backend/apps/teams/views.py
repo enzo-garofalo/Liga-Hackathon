@@ -7,21 +7,29 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .models import Participant, Team
+from .models import InviteStatus, JoinRequest, Participant, Team, TeamInvite
 from .serializers import (
     AdminTokenObtainPairSerializer,
     EmailTokenObtainPairSerializer,
+    JoinRequestCreateSerializer,
+    JoinRequestSerializer,
     MeSerializer,
     ParticipantListSerializer,
     ParticipantPublicSerializer,
     RegisterSerializer,
     TeamCreateSerializer,
+    TeamInviteCreateSerializer,
+    TeamInviteSerializer,
     TeamSerializer,
     TeamUpdateSerializer,
 )
 from .services.teams import (
+    accept_invite,
+    accept_join_request,
     assert_is_leader,
     assert_team_forming,
+    decline_invite,
+    decline_join_request,
     get_request_participant,
     leave_team,
     remove_member,
@@ -90,7 +98,7 @@ class TeamListCreateView(generics.ListCreateAPIView):
         return TeamCreateSerializer if self.request.method == 'POST' else TeamSerializer
 
     def create(self, request, *args, **kwargs):
-        get_request_participant(request)  # ensures the caller has a profile
+        get_request_participant(request)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         team = serializer.save()
@@ -140,3 +148,97 @@ class TeamRemoveMemberView(APIView):
         target = get_object_or_404(Participant, pk=participant_id)
         remove_member(team, target)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TeamInviteCreateView(APIView):
+    def post(self, request, pk):
+        team = get_object_or_404(Team, pk=pk)
+        actor = get_request_participant(request)
+        assert_is_leader(team, actor)
+        serializer = TeamInviteCreateSerializer(
+            data=request.data,
+            context={'team': team, 'invited_by': actor, 'request': request},
+        )
+        serializer.is_valid(raise_exception=True)
+        invite = serializer.save()
+        return Response(
+            TeamInviteSerializer(invite).data, status=status.HTTP_201_CREATED
+        )
+
+
+class MyInvitesListView(generics.ListAPIView):
+    serializer_class = TeamInviteSerializer
+
+    def get_queryset(self):
+        participant = get_request_participant(self.request)
+        return (
+            TeamInvite.objects
+            .filter(invitee=participant, status=InviteStatus.PENDING)
+            .select_related('team', 'invited_by')
+        )
+
+
+class InviteAcceptView(APIView):
+    def post(self, request, pk):
+        participant = get_request_participant(request)
+        invite = get_object_or_404(TeamInvite, pk=pk, invitee=participant)
+        accept_invite(invite, participant)
+        invite.refresh_from_db()
+        return Response(TeamInviteSerializer(invite).data)
+
+
+class InviteDeclineView(APIView):
+    def post(self, request, pk):
+        participant = get_request_participant(request)
+        invite = get_object_or_404(TeamInvite, pk=pk, invitee=participant)
+        decline_invite(invite, participant)
+        invite.refresh_from_db()
+        return Response(TeamInviteSerializer(invite).data)
+
+
+class TeamJoinRequestListCreateView(APIView):
+    def get(self, request, pk):
+        team = get_object_or_404(Team, pk=pk)
+        actor = get_request_participant(request)
+        assert_is_leader(team, actor)
+        queryset = (
+            JoinRequest.objects
+            .filter(team=team, status=InviteStatus.PENDING)
+            .select_related('requester', 'team')
+        )
+        return Response(JoinRequestSerializer(queryset, many=True).data)
+
+    def post(self, request, pk):
+        team = get_object_or_404(Team, pk=pk)
+        requester = get_request_participant(request)
+        serializer = JoinRequestCreateSerializer(
+            data=request.data,
+            context={'team': team, 'requester': requester, 'request': request},
+        )
+        serializer.is_valid(raise_exception=True)
+        req = serializer.save()
+        return Response(
+            JoinRequestSerializer(req).data, status=status.HTTP_201_CREATED
+        )
+
+
+class JoinRequestAcceptView(APIView):
+    def post(self, request, pk, request_id):
+        team = get_object_or_404(Team, pk=pk)
+        actor = get_request_participant(request)
+        assert_is_leader(team, actor)
+        req = get_object_or_404(JoinRequest, pk=request_id, team=team)
+        accept_join_request(req, actor)
+        req.refresh_from_db()
+        return Response(JoinRequestSerializer(req).data)
+
+
+class JoinRequestDeclineView(APIView):
+    def post(self, request, pk, request_id):
+        team = get_object_or_404(Team, pk=pk)
+        actor = get_request_participant(request)
+        assert_is_leader(team, actor)
+        req = get_object_or_404(JoinRequest, pk=request_id, team=team)
+        decline_join_request(req, actor)
+        req.refresh_from_db()
+        return Response(JoinRequestSerializer(req).data)

@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
@@ -7,13 +8,22 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .models import InviteStatus, JoinRequest, Participant, Team, TeamInvite
+from .models import (
+    InviteStatus,
+    JoinRequest,
+    Notification,
+    NotificationType,
+    Participant,
+    Team,
+    TeamInvite,
+)
 from .serializers import (
     AdminTokenObtainPairSerializer,
     EmailTokenObtainPairSerializer,
     JoinRequestCreateSerializer,
     JoinRequestSerializer,
     MeSerializer,
+    NotificationSerializer,
     ParticipantListSerializer,
     ParticipantPublicSerializer,
     RegisterSerializer,
@@ -23,6 +33,7 @@ from .serializers import (
     TeamSerializer,
     TeamUpdateSerializer,
 )
+from .services.notifications import notify
 from .services.teams import (
     accept_invite,
     accept_join_request,
@@ -151,6 +162,7 @@ class TeamRemoveMemberView(APIView):
 
 
 class TeamInviteCreateView(APIView):
+    @transaction.atomic
     def post(self, request, pk):
         team = get_object_or_404(Team, pk=pk)
         actor = get_request_participant(request)
@@ -161,6 +173,13 @@ class TeamInviteCreateView(APIView):
         )
         serializer.is_valid(raise_exception=True)
         invite = serializer.save()
+        notify(
+            invite.invitee,
+            NotificationType.TEAM_INVITE,
+            f'{actor.full_name} convidou você para a equipe {team.name}.',
+            link_to='/dashboard',
+            invite=invite,
+        )
         return Response(
             TeamInviteSerializer(invite).data, status=status.HTTP_201_CREATED
         )
@@ -208,6 +227,7 @@ class TeamJoinRequestListCreateView(APIView):
         )
         return Response(JoinRequestSerializer(queryset, many=True).data)
 
+    @transaction.atomic
     def post(self, request, pk):
         team = get_object_or_404(Team, pk=pk)
         requester = get_request_participant(request)
@@ -217,6 +237,13 @@ class TeamJoinRequestListCreateView(APIView):
         )
         serializer.is_valid(raise_exception=True)
         req = serializer.save()
+        notify(
+            team.leader,
+            NotificationType.JOIN_REQUEST,
+            f'{requester.full_name} pediu para entrar na equipe {team.name}.',
+            link_to=f'/teams/{team.id}/',
+            join_request=req,
+        )
         return Response(
             JoinRequestSerializer(req).data, status=status.HTTP_201_CREATED
         )
@@ -242,3 +269,27 @@ class JoinRequestDeclineView(APIView):
         decline_join_request(req, actor)
         req.refresh_from_db()
         return Response(JoinRequestSerializer(req).data)
+
+
+class NotificationListView(generics.ListAPIView):
+    serializer_class = NotificationSerializer
+
+    def get_queryset(self):
+        participant = get_request_participant(self.request)
+        queryset = Notification.objects.filter(participant=participant)
+        unread = self.request.query_params.get('unread')
+        if unread and unread.lower() in ('true', '1'):
+            queryset = queryset.filter(read=False)
+        return queryset
+
+
+class NotificationMarkReadView(APIView):
+    def patch(self, request, pk):
+        participant = get_request_participant(request)
+        notification = get_object_or_404(
+            Notification, pk=pk, participant=participant
+        )
+        if not notification.read:
+            notification.read = True
+            notification.save(update_fields=['read'])
+        return Response(NotificationSerializer(notification).data)

@@ -8,6 +8,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import (
     InviteStatus,
     JoinRequest,
+    Notification,
     Participant,
     Team,
     TeamInvite,
@@ -251,6 +252,13 @@ class JoinRequestCreateSerializer(serializers.Serializer):
             requester=self.context['requester'],
             status=InviteStatus.PENDING,
         )
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = ['id', 'type', 'message', 'read', 'link_to', 'created_at']
+        read_only_fields = fields
 
 
 class RegisterSerializer(serializers.Serializer):

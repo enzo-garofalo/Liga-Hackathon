@@ -10,6 +10,8 @@ from .views import (
     JoinRequestDeclineView,
     MeView,
     MyInvitesListView,
+    NotificationListView,
+    NotificationMarkReadView,
     ParticipantListView,
     RegisterView,
     TeamDetailUpdateView,
@@ -57,5 +59,11 @@ urlpatterns = [
         'teams/<uuid:pk>/join-requests/<uuid:request_id>/decline/',
         JoinRequestDeclineView.as_view(),
         name='join-request-decline',
+    ),
+    path('me/notifications/', NotificationListView.as_view(), name='notifications'),
+    path(
+        'me/notifications/<uuid:pk>/read/',
+        NotificationMarkReadView.as_view(),
+        name='notification-read',
     ),
 ]

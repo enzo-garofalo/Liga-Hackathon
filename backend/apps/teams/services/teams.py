@@ -6,11 +6,13 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from apps.teams.models import (
     InviteStatus,
     JoinRequest,
+    NotificationType,
     Participant,
     Team,
     TeamInvite,
     TeamMembership,
 )
+from apps.teams.services.notifications import notify, notify_many
 
 
 def deadline_passed():
@@ -89,6 +91,15 @@ def submit_team(team):
     team.is_open = False
     team.submitted_at = timezone.now()
     team.save(update_fields=['status', 'is_open', 'submitted_at', 'updated_at'])
+
+    members = [m.participant for m in team.memberships.select_related('participant')]
+    notify_many(
+        members,
+        NotificationType.TEAM_SUBMITTED,
+        f'A equipe {team.name} foi submetida para análise.',
+        link_to=f'/teams/{team.id}/',
+        team=team,
+    )
     return team
 
 
@@ -146,6 +157,14 @@ def accept_invite(invite, participant):
     invite.status = InviteStatus.ACCEPTED
     invite.save(update_fields=['status'])
     _cancel_other_pending(participant, exclude_invite_id=invite.pk)
+
+    notify(
+        invite.invited_by,
+        NotificationType.INVITE_ACCEPTED,
+        f'{participant.full_name} aceitou seu convite para a equipe {team.name}.',
+        link_to=f'/teams/{team.id}/',
+        invite=invite,
+    )
     return membership
 
 
@@ -157,6 +176,14 @@ def decline_invite(invite, participant):
         raise ValidationError('Este convite não está mais pendente.')
     invite.status = InviteStatus.DECLINED
     invite.save(update_fields=['status'])
+
+    notify(
+        invite.invited_by,
+        NotificationType.INVITE_DECLINED,
+        f'{participant.full_name} recusou seu convite para a equipe {invite.team.name}.',
+        link_to='/dashboard',
+        invite=invite,
+    )
 
 
 @transaction.atomic
@@ -177,6 +204,14 @@ def accept_join_request(req, leader):
     req.status = InviteStatus.ACCEPTED
     req.save(update_fields=['status'])
     _cancel_other_pending(requester, exclude_request_id=req.pk)
+
+    notify(
+        requester,
+        NotificationType.JOIN_ACCEPTED,
+        f'Seu pedido para entrar na equipe {team.name} foi aceito.',
+        link_to=f'/teams/{team.id}/',
+        join_request=req,
+    )
     return membership
 
 
@@ -188,3 +223,11 @@ def decline_join_request(req, leader):
         raise ValidationError('Este pedido não está mais pendente.')
     req.status = InviteStatus.DECLINED
     req.save(update_fields=['status'])
+
+    notify(
+        req.requester,
+        NotificationType.JOIN_DECLINED,
+        f'Seu pedido para entrar na equipe {team.name} foi recusado.',
+        link_to='/teams/',
+        join_request=req,
+    )

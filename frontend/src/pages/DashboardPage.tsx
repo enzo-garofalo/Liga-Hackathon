@@ -1,10 +1,14 @@
 import { Header } from '../components/Header'
+import { InviteListItem } from '../components/InviteListItem'
 import { StatusBanner } from '../components/StatusBanner'
+import { useMyInvites } from '../hooks/useInvites'
 import { useProfile } from '../hooks/useProfile'
 
 export function DashboardPage() {
   const meQuery = useProfile()
+  const invitesQuery = useMyInvites()
   const me = meQuery.data
+  const invites = invitesQuery.data ?? []
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -23,6 +27,18 @@ export function DashboardPage() {
                 {me.course} · {me.semester}º semestre
               </p>
             </div>
+            {invites.length > 0 && (
+              <section className="bg-white rounded-2xl border border-[#dedee5] shadow-whisper p-6">
+                <h2 className="font-display text-lg font-semibold text-near-black mb-2">
+                  Convites pendentes
+                </h2>
+                <ul className="divide-y divide-[#dedee5]">
+                  {invites.map((inv) => (
+                    <InviteListItem key={inv.id} invite={inv} />
+                  ))}
+                </ul>
+              </section>
+            )}
             <StatusBanner me={me} />
           </>
         )}

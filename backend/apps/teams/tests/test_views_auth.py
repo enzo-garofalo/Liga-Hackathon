@@ -55,6 +55,7 @@ def test_me_returns_profile_when_authenticated(auth, participant):
     assert r.status_code == 200
     assert r.data['email'] == participant.user.email
     assert r.data['has_team'] is False
+    assert r.data['team'] is None
 
 
 def test_me_returns_401_when_unauthenticated(api_client):

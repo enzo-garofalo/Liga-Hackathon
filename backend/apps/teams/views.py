@@ -3,12 +3,13 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import (
+    HackathonInfo,
     InviteStatus,
     JoinRequest,
     Notification,
@@ -20,6 +21,7 @@ from .models import (
 from .serializers import (
     AdminTokenObtainPairSerializer,
     EmailTokenObtainPairSerializer,
+    HackathonInfoSerializer,
     JoinRequestCreateSerializer,
     JoinRequestSerializer,
     MeSerializer,
@@ -37,12 +39,14 @@ from .services.notifications import notify
 from .services.teams import (
     accept_invite,
     accept_join_request,
+    approve_team,
     assert_is_leader,
     assert_team_forming,
     decline_invite,
     decline_join_request,
     get_request_participant,
     leave_team,
+    reject_team,
     remove_member,
     submit_team,
 )
@@ -293,3 +297,46 @@ class NotificationMarkReadView(APIView):
             notification.read = True
             notification.save(update_fields=['read'])
         return Response(NotificationSerializer(notification).data)
+
+
+class AdminTeamListView(generics.ListAPIView):
+    serializer_class = TeamSerializer
+    permission_classes = [IsAdminUser]
+
+    def get_queryset(self):
+        status_filter = self.request.query_params.get('status') or Team.STATUS_SUBMITTED
+        return (
+            Team.objects.filter(status=status_filter).select_related('leader')
+        )
+
+
+class AdminTeamApproveView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def patch(self, request, pk):
+        team = get_object_or_404(Team, pk=pk)
+        team = approve_team(team)
+        return Response(TeamSerializer(team).data)
+
+
+class AdminTeamRejectView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def patch(self, request, pk):
+        team = get_object_or_404(Team, pk=pk)
+        team = reject_team(team)
+        return Response(TeamSerializer(team).data)
+
+
+class AdminParticipantListView(generics.ListAPIView):
+    serializer_class = ParticipantPublicSerializer
+    permission_classes = [IsAdminUser]
+    queryset = Participant.objects.select_related('user').all()
+
+
+class HackathonInfoView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        info = HackathonInfo.load()
+        return Response(HackathonInfoSerializer(info).data)

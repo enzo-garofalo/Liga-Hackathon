@@ -5,7 +5,10 @@ from rest_framework import serializers
 from rest_framework_simplejwt.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from django.conf import settings
+
 from .models import (
+    HackathonInfo,
     InviteStatus,
     JoinRequest,
     Notification,
@@ -259,6 +262,18 @@ class NotificationSerializer(serializers.ModelSerializer):
         model = Notification
         fields = ['id', 'type', 'message', 'read', 'link_to', 'created_at']
         read_only_fields = fields
+
+
+class HackathonInfoSerializer(serializers.ModelSerializer):
+    team_deadline = serializers.SerializerMethodField()
+
+    class Meta:
+        model = HackathonInfo
+        fields = ['content', 'team_deadline', 'updated_at']
+        read_only_fields = fields
+
+    def get_team_deadline(self, obj):
+        return settings.TEAM_DEADLINE.isoformat()
 
 
 class RegisterSerializer(serializers.Serializer):

@@ -231,3 +231,60 @@ def decline_join_request(req, leader):
         link_to='/teams/',
         join_request=req,
     )
+
+
+APPROVED_TEAMS_LIMIT = 10
+
+
+@transaction.atomic
+def approve_team(team):
+    team = Team.objects.select_for_update().get(pk=team.pk)
+    if team.status != Team.STATUS_SUBMITTED:
+        raise ValidationError(
+            'Apenas equipes submetidas podem ser aprovadas.'
+        )
+
+    approved_count = (
+        Team.objects.select_for_update()
+        .filter(status=Team.STATUS_APPROVED)
+        .count()
+    )
+    if approved_count >= APPROVED_TEAMS_LIMIT:
+        raise ValidationError(
+            f'Limite de {APPROVED_TEAMS_LIMIT} equipes aprovadas atingido.'
+        )
+
+    team.status = Team.STATUS_APPROVED
+    team.save(update_fields=['status', 'updated_at'])
+
+    members = [m.participant for m in team.memberships.select_related('participant')]
+    notify_many(
+        members,
+        NotificationType.TEAM_APPROVED,
+        f'A equipe {team.name} foi aprovada para o Hackathon!',
+        link_to=f'/teams/{team.id}/',
+        team=team,
+    )
+    return team
+
+
+@transaction.atomic
+def reject_team(team):
+    team = Team.objects.select_for_update().get(pk=team.pk)
+    if team.status != Team.STATUS_SUBMITTED:
+        raise ValidationError(
+            'Apenas equipes submetidas podem ser recusadas.'
+        )
+
+    team.status = Team.STATUS_REJECTED
+    team.save(update_fields=['status', 'updated_at'])
+
+    members = [m.participant for m in team.memberships.select_related('participant')]
+    notify_many(
+        members,
+        NotificationType.TEAM_REJECTED,
+        f'A equipe {team.name} não foi selecionada para o Hackathon.',
+        link_to=f'/teams/{team.id}/',
+        team=team,
+    )
+    return team

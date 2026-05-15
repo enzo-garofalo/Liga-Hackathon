@@ -1,27 +1,55 @@
+import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import logo from '../assets/logo.svg'
+import { AuthLayout } from '../components/AuthLayout'
+import { Button } from '../components/ui/Button'
+import { Input } from '../components/ui/Input'
+import { useLogin } from '../hooks/useAuth'
+import type { LoginPayload } from '../types/auth'
+import { getApiError } from '../utils/errors'
 
 export function LoginPage() {
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginPayload>({
+    defaultValues: { email: '', password: '' },
+  })
+  const mutation = useLogin()
+
+  const onSubmit = handleSubmit((data) => mutation.mutate(data))
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <div className="bg-white rounded-2xl border border-[#dedee5] shadow-whisper p-8 w-full max-w-md">
-        <div className="flex items-center gap-3 mb-6">
-          <img src={logo} alt="Liga de TI" className="h-7" />
-          <span className="font-display font-semibold text-near-black">Liga de TI</span>
-        </div>
-        <h1 className="font-display text-2xl font-semibold text-near-black mb-2">
-          Entrar
-        </h1>
-        <p className="text-sm text-silver-blue font-ui mb-6">
-          Formulário em construção — chega na próxima fase.
-        </p>
-        <p className="text-sm font-ui">
+    <AuthLayout
+      title="Entrar"
+      subtitle="Use o e-mail e a senha do seu cadastro."
+      footer={
+        <>
           Não tem conta?{' '}
           <Link to="/register" className="text-brand hover:underline">
             Cadastre-se
           </Link>
-        </p>
-      </div>
-    </div>
+        </>
+      }
+    >
+      <form onSubmit={onSubmit} className="space-y-4">
+        <Input
+          label="E-mail"
+          type="email"
+          autoComplete="email"
+          {...register('email', { required: 'Informe seu e-mail.' })}
+          error={errors.email?.message}
+        />
+        <Input
+          label="Senha"
+          type="password"
+          autoComplete="current-password"
+          {...register('password', { required: 'Informe sua senha.' })}
+          error={errors.password?.message}
+        />
+        {mutation.error && (
+          <p className="text-sm text-red-500 font-ui">{getApiError(mutation.error)}</p>
+        )}
+        <Button type="submit" variant="primary" loading={mutation.isPending} className="w-full">
+          Entrar
+        </Button>
+      </form>
+    </AuthLayout>
   )
 }

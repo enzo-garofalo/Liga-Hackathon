@@ -1,3 +1,5 @@
+import type { TeamMinimal } from './team'
+
 export interface ParticipantSummary {
   id: string
   full_name: string
@@ -11,6 +13,7 @@ export interface ParticipantSummary {
 export interface MeProfile extends ParticipantSummary {
   email: string
   has_team: boolean
+  team: TeamMinimal | null
   created_at: string
   updated_at: string
 }

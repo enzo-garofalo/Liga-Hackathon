@@ -1,11 +1,14 @@
 import { Route, Routes } from 'react-router-dom'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { CreateTeamPage } from './pages/CreateTeamPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { InfoPage } from './pages/InfoPage'
 import { LandingPage } from './pages/LandingPage'
 import { LoginPage } from './pages/LoginPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { RegisterPage } from './pages/RegisterPage'
+import { TeamDetailPage } from './pages/TeamDetailPage'
+import { TeamsPage } from './pages/TeamsPage'
 
 function App() {
   return (
@@ -27,6 +30,30 @@ function App() {
         element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teams"
+        element={
+          <ProtectedRoute>
+            <TeamsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teams/new"
+        element={
+          <ProtectedRoute>
+            <CreateTeamPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teams/:id"
+        element={
+          <ProtectedRoute>
+            <TeamDetailPage />
           </ProtectedRoute>
         }
       />

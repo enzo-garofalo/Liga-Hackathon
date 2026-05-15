@@ -45,6 +45,7 @@ class ParticipantPublicSerializer(serializers.ModelSerializer):
 class MeSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', read_only=True)
     has_team = serializers.BooleanField(read_only=True)
+    team = serializers.SerializerMethodField()
 
     class Meta:
         model = Participant
@@ -58,10 +59,21 @@ class MeSerializer(serializers.ModelSerializer):
             'github',
             'linkedin',
             'has_team',
+            'team',
             'created_at',
             'updated_at',
         ]
-        read_only_fields = ['id', 'email', 'has_team', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'email', 'has_team', 'team', 'created_at', 'updated_at']
+
+    def get_team(self, obj):
+        membership = (
+            TeamMembership.objects.filter(participant=obj)
+            .select_related('team')
+            .first()
+        )
+        if not membership:
+            return None
+        return TeamMinimalSerializer(membership.team).data
 
 
 class ParticipantListSerializer(serializers.ModelSerializer):

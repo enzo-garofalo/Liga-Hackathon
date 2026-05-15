@@ -3,6 +3,7 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { CreateTeamPage } from './pages/CreateTeamPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { InfoPage } from './pages/InfoPage'
+import { InvitePage } from './pages/InvitePage'
 import { LandingPage } from './pages/LandingPage'
 import { LoginPage } from './pages/LoginPage'
 import { ProfilePage } from './pages/ProfilePage'
@@ -54,6 +55,14 @@ function App() {
         element={
           <ProtectedRoute>
             <TeamDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teams/:id/invites"
+        element={
+          <ProtectedRoute>
+            <InvitePage />
           </ProtectedRoute>
         }
       />

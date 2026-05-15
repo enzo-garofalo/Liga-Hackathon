@@ -2,8 +2,13 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from .views import (
+    AdminParticipantListView,
+    AdminTeamApproveView,
+    AdminTeamListView,
+    AdminTeamRejectView,
     AdminTokenObtainPairView,
     EmailTokenObtainPairView,
+    HackathonInfoView,
     InviteAcceptView,
     InviteDeclineView,
     JoinRequestAcceptView,
@@ -66,4 +71,21 @@ urlpatterns = [
         NotificationMarkReadView.as_view(),
         name='notification-read',
     ),
+    path('admin/teams/', AdminTeamListView.as_view(), name='admin-teams'),
+    path(
+        'admin/teams/<uuid:pk>/approve/',
+        AdminTeamApproveView.as_view(),
+        name='admin-team-approve',
+    ),
+    path(
+        'admin/teams/<uuid:pk>/reject/',
+        AdminTeamRejectView.as_view(),
+        name='admin-team-reject',
+    ),
+    path(
+        'admin/participants/',
+        AdminParticipantListView.as_view(),
+        name='admin-participants',
+    ),
+    path('info/', HackathonInfoView.as_view(), name='info'),
 ]

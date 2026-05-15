@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getAccessToken } from '../auth/storage'
 
 // In production, VITE_API_URL is the backend's public Railway URL.
 // Accepts with or without https:// — always normalised to absolute.
@@ -13,7 +14,7 @@ function resolveBase(): string {
 const client = axios.create({ baseURL: resolveBase() })
 
 client.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem('access_token')
+  const token = getAccessToken()
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })

@@ -1,24 +1,14 @@
 import { Route, Routes } from 'react-router-dom'
-import { ProtectedRoute } from './components/ProtectedRoute'
-import { AdminDashboardPage } from './pages/AdminDashboardPage'
-import { AdminLoginPage } from './pages/AdminLoginPage'
-import { ConfirmationPage } from './pages/ConfirmationPage'
-import { RegistrationPage } from './pages/RegistrationPage'
+import { LandingPage } from './pages/LandingPage'
+import { LoginPage } from './pages/LoginPage'
+import { RegisterPage } from './pages/RegisterPage'
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<RegistrationPage />} />
-      <Route path="/confirmacao/:id" element={<ConfirmationPage />} />
-      <Route path="/admin/login" element={<AdminLoginPage />} />
-      <Route
-        path="/admin/dashboard"
-        element={
-          <ProtectedRoute>
-            <AdminDashboardPage />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
     </Routes>
   )
 }

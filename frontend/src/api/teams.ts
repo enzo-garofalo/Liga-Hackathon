@@ -1,22 +1,29 @@
-import type { CreateTeamPayload, Team } from '../types'
+import type { ParticipantSummary } from '../types/participant'
+import type { Team, TeamCreatePayload, TeamUpdatePayload } from '../types/team'
 import client from './client'
 
-export const createTeam = (payload: CreateTeamPayload) =>
-  client.post<Team>('/teams/', payload).then((r) => r.data)
+export const getOpenTeams = () =>
+  client.get<Team[]>('/teams/').then((r) => r.data)
 
 export const getTeam = (id: string) =>
   client.get<Team>(`/teams/${id}/`).then((r) => r.data)
 
-export const getAdminTeams = () =>
-  client.get<Team[]>('/admin/teams/').then((r) => r.data)
+export const createTeam = (payload: TeamCreatePayload) =>
+  client.post<Team>('/teams/', payload).then((r) => r.data)
 
-export const approveTeam = (id: string) =>
-  client.patch<Team>(`/admin/teams/${id}/approve/`).then((r) => r.data)
+export const updateTeam = (id: string, payload: TeamUpdatePayload) =>
+  client.patch<Team>(`/teams/${id}/`, payload).then((r) => r.data)
 
-export const rejectTeam = (id: string) =>
-  client.patch<Team>(`/admin/teams/${id}/reject/`).then((r) => r.data)
+export const submitTeam = (id: string) =>
+  client.post<Team>(`/teams/${id}/submit/`).then((r) => r.data)
 
-export const loginAdmin = (username: string, password: string) =>
+export const leaveTeam = (id: string) =>
+  client.delete<void>(`/teams/${id}/leave/`).then(() => undefined)
+
+export const removeMember = (teamId: string, participantId: string) =>
+  client.delete<void>(`/teams/${teamId}/members/${participantId}/`).then(() => undefined)
+
+export const getParticipants = (search?: string) =>
   client
-    .post<{ access: string; refresh: string }>('/auth/token/', { username, password })
+    .get<ParticipantSummary[]>('/participants/', { params: search ? { search } : undefined })
     .then((r) => r.data)

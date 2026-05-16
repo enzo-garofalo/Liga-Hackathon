@@ -1,5 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { AdminDashboardPage } from './pages/AdminDashboardPage'
+import { AdminLoginPage } from './pages/AdminLoginPage'
 import { CreateTeamPage } from './pages/CreateTeamPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { InfoPage } from './pages/InfoPage'
@@ -18,6 +20,7 @@ function App() {
       <Route path="/info" element={<InfoPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/admin/login" element={<AdminLoginPage />} />
       <Route
         path="/dashboard"
         element={
@@ -63,6 +66,14 @@ function App() {
         element={
           <ProtectedRoute>
             <InvitePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute requireAdmin>
+            <AdminDashboardPage />
           </ProtectedRoute>
         }
       />

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import logo from '../assets/logo.svg'
 import { useLogout } from '../hooks/useAuth'
 import type { MeProfile } from '../types/participant'
+import { NotificationBell } from './NotificationBell'
 import { Button } from './ui/Button'
 
 interface HeaderProps {
@@ -18,7 +19,8 @@ export function Header({ me }: HeaderProps) {
           <span className="font-display font-semibold text-near-black">Liga de TI</span>
         </Link>
         {me ? (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <NotificationBell />
             <Link
               to="/profile"
               className="font-ui text-sm text-near-black hover:text-brand"

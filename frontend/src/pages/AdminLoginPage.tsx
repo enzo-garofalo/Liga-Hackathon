@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form'
 import { AuthLayout } from '../components/AuthLayout'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
+import { PasswordInput } from '../components/ui/PasswordInput'
 import { useAdminLogin } from '../hooks/useAuth'
 import type { LoginPayload } from '../types/auth'
 import { getApiError } from '../utils/errors'
@@ -27,9 +28,8 @@ export function AdminLoginPage() {
           {...register('email', { required: 'Informe o e-mail.' })}
           error={errors.email?.message}
         />
-        <Input
+        <PasswordInput
           label="Senha"
-          type="password"
           autoComplete="current-password"
           {...register('password', { required: 'Informe a senha.' })}
           error={errors.password?.message}

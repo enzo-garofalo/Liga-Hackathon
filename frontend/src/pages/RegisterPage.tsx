@@ -1,17 +1,38 @@
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { AuthLayout } from '../components/AuthLayout'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
+import { PasswordInput } from '../components/ui/PasswordInput'
+import { Select } from '../components/ui/Select'
 import { useRegister } from '../hooks/useAuth'
 import type { RegisterPayload } from '../types/auth'
 import { getApiError } from '../utils/errors'
+
+const COURSES = [
+  'Análise e Desenvolvimento de Sistemas',
+  'Bacharelado em Sistemas de Informação',
+  'Ciência da Computação',
+  'Ciência de Dados',
+  'Engenharia da Computação',
+  'Engenharia de Software',
+  'Engenharia Elétrica',
+  'Engenharia Mecatrônica',
+  'Inteligência Artificial',
+  'Redes de Computadores',
+  'Segurança da Informação',
+  'Tecnologia em Banco de Dados',
+  'Tecnologia em Gestão da Tecnologia da Informação',
+  'Tecnologia em Internet das Coisas',
+  'Outro',
+].map((c) => ({ value: c, label: c }))
 
 interface FormShape {
   email: string
   password: string
   full_name: string
   course: string
+  course_other: string
   semester: string  // RHF gives string for number inputs
   bio: string
   github: string
@@ -19,12 +40,13 @@ interface FormShape {
 }
 
 export function RegisterPage() {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormShape>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<FormShape>({
     defaultValues: {
       email: '',
       password: '',
       full_name: '',
       course: '',
+      course_other: '',
       semester: '',
       bio: '',
       github: '',
@@ -32,13 +54,15 @@ export function RegisterPage() {
     },
   })
   const mutation = useRegister()
+  const selectedCourse = useWatch({ control, name: 'course' })
+  const isOther = selectedCourse === 'Outro'
 
   const onSubmit = handleSubmit((data) => {
     const payload: RegisterPayload = {
       email: data.email,
       password: data.password,
       full_name: data.full_name,
-      course: data.course,
+      course: isOther ? data.course_other : data.course,
       semester: Number(data.semester),
       bio: data.bio,
       github: data.github || undefined,
@@ -70,9 +94,8 @@ export function RegisterPage() {
             {...register('email', { required: 'Informe seu e-mail.' })}
             error={errors.email?.message}
           />
-          <Input
+          <PasswordInput
             label="Senha"
-            type="password"
             autoComplete="new-password"
             {...register('password', {
               required: 'Crie uma senha.',
@@ -85,11 +108,21 @@ export function RegisterPage() {
             {...register('full_name', { required: 'Informe seu nome completo.' })}
             error={errors.full_name?.message}
           />
-          <Input
+          <Select
             label="Curso"
+            placeholder="Selecione seu curso"
+            options={COURSES}
             {...register('course', { required: 'Informe seu curso.' })}
             error={errors.course?.message}
           />
+          {isOther && (
+            <Input
+              label="Qual curso?"
+              placeholder="Digite o nome do seu curso"
+              {...register('course_other', { required: 'Informe o nome do curso.' })}
+              error={errors.course_other?.message}
+            />
+          )}
           <Input
             label="Semestre"
             type="number"

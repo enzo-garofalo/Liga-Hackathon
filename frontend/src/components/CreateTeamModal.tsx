@@ -5,6 +5,7 @@ import { Button } from './ui/Button'
 import { Input } from './ui/Input'
 import { useParticipantSearch } from '../hooks/useSendInvite'
 import { useCreateTeamWithInvites } from '../hooks/useCreateTeamWithInvites'
+import { useProfile } from '../hooks/useProfile'
 import { getApiError } from '../utils/errors'
 import type { ParticipantSummary } from '../types/participant'
 
@@ -28,6 +29,7 @@ export function CreateTeamModal({ onClose }: Props) {
     defaultValues: { name: '', is_open: false },
   })
   const mutation = useCreateTeamWithInvites()
+  const { data: me } = useProfile()
 
   const [searchInput, setSearchInput] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -60,7 +62,9 @@ export function CreateTeamModal({ onClose }: Props) {
     return () => document.removeEventListener('keydown', handleEsc)
   }, [onClose])
 
-  const filtered = (results ?? []).filter((p) => !selected.some((s) => s.id === p.id))
+  const filtered = (results ?? []).filter(
+    (p) => p.id !== me?.id && !selected.some((s) => s.id === p.id),
+  )
 
   function selectParticipant(p: ParticipantSummary) {
     if (selected.length >= MAX_INVITEES) return

@@ -133,7 +133,7 @@ export function AuthLeftPanel({ sticky = false }: { sticky?: boolean }) {
               <span className="block text-4xl font-semibold text-white">ideias em código</span>
             </h2>
             <p className="font-ui font-light text-base text-white/50 mt-3">
-              Hackathon Liga de TI — 06 de junho de 2026
+              Hackathon Liga de TI — 13 de junho de 2026
             </p>
           </div>
         </div>

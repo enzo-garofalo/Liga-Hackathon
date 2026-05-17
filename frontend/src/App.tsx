@@ -4,7 +4,6 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { AdminLoginPage } from './pages/AdminLoginPage'
 import { CreateTeamPage } from './pages/CreateTeamPage'
 import { DashboardPage } from './pages/DashboardPage'
-import { InfoPage } from './pages/InfoPage'
 import { InvitePage } from './pages/InvitePage'
 import { LandingPage } from './pages/LandingPage'
 import { LoginPage } from './pages/LoginPage'
@@ -17,7 +16,6 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/info" element={<InfoPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/admin/login" element={<AdminLoginPage />} />

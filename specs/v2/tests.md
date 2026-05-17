@@ -1,0 +1,122 @@
+# Testes — v2
+
+## Backend
+
+### tests/test_models.py
+```python
+test_participant_has_team_false_when_no_membership
+test_participant_has_team_true_when_membership_exists
+test_team_status_default_is_forming
+test_team_membership_unique_per_participant
+```
+
+### tests/test_serializers.py
+```python
+test_register_creates_user_and_participant
+test_register_fails_duplicate_email
+test_register_requires_full_name_course_semester_bio
+test_github_and_linkedin_optional
+```
+
+### tests/test_views_auth.py
+```python
+test_register_returns_201_with_valid_data
+test_login_returns_tokens
+test_login_fails_wrong_password
+test_me_returns_profile_when_authenticated
+test_me_returns_401_when_unauthenticated
+test_me_patch_updates_profile
+```
+
+### tests/test_views_teams.py
+```python
+test_create_team_makes_creator_leader_and_member
+test_create_team_fails_if_participant_has_team
+test_submit_team_succeeds_with_4_members
+test_submit_team_fails_with_less_than_4_members
+test_submit_locks_membership_operations
+test_leave_team_transfers_leadership_to_oldest_member
+test_leave_team_deletes_team_if_last_member
+test_remove_member_only_allowed_by_leader
+test_remove_member_blocked_when_submitted
+```
+
+### tests/test_views_invites.py
+```python
+test_leader_can_invite_participant_without_team
+test_invite_fails_if_invitee_has_team
+test_invite_fails_if_team_already_has_4_members
+test_invite_sends_email_to_invitee
+test_invite_creates_notification_for_invitee
+test_accept_invite_creates_membership
+test_accept_invite_cancels_other_pending_invites
+test_decline_invite_does_not_create_membership
+```
+
+### tests/test_views_join_requests.py
+```python
+test_join_request_fails_if_team_not_open
+test_join_request_fails_if_requester_has_team
+test_join_request_fails_if_team_full
+test_join_request_sends_email_to_leader
+test_join_request_creates_notification_for_leader
+test_leader_can_accept_join_request
+test_leader_can_decline_join_request
+test_accept_join_request_creates_membership
+```
+
+### tests/test_deadline.py
+```python
+test_disband_incomplete_teams_command_deletes_forming_teams
+test_disband_sends_email_to_all_members
+test_disband_does_not_affect_submitted_or_approved_teams
+test_teams_cannot_be_created_after_deadline
+test_teams_cannot_be_submitted_after_deadline
+```
+
+### tests/test_views_admin.py
+```python
+test_admin_list_shows_only_submitted_teams
+test_approve_team_sends_email_to_all_members
+test_approve_team_fails_when_10_already_approved
+test_reject_team_sends_email_to_all_members
+```
+
+## Frontend
+
+### hooks
+```typescript
+// useAuth
+test_register_calls_api_and_stores_token
+test_login_stores_tokens_in_sessionStorage
+test_logout_clears_tokens_and_redirects
+
+// useTeam
+test_submit_disabled_when_less_than_4_members
+test_submit_calls_correct_endpoint
+test_leave_removes_participant_from_team
+
+// useNotifications
+test_unread_count_updates_after_fetch
+test_mark_as_read_updates_notification
+test_polling_fires_every_30_seconds
+```
+
+### components
+```typescript
+// NotificationBell
+test_renders_unread_count_badge
+test_dropdown_shows_notifications
+test_click_marks_as_read
+
+// TeamCard
+test_renders_member_count
+test_shows_open_badge_when_is_open
+test_join_button_hidden_when_participant_has_team
+
+// StatusBanner
+test_shows_create_team_options_when_no_team
+test_shows_member_progress_when_forming
+test_shows_blocked_state_when_submitted
+test_submit_button_visible_only_with_4_members
+```

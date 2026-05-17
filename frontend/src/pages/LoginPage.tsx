@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { AuthLayout } from '../components/AuthLayout'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
+import { PasswordInput } from '../components/ui/PasswordInput'
 import { useLogin } from '../hooks/useAuth'
 import type { LoginPayload } from '../types/auth'
 import { getApiError } from '../utils/errors'
@@ -36,9 +37,8 @@ export function LoginPage() {
           {...register('email', { required: 'Informe seu e-mail.' })}
           error={errors.email?.message}
         />
-        <Input
+        <PasswordInput
           label="Senha"
-          type="password"
           autoComplete="current-password"
           {...register('password', { required: 'Informe sua senha.' })}
           error={errors.password?.message}

@@ -1,12 +1,22 @@
-import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import {
-  Calendar, Clock, MapPin, Users,
-  Network, Briefcase, Trophy,
+  ArrowRight,
+  Briefcase,
+  Calendar,
   ChevronDown,
-  UserPlus, Send, Code2, ArrowRight,
-  UserCheck, ShieldX, ShieldAlert, Code,
+  Clock,
+  Code,
+  Code2,
+  MapPin,
+  Network,
+  Send,
+  ShieldAlert,
+  Trophy,
+  UserCheck,
+  UserPlus,
+  Users
 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import logo from '../assets/logo.svg'
 import { Button } from '../components/ui/Button'
 
@@ -167,7 +177,7 @@ function Hero() {
         <div style={{ animation: 'hero-float 6s ease-in-out infinite' }}>
           <h1 className="font-display leading-tight tracking-tight mb-4">
             <span className="block text-5xl md:text-7xl font-light text-white/70">Hackathon</span>
-            <span className="block text-5xl md:text-7xl font-semibold text-white">Liga de TI</span>
+            <span className="block text-5xl md:text-7xl font-semibold text-white">Liga de TI + WeHandle</span>
           </h1>
           {/* MOCK DATA */}
           <p className="font-ui font-light text-xl text-white/60 mb-10">

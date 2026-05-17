@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Header } from '../components/Header'
 import { JoinRequestListItem } from '../components/JoinRequestListItem'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
@@ -37,11 +36,11 @@ export function TeamDetailPage() {
   const teamQuery = useTeam(id)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header me={meQuery.data} />
-      <main className="max-w-3xl mx-auto px-4 py-10 space-y-6">
+    <main className="px-4 py-6 md:px-8 md:py-8">
+      <p className="text-xs text-[#9497a9] font-ui uppercase tracking-widest mb-6">Equipes</p>
+      <div className="max-w-3xl space-y-6">
         {teamQuery.isLoading && (
-          <p className="font-ui text-silver-blue">Carregando equipe...</p>
+          <p className="font-ui text-[#9497a9]">Carregando equipe...</p>
         )}
         {teamQuery.isError && (
           <p className="font-ui text-red-500">Equipe não encontrada.</p>
@@ -54,8 +53,8 @@ export function TeamDetailPage() {
             meHasTeam={meQuery.data?.has_team ?? false}
           />
         )}
-      </main>
-    </div>
+      </div>
+    </main>
   )
 }
 
@@ -111,17 +110,17 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
 
   return (
     <>
-      <header className="flex items-start justify-between gap-4">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-semibold text-near-black mb-1">
+          <h1 className="font-display text-3xl font-semibold text-[#101114] mb-1">
             {team.name}
           </h1>
-          <p className="text-sm text-silver-blue font-ui">
+          <p className="text-sm text-[#9497a9] font-ui">
             {team.member_count}/4 membros · {team.is_open ? 'Aberta' : 'Fechada'}
           </p>
         </div>
         <Badge variant={STATUS_VARIANT[team.status]}>{STATUS_LABEL[team.status]}</Badge>
-      </header>
+      </div>
 
       {isLeader && canMutate && (
         <div className="flex flex-wrap items-center gap-3">
@@ -146,7 +145,7 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
       {canRequestJoin && (
         <div>
           {requestSent ? (
-            <p className="font-ui text-brand-green">
+            <p className="font-ui text-green-600">
               Pedido enviado. Aguarde a resposta do líder.
             </p>
           ) : (
@@ -161,8 +160,8 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
         </div>
       )}
 
-      <section className="bg-white rounded-2xl border border-[#dedee5] shadow-whisper p-6">
-        <h2 className="font-display text-lg font-semibold text-near-black mb-4">
+      <section className="bg-white rounded-2xl border border-[#dedee5] p-6">
+        <h2 className="font-display text-lg font-semibold text-[#101114] mb-4">
           Membros
         </h2>
         <ul className="divide-y divide-[#dedee5]">
@@ -180,8 +179,8 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
       </section>
 
       {isLeader && canMutate && pendingRequests.length > 0 && (
-        <section className="bg-white rounded-2xl border border-[#dedee5] shadow-whisper p-6">
-          <h2 className="font-display text-lg font-semibold text-near-black mb-4">
+        <section className="bg-white rounded-2xl border border-[#dedee5] p-6">
+          <h2 className="font-display text-lg font-semibold text-[#101114] mb-4">
             Pedidos de entrada
           </h2>
           <ul className="divide-y divide-[#dedee5]">
@@ -218,21 +217,21 @@ function MemberRow({ member, isLeader, canRemove, onRemove, removing }: MemberRo
     <li className="py-4 flex items-start justify-between gap-4">
       <div>
         <div className="flex items-center gap-2">
-          <p className="font-ui font-medium text-near-black">{member.full_name}</p>
+          <p className="font-ui font-medium text-[#101114]">{member.full_name}</p>
           {isLeader && <Badge variant="pending">Líder</Badge>}
         </div>
-        <p className="text-xs text-silver-blue font-ui mt-1">
+        <p className="text-xs text-[#9497a9] font-ui mt-1">
           {member.course} · {member.semester}º semestre
         </p>
         {(member.github || member.linkedin) && (
-          <p className="text-xs text-silver-blue font-ui mt-1 flex gap-3">
+          <p className="text-xs text-[#9497a9] font-ui mt-1 flex gap-3">
             {member.github && (
-              <a href={member.github} target="_blank" rel="noreferrer" className="hover:text-brand">
+              <a href={member.github} target="_blank" rel="noreferrer" className="hover:text-[#7132f5]">
                 GitHub
               </a>
             )}
             {member.linkedin && (
-              <a href={member.linkedin} target="_blank" rel="noreferrer" className="hover:text-brand">
+              <a href={member.linkedin} target="_blank" rel="noreferrer" className="hover:text-[#7132f5]">
                 LinkedIn
               </a>
             )}

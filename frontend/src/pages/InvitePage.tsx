@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Header } from '../components/Header'
 import { ParticipantCard } from '../components/ParticipantCard'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
@@ -36,34 +35,36 @@ export function InvitePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header me={me} />
-      <main className="max-w-3xl mx-auto px-4 py-10 space-y-6">
+    <main className="px-4 py-6 md:px-8 md:py-8">
+      <div className="mb-8">
+        <p className="text-xs text-[#9497a9] font-ui uppercase tracking-widest mb-1">Equipes</p>
+        <h1 className="font-display text-3xl font-semibold text-[#101114]">
+          {team ? `Convidar para ${team.name}` : 'Convidar membro'}
+        </h1>
+        {team && (
+          <p className="text-sm text-[#9497a9] font-ui mt-1">{team.member_count}/4 membros</p>
+        )}
+      </div>
+
+      <div className="max-w-3xl space-y-6">
         {teamQuery.isLoading && (
-          <p className="font-ui text-silver-blue">Carregando equipe...</p>
+          <p className="font-ui text-[#9497a9]">Carregando equipe...</p>
         )}
         {team && !isLeader && (
-          <p className="font-ui text-red-500">
-            Apenas o líder pode convidar membros.
-          </p>
+          <p className="font-ui text-red-500">Apenas o líder pode convidar membros.</p>
         )}
         {team && isLeader && (
           <>
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="font-display text-3xl font-semibold text-near-black">
-                  Convidar para {team.name}
-                </h1>
-                <p className="text-sm text-silver-blue font-ui">
-                  {team.member_count}/4 membros
-                </p>
-              </div>
+            <div className="flex justify-end">
               <Link to={`/teams/${team.id}`}>
-                <Button variant="ghost">Voltar para a equipe</Button>
+                <Button variant="ghost">← Voltar para a equipe</Button>
               </Link>
             </div>
 
-            <form onSubmit={handleSearch} className="flex items-end gap-3">
+            <form
+              onSubmit={handleSearch}
+              className="bg-white rounded-2xl border border-[#dedee5] p-6 flex items-end gap-3"
+            >
               <div className="flex-1">
                 <Input
                   label="Buscar participante por nome"
@@ -78,18 +79,17 @@ export function InvitePage() {
             </form>
 
             {participantsQuery.isLoading && search && (
-              <p className="font-ui text-silver-blue">Buscando...</p>
+              <p className="font-ui text-[#9497a9]">Buscando...</p>
             )}
             {participantsQuery.data && participantsQuery.data.length === 0 && (
-              <p className="font-ui text-silver-blue">
+              <p className="font-ui text-[#9497a9]">
                 Nenhum participante sem equipe encontrado para "{search}".
               </p>
             )}
             {sendInvite.error && (
-              <p className="text-sm text-red-500 font-ui">
-                {getApiError(sendInvite.error)}
-              </p>
+              <p className="text-sm text-red-500 font-ui">{getApiError(sendInvite.error)}</p>
             )}
+
             <div className="grid grid-cols-1 gap-4">
               {participantsQuery.data?.map((p) => (
                 <ParticipantCard
@@ -103,7 +103,7 @@ export function InvitePage() {
             </div>
           </>
         )}
-      </main>
-    </div>
+      </div>
+    </main>
   )
 }

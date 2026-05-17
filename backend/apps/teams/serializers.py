@@ -339,7 +339,13 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
         self.fields['email'] = serializers.EmailField()
 
     def validate(self, attrs):
-        attrs[self.username_field] = attrs.pop('email')
+        User = get_user_model()
+        email = attrs.pop('email')
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise AuthenticationFailed('Usuário e/ou senha incorreto(s).')
+        attrs[self.username_field] = user.username
         return super().validate(attrs)
 
 

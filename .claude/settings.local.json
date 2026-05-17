@@ -3,7 +3,35 @@
     "allow": [
       "Bash(docker compose exec *)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(docker --version)",
+      "Bash(docker compose *)",
+      "Bash(py --version)",
+      "Bash(curl -fsS http://localhost:8000/api/v1/health/)",
+      "Bash(curl -s -o /tmp/reg.json -w '%{http_code}\\\\n' -X POST http://localhost:8000/api/v1/auth/register/ -H 'Content-Type: application/json' -d '{\"email\":\"ana@x.com\",\"password\":\"strongpass123\",\"full_name\":\"Ana\",\"course\":\"CC\",\"semester\":4,\"bio\":\"oi\"}')",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /tmp/dup.json -w '%{http_code}\\\\n' -X POST http://localhost:8000/api/v1/auth/register/ -H 'Content-Type: application/json' -d '{\"email\":\"ana@x.com\",\"password\":\"strongpass123\",\"full_name\":\"Ana\",\"course\":\"CC\",\"semester\":4,\"bio\":\"oi\"}')",
+      "Bash(curl -s -o /tmp/miss.json -w '%{http_code}\\\\n' -X POST http://localhost:8000/api/v1/auth/register/ -H 'Content-Type: application/json' -d '{\"email\":\"bia@x.com\",\"password\":\"strongpass123\"}')",
+      "Bash(curl -s -o /tmp/reg.json -w '%{http_code}\\\\n' -X POST http://localhost:8000/api/v1/auth/register/ -H 'Content-Type: application/json' -d '{\"email\":\"bia@x.com\",\"password\":\"strongpass123\",\"full_name\":\"Bia\",\"course\":\"CC\",\"semester\":4,\"bio\":\"oi\",\"github\":\"https://github.com/bia\"}')",
+      "Bash(curl -s -o /tmp/w.json -w '%{http_code}\\\\n' -X POST http://localhost:8000/api/v1/auth/register/ -H 'Content-Type: application/json' -d '{\"email\":\"carla@x.com\",\"password\":\"123\",\"full_name\":\"Carla\",\"course\":\"CC\",\"semester\":4,\"bio\":\"oi\"}')",
+      "Bash(curl -s -o /tmp/tok.json -w '%{http_code}\\\\n' -X POST http://localhost:8000/api/v1/auth/token/ -H 'Content-Type: application/json' -d '{\"email\":\"bia@x.com\",\"password\":\"strongpass123\"}')",
+      "Bash(curl -s -o /tmp/twrong.json -w '%{http_code}\\\\n' -X POST http://localhost:8000/api/v1/auth/token/ -H 'Content-Type: application/json' -d '{\"email\":\"bia@x.com\",\"password\":\"wrong\"}')",
+      "Bash(curl -s -o /tmp/aw.json -w '%{http_code}\\\\n' -X POST http://localhost:8000/api/v1/auth/admin/token/ -H 'Content-Type: application/json' -d '{\"email\":\"bia@x.com\",\"password\":\"strongpass123\"}')",
+      "Bash(curl -s -o /tmp/atok.json -w '%{http_code}\\\\n' -X POST http://localhost:8000/api/v1/auth/admin/token/ -H 'Content-Type: application/json' -d '{\"email\":\"admin@x.com\",\"password\":\"admin12345!\"}')",
+      "Bash(curl -s -X POST http://localhost:8000/api/v1/auth/token/ -H 'Content-Type: application/json' -d '{\"email\":\"ana@x.com\",\"password\":\"strongpass123\"}')",
+      "Bash(bash *)",
+      "Bash(npm run *)",
+      "Bash(./node_modules/.bin/tsc -b)",
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(curl -fsS http://localhost:5173/)",
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}\\\\n' http://localhost:5173/login)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}\\\\n' http://localhost:5173/register)",
+      "Bash(curl -s http://localhost:5173/src/pages/LandingPage.tsx)",
+      "Bash(curl -s http://localhost:5173/src/pages/RegisterPage.tsx)",
+      "Bash(docker build *)",
+      "Bash(python *)"
     ]
   }
 }

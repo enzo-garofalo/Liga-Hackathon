@@ -1,8 +1,8 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, Outlet } from 'react-router-dom'
 import { getAccessToken, getSessionKind } from '../auth/storage'
 
 interface ProtectedRouteProps {
-  children: React.ReactNode
+  children?: React.ReactNode
   requireAdmin?: boolean
 }
 
@@ -19,5 +19,5 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
   if (!requireAdmin && kind !== 'participant') {
     return <Navigate to="/login" replace />
   }
-  return <>{children}</>
+  return children ? <>{children}</> : <Outlet />
 }

@@ -59,6 +59,7 @@ def health_check(request):
 
 
 class RegisterView(generics.CreateAPIView):
+    authentication_classes = []
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
 
@@ -335,6 +336,7 @@ class AdminParticipantListView(generics.ListAPIView):
 
 
 class HackathonInfoView(APIView):
+    authentication_classes = []
     permission_classes = [AllowAny]
 
     def get(self, request):

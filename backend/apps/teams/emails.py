@@ -1,5 +1,9 @@
+import logging
+
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
+
+logger = logging.getLogger(__name__)
 
 HACKATHON_DATE = '06/06'
 ANALYSIS_DEADLINE = '06/06'
@@ -10,9 +14,12 @@ def _deadline():
 
 
 def _send(subject, text, html, recipients):
-    msg = EmailMultiAlternatives(subject, text, settings.DEFAULT_FROM_EMAIL, recipients)
-    msg.attach_alternative(html, 'text/html')
-    msg.send()
+    try:
+        msg = EmailMultiAlternatives(subject, text, settings.DEFAULT_FROM_EMAIL, recipients)
+        msg.attach_alternative(html, 'text/html')
+        msg.send()
+    except Exception:
+        logger.exception('Falha ao enviar e-mail "%s" para %s', subject, recipients)
 
 
 def send_invite_received(participant, invite):

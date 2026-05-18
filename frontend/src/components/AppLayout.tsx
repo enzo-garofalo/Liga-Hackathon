@@ -27,7 +27,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
   const navItems = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard',       match: (p: string) => p === '/dashboard' },
     { to: '/profile',   icon: User,            label: 'Meu perfil',      match: (p: string) => p === '/profile' },
-    { to: '/teams',     icon: Users,           label: 'Equipes abertas', match: (p: string) => p.startsWith('/teams') },
+    { to: '/teams',     icon: Users,           label: 'Equipes abertas', match: (p: string) => p === '/teams' },
     { to: '/dashboard#notificacoes', icon: Bell, label: 'Notificações',  match: () => false, badge: unread > 0 ? unread : null },
     ...(me?.team ? [{ to: `/teams/${me.team.id}`, icon: Users, label: 'Minha equipe', match: (p: string) => p === `/teams/${me.team!.id}` }] : []),
   ]

@@ -4,7 +4,6 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { AdminLoginPage } from './pages/AdminLoginPage'
 import { DashboardPage } from './pages/DashboardPage'
-import { InvitePage } from './pages/InvitePage'
 import { LandingPage } from './pages/LandingPage'
 import { LoginPage } from './pages/LoginPage'
 import { ProfilePage } from './pages/ProfilePage'
@@ -28,7 +27,6 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/teams" element={<TeamsPage />} />
           <Route path="/teams/:id" element={<TeamDetailPage />} />
-          <Route path="/teams/:id/invites" element={<InvitePage />} />
         </Route>
       </Route>
 

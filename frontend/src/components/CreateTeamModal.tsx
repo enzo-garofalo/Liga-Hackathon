@@ -86,11 +86,10 @@ export function CreateTeamModal({ onClose }: Props) {
   })
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/40"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
-    >
-      <div className="max-w-lg w-full rounded-2xl bg-white shadow-2xl p-6">
+    <>
+      <div className="fixed inset-0 z-[100] bg-black/30 backdrop-blur-sm" style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }} onClick={onClose} />
+      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 pointer-events-none">
+      <div className="max-w-lg w-full rounded-2xl bg-white shadow-2xl p-6 pointer-events-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-display font-semibold text-xl text-[#101114]">Criar equipe</h2>
@@ -230,6 +229,7 @@ export function CreateTeamModal({ onClose }: Props) {
           </div>
         </form>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

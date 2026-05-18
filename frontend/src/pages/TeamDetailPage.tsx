@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { X } from 'lucide-react'
 import { JoinRequestListItem } from '../components/JoinRequestListItem'
-import { Badge } from '../components/ui/Badge'
+import { InviteMembersModal } from '../components/InviteMembersModal'
 import { Button } from '../components/ui/Button'
 import { useMe } from '../hooks/useAuth'
 import { useCreateJoinRequest, useTeamJoinRequests } from '../hooks/useJoinRequests'
@@ -17,17 +18,29 @@ import type { Team, TeamStatus } from '../types/team'
 import { getApiError } from '../utils/errors'
 
 const STATUS_LABEL: Record<TeamStatus, string> = {
-  forming: 'Em formação',
+  forming:   'Em formação',
   submitted: 'Submetida',
-  approved: 'Aprovada',
-  rejected: 'Não selecionada',
+  approved:  'Aprovada',
+  rejected:  'Não selecionada',
 }
 
-const STATUS_VARIANT: Record<TeamStatus, 'success' | 'neutral' | 'pending'> = {
-  forming: 'pending',
-  submitted: 'pending',
-  approved: 'success',
-  rejected: 'neutral',
+const STATUS_CLASSES: Record<TeamStatus, string> = {
+  forming:   'bg-yellow-100 text-yellow-700',
+  submitted: 'bg-blue-100 text-blue-700',
+  approved:  'bg-green-100 text-green-700',
+  rejected:  'bg-red-100 text-red-700',
+}
+
+// Avatar colors: index 0 = leader (always purple-600), rest in ascending purple tones
+const MEMBER_AVATAR_COLORS = [
+  'bg-purple-100 text-purple-700',
+  'bg-purple-200 text-purple-800',
+  'bg-purple-300 text-purple-900',
+  'bg-purple-500/20 text-purple-700',
+]
+
+function memberInitials(name: string) {
+  return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
 }
 
 export function TeamDetailPage() {
@@ -36,9 +49,8 @@ export function TeamDetailPage() {
   const teamQuery = useTeam(id)
 
   return (
-    <main className="px-4 py-6 md:px-8 md:py-8">
-      <p className="text-xs text-[#9497a9] font-ui uppercase tracking-widest mb-6">Equipes</p>
-      <div className="max-w-3xl space-y-6">
+    <main className="px-4 py-6 md:px-10 md:py-10">
+      <div className="max-w-2xl mx-auto space-y-6">
         {teamQuery.isLoading && (
           <p className="font-ui text-[#9497a9]">Carregando equipe...</p>
         )}
@@ -72,13 +84,14 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
   const isVisitor = meId !== null && !isMember
   const canMutate = team.status === 'forming'
 
-  const updateMutation = useUpdateTeam(id)
-  const submitMutation = useSubmitTeam(id)
-  const leaveMutation = useLeaveTeam(id)
-  const removeMutation = useRemoveMember(id)
+  const updateMutation    = useUpdateTeam(id)
+  const submitMutation    = useSubmitTeam(id)
+  const leaveMutation     = useLeaveTeam(id)
+  const removeMutation    = useRemoveMember(id)
   const joinRequestMutation = useCreateJoinRequest()
   const joinRequestsQuery = useTeamJoinRequests(isLeader && canMutate ? id : undefined)
   const [requestSent, setRequestSent] = useState(false)
+  const [inviteModalOpen, setInviteModalOpen] = useState(false)
 
   const handleToggleOpen = () => updateMutation.mutate({ is_open: !team.is_open })
   const handleSubmit = () => {
@@ -108,22 +121,34 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
     isVisitor && !meHasTeam && team.is_open && team.status === 'forming' && team.member_count < 4
   const pendingRequests = joinRequestsQuery.data ?? []
 
+  // Leader only leaves if there's more than 1 member
+  const canLeave = (isLeader || isMember) && canMutate
+
   return (
     <>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="font-display text-3xl font-semibold text-[#101114] mb-1">
-            {team.name}
-          </h1>
-          <p className="text-sm text-[#9497a9] font-ui">
-            {team.member_count}/4 membros · {team.is_open ? 'Aberta' : 'Fechada'}
-          </p>
+      {/* Header */}
+      <div>
+        <p className="text-xs text-[#9497a9] font-ui uppercase tracking-widest mb-2">Equipes</p>
+        <div className="flex items-center gap-3 flex-wrap">
+          <h1 className="font-display text-3xl font-bold text-[#101114]">{team.name}</h1>
+          <span className={[
+            'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-ui',
+            STATUS_CLASSES[team.status],
+          ].join(' ')}>
+            {STATUS_LABEL[team.status]}
+          </span>
         </div>
-        <Badge variant={STATUS_VARIANT[team.status]}>{STATUS_LABEL[team.status]}</Badge>
+        <p className="text-sm text-[#9497a9] font-ui mt-1">
+          {team.member_count}/4 membros · {team.is_open ? 'Aberta' : 'Fechada'}
+        </p>
       </div>
 
+      {/* Leader action buttons */}
       {isLeader && canMutate && (
         <div className="flex flex-wrap items-center gap-3">
+          <Button variant="primary" onClick={() => setInviteModalOpen(true)}>
+            Convidar membro
+          </Button>
           <Button
             variant="outlined"
             onClick={handleToggleOpen}
@@ -131,9 +156,6 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
           >
             {team.is_open ? 'Fechar para pedidos' : 'Abrir para pedidos'}
           </Button>
-          <Link to={`/teams/${team.id}/invites`}>
-            <Button variant="outlined">Convidar membro</Button>
-          </Link>
           {team.member_count === 4 && (
             <Button variant="primary" onClick={handleSubmit} loading={submitMutation.isPending}>
               Submeter para análise
@@ -148,10 +170,11 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
         </p>
       )}
 
+      {/* Visitor join request */}
       {canRequestJoin && (
         <div>
           {requestSent ? (
-            <p className="font-ui text-green-600">
+            <p className="font-ui text-green-600 text-sm">
               Pedido enviado. Aguarde a resposta do líder.
             </p>
           ) : (
@@ -166,15 +189,15 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
         </div>
       )}
 
-      <section className="bg-white rounded-2xl border border-[#dedee5] p-6">
-        <h2 className="font-display text-lg font-semibold text-[#101114] mb-4">
-          Membros
-        </h2>
-        <ul className="divide-y divide-[#dedee5]">
-          {team.members.map((m) => (
+      {/* Members card */}
+      <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <h2 className="font-display text-base font-semibold text-[#101114] mb-4">Membros</h2>
+        <ul className="divide-y divide-gray-100">
+          {team.members.map((m, i) => (
             <MemberRow
               key={m.id}
               member={m}
+              index={i}
               isLeader={m.id === team.leader.id}
               canRemove={isLeader && canMutate && m.id !== team.leader.id}
               onRemove={() => handleRemove(m.id, m.full_name)}
@@ -184,12 +207,13 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
         </ul>
       </section>
 
+      {/* Pending join requests (leader only) */}
       {isLeader && canMutate && pendingRequests.length > 0 && (
-        <section className="bg-white rounded-2xl border border-[#dedee5] p-6">
-          <h2 className="font-display text-lg font-semibold text-[#101114] mb-4">
+        <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h2 className="font-display text-base font-semibold text-[#101114] mb-4">
             Pedidos de entrada
           </h2>
-          <ul className="divide-y divide-[#dedee5]">
+          <ul className="divide-y divide-gray-100">
             {pendingRequests.map((req) => (
               <JoinRequestListItem key={req.id} request={req} teamId={id} />
             ))}
@@ -197,14 +221,41 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
         </section>
       )}
 
-      {isMember && canMutate && (
-        <Button variant="ghost" onClick={handleLeave} loading={leaveMutation.isPending}>
-          Sair da equipe
-        </Button>
-      )}
-
       {mutationError && (
         <p className="text-sm text-red-500 font-ui">{getApiError(mutationError)}</p>
+      )}
+
+      {canLeave && (
+        <div className="mt-6 flex justify-start">
+          <button
+            onClick={handleLeave}
+            disabled={leaveMutation.isPending}
+            className={[
+              'group flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-ui font-medium',
+              'text-red-500 border border-red-200 bg-red-50/50',
+              'hover:bg-red-50 hover:border-red-300 hover:text-red-600',
+              'transition-all duration-150',
+              'disabled:opacity-40 disabled:cursor-not-allowed',
+            ].join(' ')}
+          >
+            <svg
+              className="w-4 h-4 flex-shrink-0 transition-transform duration-150 group-hover:-translate-x-0.5"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            {leaveMutation.isPending ? 'Saindo...' : 'Sair da equipe'}
+          </button>
+        </div>
+      )}
+
+      {inviteModalOpen && meId && (
+        <InviteMembersModal
+          teamId={team.id}
+          maxInvitees={4 - team.member_count}
+          meId={meId}
+          onClose={() => setInviteModalOpen(false)}
+        />
       )}
     </>
   )
@@ -212,42 +263,69 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
 
 interface MemberRowProps {
   member: ParticipantSummary
+  index: number
   isLeader: boolean
   canRemove: boolean
   onRemove: () => void
   removing: boolean
 }
 
-function MemberRow({ member, isLeader, canRemove, onRemove, removing }: MemberRowProps) {
+function MemberRow({ member, index, isLeader, canRemove, onRemove, removing }: MemberRowProps) {
+  const avatarClasses = isLeader
+    ? 'bg-purple-600 text-white'
+    : MEMBER_AVATAR_COLORS[(index - 1) % MEMBER_AVATAR_COLORS.length]
+
   return (
-    <li className="py-4 flex items-start justify-between gap-4">
-      <div>
+    <li className="py-4 first:pt-0 last:pb-0 flex items-center gap-4 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-gray-100">
+      {/* Avatar */}
+      <div className={[
+        'w-11 h-11 rounded-full flex-shrink-0 flex items-center justify-center',
+        avatarClasses,
+      ].join(' ')}>
+        <span className="text-sm font-semibold font-display">
+          {memberInitials(member.full_name)}
+        </span>
+      </div>
+
+      {/* Info */}
+      <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className="font-ui font-medium text-[#101114]">{member.full_name}</p>
-          {isLeader && <Badge variant="pending">Líder</Badge>}
+          <p className="font-ui font-medium text-[#101114] truncate">{member.full_name}</p>
+          {isLeader && (
+            <span className="bg-purple-100 text-purple-700 text-xs font-medium px-2 py-0.5 rounded-full font-ui">
+              Líder
+            </span>
+          )}
         </div>
-        <p className="text-xs text-[#9497a9] font-ui mt-1">
+        <p className="text-xs text-[#9497a9] font-ui mt-0.5">
           {member.course} · {member.semester}º semestre
         </p>
         {(member.github || member.linkedin) && (
-          <p className="text-xs text-[#9497a9] font-ui mt-1 flex gap-3">
+          <p className="text-xs text-[#9497a9] font-ui mt-0.5 flex gap-3">
             {member.github && (
-              <a href={member.github} target="_blank" rel="noreferrer" className="hover:text-[#7132f5]">
+              <a href={member.github} target="_blank" rel="noreferrer" className="hover:text-[#7132f5] transition-colors">
                 GitHub
               </a>
             )}
             {member.linkedin && (
-              <a href={member.linkedin} target="_blank" rel="noreferrer" className="hover:text-[#7132f5]">
+              <a href={member.linkedin} target="_blank" rel="noreferrer" className="hover:text-[#7132f5] transition-colors">
                 LinkedIn
               </a>
             )}
           </p>
         )}
       </div>
+
+      {/* Remove button */}
       {canRemove && (
-        <Button variant="ghost" onClick={onRemove} loading={removing}>
-          Remover
-        </Button>
+        <button
+          onClick={onRemove}
+          disabled={removing}
+          className="flex-shrink-0 p-1.5 rounded-lg text-[#9497a9] hover:text-red-500 hover:bg-red-50 transition-colors disabled:opacity-40"
+          title={`Remover ${member.full_name}`}
+        >
+          <X className="w-4 h-4" />
+        </button>
       )}
     </li>
   )

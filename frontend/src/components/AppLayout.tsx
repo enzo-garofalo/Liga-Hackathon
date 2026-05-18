@@ -1,8 +1,12 @@
-import { useState, useMemo } from 'react'
-import { Link, Outlet, useLocation } from 'react-router-dom'
 import {
-  LayoutDashboard, User, Users, Bell, LogOut, Menu, X,
+  Bell,
+  LayoutDashboard,
+  LogOut, Menu,
+  User, Users,
+  X,
 } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.svg'
 import { useLogout } from '../hooks/useAuth'
 import { useNotifications } from '../hooks/useNotifications'
@@ -38,7 +42,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
       <div className="flex items-center gap-2.5 px-5 h-16 border-b border-[#dedee5] flex-shrink-0">
         <Link to="/" className="flex items-center gap-2.5">
           <img src={logo} alt="Liga de TI" className="h-7" />
-          <span className="font-display font-semibold text-[#101114] text-sm">Liga de TI</span>
+          <span className="font-display font-semibold text-[rgb(16, 17, 20)] text-xl">Liga de TI</span>
         </Link>
         {onClose && (
           <button onClick={onClose} className="ml-auto text-[#9497a9] hover:text-[#101114]">

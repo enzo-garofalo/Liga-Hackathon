@@ -34,6 +34,10 @@ services:
       - /app/node_modules
     ports:
       - "5173:5173"
+    env_file:
+      - .env
+    environment:
+      VITE_WHATSAPP_LINK: ${VITE_WHATSAPP_LINK}
     depends_on:
       - backend
 

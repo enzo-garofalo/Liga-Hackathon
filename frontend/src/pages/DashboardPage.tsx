@@ -1,10 +1,10 @@
+import { Clock, Inbox, Mail, User, Users } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { User, Users, Mail, Clock, Inbox, ChevronRight } from 'lucide-react'
-import { Button } from '../components/ui/Button'
 import { CreateTeamModal } from '../components/CreateTeamModal'
 import { InviteListItem } from '../components/InviteListItem'
 import { StatusBanner } from '../components/StatusBanner'
+import { Button } from '../components/ui/Button'
 import { useMyInvites } from '../hooks/useInvites'
 import { useNotifications } from '../hooks/useNotifications'
 import { useProfile } from '../hooks/useProfile'
@@ -187,10 +187,7 @@ export function DashboardPage() {
       {/* Recent activity */}
       <section id="notificacoes" className="mt-8">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-display font-semibold text-base text-[#101114]">Atividade recente</h2>
-          <Link to="/dashboard#notificacoes" className="text-sm font-ui text-[#7132f5] hover:underline flex items-center gap-1">
-            Ver todas <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
+          <h2 className="font-display font-semibold text-base text-[#101114]">Notificações recentes</h2>
         </div>
         <div className="bg-white border border-[#dedee5] rounded-2xl overflow-hidden">
           {notifQuery.isLoading ? (

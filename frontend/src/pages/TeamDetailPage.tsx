@@ -142,6 +142,12 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
         </div>
       )}
 
+      {!isLeader && isMember && canMutate && team.member_count === 4 && (
+        <p className="text-sm text-[#9497a9] font-ui">
+          Apenas o líder da equipe pode submeter para análise.
+        </p>
+      )}
+
       {canRequestJoin && (
         <div>
           {requestSent ? (

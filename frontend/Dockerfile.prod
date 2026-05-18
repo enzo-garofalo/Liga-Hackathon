@@ -13,6 +13,9 @@ COPY frontend/ .
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
+ARG VITE_WHATSAPP_LINK
+ENV VITE_WHATSAPP_LINK=$VITE_WHATSAPP_LINK
+
 RUN npm run build
 
 # ── Stage 2: serve ────────────────────────────────────────────────

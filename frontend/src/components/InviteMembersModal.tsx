@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
-import { X, Search, Loader2, UserRound, CheckCircle2 } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
-import { Button } from './ui/Button'
-import { useParticipantSearch } from '../hooks/useSendInvite'
+import { CheckCircle2, Loader2, Search, UserRound, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { createInvite } from '../api/invites'
-import { getApiError } from '../utils/errors'
+import { useParticipantSearch } from '../hooks/useSendInvite'
 import type { ParticipantSummary } from '../types/participant'
+import { getApiError } from '../utils/errors'
+import { Button } from './ui/Button'
 
 interface Props {
   teamId: string
@@ -20,7 +20,6 @@ function initials(name: string) {
 
 export function InviteMembersModal({ teamId, maxInvitees, meId, onClose }: Props) {
   const qc = useQueryClient()
-
   const [searchInput, setSearchInput] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [selected, setSelected] = useState<ParticipantSummary[]>([])
@@ -28,7 +27,6 @@ export function InviteMembersModal({ teamId, maxInvitees, meId, onClose }: Props
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
-
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -38,9 +36,7 @@ export function InviteMembersModal({ teamId, maxInvitees, meId, onClose }: Props
 
   useEffect(() => {
     function handleOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setShowDropdown(false)
-      }
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setShowDropdown(false)
     }
     document.addEventListener('mousedown', handleOutside)
     return () => document.removeEventListener('mousedown', handleOutside)
@@ -55,7 +51,6 @@ export function InviteMembersModal({ teamId, maxInvitees, meId, onClose }: Props
   }, [onClose])
 
   const { data: results, isLoading: isSearching } = useParticipantSearch(debouncedSearch)
-
   const filtered = (results ?? []).filter(
     (p) => p.id !== meId && !selected.some((s) => s.id === p.id),
   )
@@ -90,130 +85,129 @@ export function InviteMembersModal({ teamId, maxInvitees, meId, onClose }: Props
 
   return (
     <>
-    <div className="fixed inset-0 z-[100] bg-black/30 backdrop-blur-sm" style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }} onClick={onClose} />
-    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 pointer-events-none">
-      <div className="max-w-lg w-full rounded-2xl bg-white shadow-2xl p-6 pointer-events-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-display font-semibold text-xl text-[#101114]">Convidar membro</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-[#9497a9] hover:text-[#101114] hover:bg-gray-100 transition-colors"
-            aria-label="Fechar"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+      <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="pointer-events-none fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div className="glass-panel pointer-events-auto w-full max-w-lg rounded-2xl p-6">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="font-display text-xl font-semibold text-ink">Convidar membro</h2>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg p-1.5 text-ink/46 transition-colors hover:bg-ink/10 hover:text-ink"
+              aria-label="Fechar"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
 
-        <div className="space-y-5">
-          {/* Chips */}
-          {selected.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {selected.map((p) => (
-                <span
-                  key={p.id}
-                  className="inline-flex items-center gap-1.5 bg-[#7132f5]/10 text-[#7132f5] rounded-full pl-3 pr-2 py-1 text-xs font-ui font-medium"
-                >
-                  {p.full_name.split(' ')[0]}
-                  <button
-                    type="button"
-                    onClick={() => removeSelected(p.id)}
-                    className="rounded-full hover:bg-[#7132f5]/20 transition-colors p-0.5"
-                    aria-label={`Remover ${p.full_name}`}
+          <div className="space-y-5">
+            {selected.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {selected.map((p) => (
+                  <span
+                    key={p.id}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-brand/15 py-1 pl-3 pr-2 text-xs font-medium text-brand-soft"
                   >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Search input */}
-          {selected.length < maxInvitees ? (
-            <div ref={dropdownRef} className="relative">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9497a9] pointer-events-none" />
-                <input
-                  type="text"
-                  value={searchInput}
-                  onChange={(e) => { setSearchInput(e.target.value); setShowDropdown(true) }}
-                  onFocus={() => { if (searchInput.trim()) setShowDropdown(true) }}
-                  placeholder="Buscar participante por nome…"
-                  className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-[#dedee5] font-ui text-sm text-[#101114] placeholder:text-[#9497a9] bg-white focus:outline-none focus:ring-2 focus:ring-[#7132f5]/30 focus:border-[#7132f5] transition-colors"
-                />
-                {isSearching && (
-                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9497a9] animate-spin pointer-events-none" />
-                )}
+                    {p.full_name.split(' ')[0]}
+                    <button
+                      type="button"
+                      onClick={() => removeSelected(p.id)}
+                      className="rounded-full p-0.5 transition-colors hover:bg-brand/25"
+                      aria-label={`Remover ${p.full_name}`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                ))}
               </div>
+            )}
 
-              {showDropdown && debouncedSearch.trim().length > 0 && (
-                <div className="absolute z-10 top-full mt-1 w-full bg-white rounded-xl border border-[#dedee5] shadow-lg overflow-hidden">
-                  {!isSearching && filtered.length === 0 ? (
-                    <div className="flex items-center gap-2.5 px-4 py-3 text-sm text-[#9497a9] font-ui">
-                      <UserRound className="w-4 h-4 flex-shrink-0" />
-                      Nenhum participante encontrado
-                    </div>
-                  ) : (
-                    <ul className="max-h-48 overflow-y-auto divide-y divide-[#dedee5]">
-                      {filtered.map((p) => (
-                        <li key={p.id}>
-                          <button
-                            type="button"
-                            onMouseDown={(e) => e.preventDefault()}
-                            onClick={() => selectParticipant(p)}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#7132f5]/5 transition-colors text-left"
-                          >
-                            <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-700 font-ui font-semibold text-xs flex items-center justify-center flex-shrink-0 select-none">
-                              {initials(p.full_name)}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-ui font-medium text-[#101114] truncate">{p.full_name}</p>
-                              <p className="text-xs text-[#9497a9] font-ui truncate">{p.course} · {p.semester}º sem.</p>
-                            </div>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+            {selected.length < maxInvitees ? (
+              <div ref={dropdownRef} className="relative">
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/42" />
+                  <input
+                    type="text"
+                    value={searchInput}
+                    onChange={(e) => {
+                      setSearchInput(e.target.value)
+                      setShowDropdown(true)
+                    }}
+                    onFocus={() => {
+                      if (searchInput.trim()) setShowDropdown(true)
+                    }}
+                    placeholder="Buscar participante por nome..."
+                    className="w-full rounded-xl border border-ink/12 bg-transparent py-2.5 pl-9 pr-9 text-sm text-ink placeholder:text-ink/34 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
+                  />
+                  {isSearching && (
+                    <Loader2 className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-ink/42" />
                   )}
                 </div>
-              )}
+
+                {showDropdown && debouncedSearch.trim().length > 0 && (
+                  <div className="glass-panel absolute top-full z-10 mt-1 w-full overflow-hidden rounded-xl">
+                    {!isSearching && filtered.length === 0 ? (
+                      <div className="flex items-center gap-2.5 px-4 py-3 text-sm text-ink/46">
+                        <UserRound className="h-4 w-4 flex-shrink-0" />
+                        Nenhum participante encontrado
+                      </div>
+                    ) : (
+                      <ul className="max-h-48 divide-y divide-ink/10 overflow-y-auto">
+                        {filtered.map((p) => (
+                          <li key={p.id}>
+                            <button
+                              type="button"
+                              onMouseDown={(e) => e.preventDefault()}
+                              onClick={() => selectParticipant(p)}
+                              className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-brand/10"
+                            >
+                              <div className="flex h-8 w-8 flex-shrink-0 select-none items-center justify-center rounded-full bg-brand/15 text-xs font-semibold text-brand-soft">
+                                {initials(p.full_name)}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="truncate text-sm font-medium text-ink">{p.full_name}</p>
+                                <p className="truncate text-xs text-ink/46">{p.course} - {p.semester} sem.</p>
+                              </div>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-xs text-ink/46">
+                Máximo de {maxInvitees} convite{maxInvitees > 1 ? 's' : ''} atingido
+              </p>
+            )}
+
+            {error && <p className="text-sm text-red-400">{error}</p>}
+
+            {done && (
+              <div className="flex items-center gap-2 text-sm text-green-700">
+                <CheckCircle2 className="h-4 w-4" />
+                Convites enviados!
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3 pt-1">
+              <Button type="button" variant="ghost" onClick={onClose} disabled={isPending}>
+                Cancelar
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                loading={isPending}
+                disabled={selected.length === 0}
+                onClick={handleSend}
+              >
+                Enviar convite{selected.length > 1 ? 's' : ''}
+              </Button>
             </div>
-          ) : (
-            <p className="text-xs text-[#9497a9] font-ui">
-              Máximo de {maxInvitees} convite{maxInvitees > 1 ? 's' : ''} atingido
-            </p>
-          )}
-
-          {error && (
-            <p className="text-sm text-red-500 font-ui">{error}</p>
-          )}
-
-          {done && (
-            <div className="flex items-center gap-2 text-sm text-green-600 font-ui">
-              <CheckCircle2 className="w-4 h-4" />
-              Convites enviados!
-            </div>
-          )}
-
-          {/* Footer */}
-          <div className="flex justify-end gap-3 pt-1">
-            <Button type="button" variant="ghost" onClick={onClose} disabled={isPending}>
-              Cancelar
-            </Button>
-            <Button
-              type="button"
-              variant="primary"
-              loading={isPending}
-              disabled={selected.length === 0}
-              onClick={handleSend}
-            >
-              Enviar convite{selected.length > 1 ? 's' : ''}
-            </Button>
           </div>
         </div>
       </div>
-    </div>
     </>
   )
 }

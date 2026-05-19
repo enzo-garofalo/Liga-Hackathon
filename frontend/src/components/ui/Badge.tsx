@@ -7,8 +7,8 @@ interface BadgeProps {
 
 const variantClasses: Record<Variant, string> = {
   success: 'bg-brand-green/10 text-brand-green',
-  neutral: 'bg-silver-blue/10 text-silver-blue',
-  pending: 'bg-brand/10 text-brand',
+  neutral: 'bg-ink/10 text-ink/62',
+  pending: 'bg-brand/15 text-brand-soft border border-brand/25',
 }
 
 export function Badge({ variant, children }: BadgeProps) {

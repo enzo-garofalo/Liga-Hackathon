@@ -10,16 +10,16 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, error, options, placeholder, className = '', ...props }, ref) => (
     <div className="flex flex-col gap-1">
-      <label className="text-sm font-medium font-ui text-near-black">{label}</label>
+      <label className="text-sm font-medium font-ui text-ink/80">{label}</label>
       <div className="relative">
         <select
           ref={ref}
           {...props}
           className={[
-            'w-full px-3.5 py-2.5 pr-9 rounded-xl border font-ui text-sm text-near-black bg-white',
+            'w-full px-0 py-2.5 pr-9 rounded-none border-0 border-b font-ui text-sm text-ink bg-transparent',
             'focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand',
             'transition-colors appearance-none cursor-pointer',
-            error ? 'border-red-400' : 'border-[#dedee5]',
+            error ? 'border-red-400' : 'border-ink/20',
             className,
           ].join(' ')}
         >

@@ -11,25 +11,25 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
 
     return (
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium font-ui text-near-black">{label}</label>
+        <label className="text-sm font-medium font-ui text-ink/80">{label}</label>
         <div className="relative">
           <input
             ref={ref}
             type={visible ? 'text' : 'password'}
             {...props}
             className={[
-              'w-full px-3.5 py-2.5 pr-10 rounded-xl border font-ui text-sm text-near-black',
-              'placeholder:text-silver-blue bg-white',
+              'w-full px-0 py-2.5 pr-10 rounded-none border-0 border-b font-ui text-sm text-ink',
+              'placeholder:text-ink/40 bg-transparent',
               'focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand',
               'transition-colors',
-              error ? 'border-red-400' : 'border-[#dedee5]',
+              error ? 'border-red-400' : 'border-ink/20',
               className,
             ].join(' ')}
           />
           <button
             type="button"
             onClick={() => setVisible((v) => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-silver-blue hover:text-near-black transition-colors"
+            className="absolute right-0 top-1/2 -translate-y-1/2 text-ink/42 hover:text-ink transition-colors"
             aria-label={visible ? 'Ocultar senha' : 'Revelar senha'}
           >
             {visible ? (

@@ -37,15 +37,15 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
   ]
 
   return (
-    <aside className="flex flex-col h-full bg-white border-r border-[#dedee5]">
+    <aside className="flex flex-col h-full bg-ink border-r border-white/10">
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 h-16 border-b border-[#dedee5] flex-shrink-0">
+      <div className="flex items-center gap-2.5 px-5 h-16 border-b border-white/10 flex-shrink-0">
         <Link to="/" className="flex items-center gap-2.5">
-          <img src={logo} alt="Liga de TI" className="h-7" />
-          <span className="font-display font-semibold text-[rgb(16, 17, 20)] text-xl">Liga de TI</span>
+          <img src={logo} alt="Liga de TI" className="h-7 brightness-0 invert" />
+          <span className="font-clash text-xl font-semibold text-white">Hackathons</span>
         </Link>
         {onClose && (
-          <button onClick={onClose} className="ml-auto text-[#9497a9] hover:text-[#101114]">
+          <button onClick={onClose} className="ml-auto text-white/50 hover:text-white">
             <X className="w-5 h-5" />
           </button>
         )}
@@ -64,17 +64,17 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
                 className={[
                   'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors relative',
                   active
-                    ? 'bg-[#7132f5]/10 text-[#7132f5] font-medium'
-                    : 'text-[#686b82] hover:bg-gray-50 hover:text-[#101114]',
+                    ? 'bg-brand/15 text-white font-medium'
+                    : 'text-white/54 hover:bg-white/[0.06] hover:text-white',
                 ].join(' ')}
               >
                 {active && (
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[#7132f5] rounded-l" />
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-brand rounded-l" />
                 )}
                 <Icon className="w-4 h-4 flex-shrink-0" />
                 <span className="font-ui flex-1">{label}</span>
                 {badge != null && (
-                  <span className="bg-[#7132f5] text-white text-[10px] font-semibold font-ui px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                  <span className="bg-brand text-white text-[10px] font-semibold font-ui px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
                     {badge}
                   </span>
                 )}
@@ -82,24 +82,24 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
             )
           })}
         </div>
-        <hr className="border-[#dedee5] my-3 mx-4" />
+        <hr className="border-white/10 my-3 mx-4" />
       </nav>
 
       {/* Footer */}
       {me && (
-        <div className="px-4 py-4 border-t border-[#dedee5] flex-shrink-0">
+        <div className="px-4 py-4 border-t border-white/10 flex-shrink-0">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-8 h-8 rounded-full bg-[#7132f5] flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center flex-shrink-0">
               <span className="text-white text-xs font-semibold font-display">{initials(me.full_name)}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-ui font-medium text-xs text-[#101114] truncate">{me.full_name}</p>
-              <p className="font-ui text-[10px] text-[#9497a9] truncate">{me.course}</p>
+              <p className="font-ui font-medium text-xs text-white truncate">{me.full_name}</p>
+              <p className="font-ui text-[10px] text-white/42 truncate">{me.course}</p>
             </div>
           </div>
           <button
             onClick={logout}
-            className="flex items-center gap-2 text-xs font-ui text-[#9497a9] hover:text-red-500 transition-colors w-full"
+            className="flex items-center gap-2 text-xs font-ui text-white/46 hover:text-red-400 transition-colors w-full"
           >
             <LogOut className="w-3.5 h-3.5" />
             Sair
@@ -119,7 +119,7 @@ export function AppLayout() {
   )
 
   return (
-    <div className="flex h-screen bg-[#f8f8fa] overflow-hidden">
+    <div className="flex h-screen app-shell overflow-hidden">
       {/* Desktop sidebar */}
       <div className="hidden md:flex w-64 flex-shrink-0 flex-col h-full">
         <Sidebar />
@@ -138,17 +138,17 @@ export function AppLayout() {
       {/* Main area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile top bar */}
-        <header className="md:hidden flex items-center justify-between px-4 h-14 bg-white border-b border-[#dedee5] flex-shrink-0">
+        <header className="md:hidden flex items-center justify-between px-4 h-14 bg-ink border-b border-white/10 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <button onClick={() => setOpen(true)} className="text-[#686b82]">
+            <button onClick={() => setOpen(true)} className="text-white/62">
               <Menu className="w-5 h-5" />
             </button>
-            <img src={logo} alt="Liga de TI" className="h-6" />
+            <img src={logo} alt="Liga de TI" className="h-6 brightness-0 invert" />
           </div>
-          <Link to="/dashboard#notificacoes" className="relative text-[#686b82]">
+          <Link to="/dashboard#notificacoes" className="relative text-white/62">
             <Bell className="w-5 h-5" />
             {unread > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#7132f5] text-white text-[9px] rounded-full flex items-center justify-center font-semibold">
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand text-white text-[9px] rounded-full flex items-center justify-center font-semibold">
                 {unread}
               </span>
             )}

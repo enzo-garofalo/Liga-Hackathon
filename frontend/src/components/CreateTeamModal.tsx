@@ -1,13 +1,13 @@
+import { Loader2, Search, UserRound, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { X, Search, Loader2, UserRound } from 'lucide-react'
-import { Button } from './ui/Button'
-import { Input } from './ui/Input'
-import { useParticipantSearch } from '../hooks/useSendInvite'
 import { useCreateTeamWithInvites } from '../hooks/useCreateTeamWithInvites'
 import { useProfile } from '../hooks/useProfile'
-import { getApiError } from '../utils/errors'
+import { useParticipantSearch } from '../hooks/useSendInvite'
 import type { ParticipantSummary } from '../types/participant'
+import { getApiError } from '../utils/errors'
+import { Button } from './ui/Button'
+import { Input } from './ui/Input'
 
 interface FormShape {
   name: string
@@ -46,9 +46,7 @@ export function CreateTeamModal({ onClose }: Props) {
 
   useEffect(() => {
     function handleOutsideClick(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setShowDropdown(false)
-      }
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setShowDropdown(false)
     }
     document.addEventListener('mousedown', handleOutsideClick)
     return () => document.removeEventListener('mousedown', handleOutsideClick)
@@ -87,148 +85,140 @@ export function CreateTeamModal({ onClose }: Props) {
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] bg-black/30 backdrop-blur-sm" style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }} onClick={onClose} />
-      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 pointer-events-none">
-      <div className="max-w-lg w-full rounded-2xl bg-white shadow-2xl p-6 pointer-events-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="font-display font-semibold text-xl text-[#101114]">Criar equipe</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-[#9497a9] hover:text-[#101114] hover:bg-gray-100 transition-colors"
-            aria-label="Fechar"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+      <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="pointer-events-none fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div className="glass-panel pointer-events-auto w-full max-w-lg rounded-2xl p-6">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="font-display text-xl font-semibold text-ink">Criar equipe</h2>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg p-1.5 text-ink/46 transition-colors hover:bg-ink/10 hover:text-ink"
+              aria-label="Fechar"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
 
-        <form onSubmit={onSubmit} className="space-y-5">
-          {/* Name */}
-          <Input
-            label="Nome da equipe"
-            placeholder="DevSquad"
-            {...register('name', { required: 'Escolha um nome.' })}
-            error={errors.name?.message}
-          />
-
-          {/* Is open */}
-          <label className="flex items-start gap-3 p-4 rounded-xl border border-[#dedee5] cursor-pointer hover:bg-gray-50 transition-colors">
-            <input
-              type="checkbox"
-              {...register('is_open')}
-              className="mt-0.5 w-4 h-4 accent-[#7132f5] cursor-pointer flex-shrink-0"
+          <form onSubmit={onSubmit} className="space-y-5">
+            <Input
+              label="Nome da equipe"
+              placeholder="DevSquad"
+              {...register('name', { required: 'Escolha um nome.' })}
+              error={errors.name?.message}
             />
-            <div>
-              <p className="text-sm font-medium font-ui text-[#101114]">Equipe aberta</p>
-              <p className="text-xs text-[#9497a9] font-ui mt-0.5">
-                Outros participantes podem solicitar entrada na sua equipe
-              </p>
-            </div>
-          </label>
 
-          {/* Invite participants */}
-          <div>
-            <p className="text-sm font-medium font-ui text-[#101114] mb-1.5">
-              Convidar participantes{' '}
-              <span className="font-normal text-[#9497a9]">(opcional)</span>
-            </p>
-
-            {/* Chips */}
-            {selected.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-2">
-                {selected.map((p) => (
-                  <span
-                    key={p.id}
-                    className="inline-flex items-center gap-1.5 bg-[#7132f5]/10 text-[#7132f5] rounded-full pl-3 pr-2 py-1 text-xs font-ui font-medium"
-                  >
-                    {p.full_name.split(' ')[0]}
-                    <button
-                      type="button"
-                      onClick={() => removeSelected(p.id)}
-                      className="rounded-full hover:bg-[#7132f5]/20 transition-colors p-0.5"
-                      aria-label={`Remover ${p.full_name}`}
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-ink/12 p-4 transition-colors hover:bg-ink/[0.04]">
+              <input
+                type="checkbox"
+                {...register('is_open')}
+                className="mt-0.5 h-4 w-4 flex-shrink-0 cursor-pointer accent-[#7132f5]"
+              />
+              <div>
+                <p className="text-sm font-medium text-ink">Equipe aberta</p>
+                <p className="mt-0.5 text-xs text-ink/46">
+                  Outros participantes podem solicitar entrada na sua equipe
+                </p>
               </div>
-            )}
+            </label>
 
-            {/* Search input — hidden when limit reached */}
-            {selected.length < MAX_INVITEES ? (
-              <div ref={dropdownRef} className="relative">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9497a9] pointer-events-none" />
-                  <input
-                    type="text"
-                    value={searchInput}
-                    onChange={(e) => { setSearchInput(e.target.value); setShowDropdown(true) }}
-                    onFocus={() => { if (searchInput.trim()) setShowDropdown(true) }}
-                    placeholder="Buscar por nome ou e-mail…"
-                    className="w-full pl-9 pr-9 py-2.5 rounded-xl border border-[#dedee5] font-ui text-sm text-[#101114] placeholder:text-[#9497a9] bg-white focus:outline-none focus:ring-2 focus:ring-[#7132f5]/30 focus:border-[#7132f5] transition-colors"
-                  />
-                  {isSearching && (
-                    <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9497a9] animate-spin pointer-events-none" />
-                  )}
+            <div>
+              <p className="mb-1.5 text-sm font-medium text-ink/82">
+                Convidar participantes <span className="font-normal text-ink/42">(opcional)</span>
+              </p>
+
+              {selected.length > 0 && (
+                <div className="mb-2 flex flex-wrap gap-2">
+                  {selected.map((p) => (
+                    <span
+                      key={p.id}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-brand/15 py-1 pl-3 pr-2 text-xs font-medium text-brand-soft"
+                    >
+                      {p.full_name.split(' ')[0]}
+                      <button
+                        type="button"
+                        onClick={() => removeSelected(p.id)}
+                        className="rounded-full p-0.5 transition-colors hover:bg-brand/25"
+                        aria-label={`Remover ${p.full_name}`}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
                 </div>
+              )}
 
-                {showDropdown && debouncedSearch.trim().length > 0 && (
-                  <div className="absolute z-10 top-full mt-1 w-full bg-white rounded-xl border border-[#dedee5] shadow-lg overflow-hidden">
-                    {!isSearching && filtered.length === 0 ? (
-                      <div className="flex items-center gap-2.5 px-4 py-3 text-sm text-[#9497a9] font-ui">
-                        <UserRound className="w-4 h-4 flex-shrink-0" />
-                        Nenhum participante encontrado
-                      </div>
-                    ) : (
-                      <ul className="max-h-48 overflow-y-auto divide-y divide-[#dedee5]">
-                        {filtered.map((p) => (
-                          <li key={p.id}>
-                            <button
-                              type="button"
-                              onMouseDown={(e) => e.preventDefault()}
-                              onClick={() => selectParticipant(p)}
-                              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-[#7132f5]/5 transition-colors text-left"
-                            >
-                              <div className="w-8 h-8 rounded-full bg-[#7132f5]/10 text-[#7132f5] font-ui font-semibold text-xs flex items-center justify-center flex-shrink-0 select-none">
-                                {initials(p.full_name)}
-                              </div>
-                              <div className="min-w-0">
-                                <p className="text-sm font-ui font-medium text-[#101114] truncate">{p.full_name}</p>
-                                <p className="text-xs text-[#9497a9] font-ui truncate">{p.course} · {p.semester}º sem.</p>
-                              </div>
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
+              {selected.length < MAX_INVITEES ? (
+                <div ref={dropdownRef} className="relative">
+                  <div className="relative">
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/42" />
+                    <input
+                      type="text"
+                      value={searchInput}
+                      onChange={(e) => {
+                        setSearchInput(e.target.value)
+                        setShowDropdown(true)
+                      }}
+                      onFocus={() => {
+                        if (searchInput.trim()) setShowDropdown(true)
+                      }}
+                      placeholder="Buscar por nome ou e-mail..."
+                      className="w-full rounded-xl border border-ink/12 bg-transparent py-2.5 pl-9 pr-9 text-sm text-ink placeholder:text-ink/34 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
+                    />
+                    {isSearching && (
+                      <Loader2 className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-ink/42" />
                     )}
                   </div>
-                )}
-              </div>
-            ) : (
-              <p className="text-xs text-[#9497a9] font-ui">
-                Limite de {MAX_INVITEES} convidados atingido
-              </p>
-            )}
-          </div>
 
-          {/* Error */}
-          {mutation.error && (
-            <p className="text-sm text-red-500 font-ui">{getApiError(mutation.error)}</p>
-          )}
+                  {showDropdown && debouncedSearch.trim().length > 0 && (
+                    <div className="glass-panel absolute top-full z-10 mt-1 w-full overflow-hidden rounded-xl">
+                      {!isSearching && filtered.length === 0 ? (
+                        <div className="flex items-center gap-2.5 px-4 py-3 text-sm text-ink/46">
+                          <UserRound className="h-4 w-4 flex-shrink-0" />
+                          Nenhum participante encontrado
+                        </div>
+                      ) : (
+                        <ul className="max-h-48 divide-y divide-ink/10 overflow-y-auto">
+                          {filtered.map((p) => (
+                            <li key={p.id}>
+                              <button
+                                type="button"
+                                onMouseDown={(e) => e.preventDefault()}
+                                onClick={() => selectParticipant(p)}
+                                className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-brand/10"
+                              >
+                                <div className="flex h-8 w-8 flex-shrink-0 select-none items-center justify-center rounded-full bg-brand/15 text-xs font-semibold text-brand-soft">
+                                  {initials(p.full_name)}
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="truncate text-sm font-medium text-ink">{p.full_name}</p>
+                                  <p className="truncate text-xs text-ink/46">{p.course} - {p.semester} sem.</p>
+                                </div>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-ink/46">Limite de {MAX_INVITEES} convidados atingido</p>
+              )}
+            </div>
 
-          {/* Footer */}
-          <div className="flex justify-end gap-3 pt-1">
-            <Button type="button" variant="ghost" onClick={onClose} disabled={mutation.isPending}>
-              Cancelar
-            </Button>
-            <Button type="submit" variant="primary" loading={mutation.isPending}>
-              Criar equipe
-            </Button>
-          </div>
-        </form>
-      </div>
+            {mutation.error && <p className="text-sm text-red-400">{getApiError(mutation.error)}</p>}
+
+            <div className="flex justify-end gap-3 pt-1">
+              <Button type="button" variant="ghost" onClick={onClose} disabled={mutation.isPending}>
+                Cancelar
+              </Button>
+              <Button type="submit" variant="primary" loading={mutation.isPending}>
+                Criar equipe
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </>
   )

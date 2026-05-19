@@ -1,0 +1,53 @@
+<svg width="1440" height="820" viewBox="0 0 1440 820" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="820" fill="#dfe5e2"/>
+  <rect width="1440" height="820" fill="url(#room)"/>
+  <path d="M0 0h1440v270H0z" fill="url(#topLight)" opacity=".8"/>
+  <path d="M0 535c210-44 354-51 518-8 138 36 247 102 402 114 177 14 325-47 520-98v277H0V535z" fill="#1f1c18" opacity=".26"/>
+  <g opacity=".92">
+    <rect x="166" y="132" width="290" height="338" rx="22" fill="#6f4a35"/>
+    <rect x="196" y="168" width="230" height="148" rx="18" fill="#26201e" opacity=".38"/>
+    <rect x="216" y="344" width="190" height="72" rx="15" fill="#c28a64" opacity=".64"/>
+  </g>
+  <g opacity=".9">
+    <rect x="961" y="91" width="292" height="374" rx="24" fill="#b9c9c2"/>
+    <rect x="1002" y="135" width="210" height="164" rx="22" fill="#ecf2ef" opacity=".5"/>
+    <rect x="1019" y="324" width="178" height="78" rx="18" fill="#2e3b38" opacity=".25"/>
+  </g>
+  <ellipse cx="731" cy="724" rx="560" ry="84" fill="#171312" opacity=".3"/>
+  <path d="M263 680c138-90 754-116 910-12 28 19 11 58-24 64-238 43-676 39-883-2-37-7-42-25-3-50z" fill="#191512" opacity=".72"/>
+  <g>
+    <path d="M527 385c-56 20-90 75-96 156l-12 174h361l-14-179c-7-85-45-137-109-154-32 28-89 30-130 3z" fill="#904a31"/>
+    <path d="M493 392c-54 29-86 80-91 148l-12 175h75l26-188 52-88-50-47z" fill="#733826"/>
+    <path d="M680 394c56 29 89 80 94 148l13 173h-81l-23-185-54-91 51-45z" fill="#733826"/>
+    <path d="M508 229c8-89 58-139 140-127 71 10 107 68 96 151l-16 119c-8 62-51 108-113 112-68 5-117-39-124-106l17-149z" fill="#c98665"/>
+    <path d="M491 282c-23-109 21-196 110-215 83-18 166 29 178 107 8 53-14 89-53 111-7-70-43-106-108-112-63-6-102 34-127 109z" fill="#3b241f"/>
+    <path d="M587 478c39 28 79 28 120 0l-25 78c-23 27-66 26-91-1l-4-77z" fill="#e4baa5" opacity=".9"/>
+  </g>
+  <g opacity=".75">
+    <path d="M822 465c20-73 79-116 152-104 67 11 105 65 94 133l-16 100H793l29-129z" fill="#2d3132"/>
+    <circle cx="947" cy="292" r="82" fill="#967765"/>
+    <path d="M868 304c-29-95 46-176 136-145 43 15 70 52 70 96-59-2-119-8-206 49z" fill="#2a2523"/>
+  </g>
+  <g opacity=".68">
+    <path d="M197 510c42-64 122-79 175-30 40 37 48 88 33 150H163c-10-46 0-86 34-120z" fill="#262b2b"/>
+    <circle cx="285" cy="386" r="64" fill="#986f58"/>
+    <path d="M213 386c-9-83 42-130 114-116 41 8 72 38 79 77-58 4-112 13-193 39z" fill="#221c1b"/>
+  </g>
+  <rect x="466" y="598" width="434" height="122" rx="16" fill="#eef1ec"/>
+  <rect x="512" y="629" width="158" height="11" rx="5.5" fill="#171312" opacity=".28"/>
+  <rect x="512" y="659" width="292" height="10" rx="5" fill="#7132f5" opacity=".58"/>
+  <rect x="512" y="688" width="226" height="10" rx="5" fill="#171312" opacity=".16"/>
+  <rect x="764" y="625" width="85" height="44" rx="22" fill="#171312"/>
+  <defs>
+    <linearGradient id="room" x1="0" y1="0" x2="1440" y2="820" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ebe8dd"/>
+      <stop offset=".42" stop-color="#c9d3cc"/>
+      <stop offset="1" stop-color="#4b423b"/>
+    </linearGradient>
+    <radialGradient id="topLight" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(763 74) rotate(95.9) scale(646 1141)">
+      <stop stop-color="#fff8df"/>
+      <stop offset=".38" stop-color="#d9e8df" stop-opacity=".68"/>
+      <stop offset="1" stop-color="#1d1b18" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+</svg>

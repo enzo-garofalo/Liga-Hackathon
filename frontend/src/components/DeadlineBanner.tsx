@@ -23,7 +23,7 @@ export function DeadlineBanner() {
   if (days < 0 || days > 7) return null
 
   return (
-    <div className="bg-brand/10 border-b border-brand/20 text-brand font-ui text-sm px-6 py-2 text-center">
+    <div className="bg-brand/15 border-b border-brand/25 text-brand-soft font-ui text-sm px-6 py-2 text-center">
       {deadlineMessage(days, info.team_deadline)}
     </div>
   )

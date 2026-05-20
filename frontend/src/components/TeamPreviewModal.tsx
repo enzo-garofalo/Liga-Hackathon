@@ -1,33 +1,19 @@
-import { useState } from 'react'
 import { X } from 'lucide-react'
-import { Button } from './ui/Button'
+import { useState } from 'react'
 import { useCreateJoinRequest } from '../hooks/useJoinRequests'
-import { getApiError } from '../utils/errors'
 import type { Team, TeamStatus } from '../types/team'
+import { getApiError } from '../utils/errors'
+import { Button } from './ui/Button'
 
 const STATUS_LABEL: Record<TeamStatus, string> = {
-  forming:   'Em formação',
+  forming: 'Em formação',
   submitted: 'Submetida',
-  approved:  'Aprovada',
-  rejected:  'Não selecionada',
+  approved: 'Aprovada',
+  rejected: 'Não selecionada',
 }
-
-const STATUS_CLASSES: Record<TeamStatus, string> = {
-  forming:   'bg-yellow-100 text-yellow-700',
-  submitted: 'bg-blue-100 text-blue-700',
-  approved:  'bg-green-100 text-green-700',
-  rejected:  'bg-red-100 text-red-700',
-}
-
-const MEMBER_AVATAR_COLORS = [
-  'bg-purple-100 text-purple-700',
-  'bg-purple-200 text-purple-800',
-  'bg-purple-300 text-purple-900',
-  'bg-purple-500/20 text-purple-700',
-]
 
 function initials(name: string) {
-  return name.split(' ').slice(0, 2).map(w => w[0]).join('').toUpperCase()
+  return name.split(' ').slice(0, 2).map((w) => w[0]).join('').toUpperCase()
 }
 
 interface Props {
@@ -39,7 +25,7 @@ interface Props {
 
 export function TeamPreviewModal({ team, meId, meHasTeam, onClose }: Props) {
   const isLeader = meId !== null && team.leader.id === meId
-  const isMember = meId !== null && team.members.some(m => m.id === meId)
+  const isMember = meId !== null && team.members.some((m) => m.id === meId)
   const canJoin = !isLeader && !isMember && !meHasTeam && team.is_open && team.member_count < 4
 
   const [requestSent, setRequestSent] = useState(false)
@@ -51,7 +37,7 @@ export function TeamPreviewModal({ team, meId, meHasTeam, onClose }: Props) {
       onSuccess: () => setRequestSent(true),
       onError: (err) => {
         const msg = getApiError(err).toLowerCase()
-        if (msg.includes('pendente') || msg.includes('já enviou') || msg.includes('already')) {
+        if (msg.includes('pendente') || msg.includes('já enviou') || msg.includes('ja enviou') || msg.includes('already')) {
           setHasPendingRequest(true)
         }
       },
@@ -60,67 +46,53 @@ export function TeamPreviewModal({ team, meId, meHasTeam, onClose }: Props) {
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-[100] bg-black/30 backdrop-blur-sm"
-        style={{ backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
-        onClick={onClose}
-      />
-      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 pointer-events-none">
-        <div className="max-w-lg w-full rounded-2xl bg-white shadow-2xl p-6 pointer-events-auto max-h-[90vh] flex flex-col">
-
-          {/* Header */}
-          <div className="flex items-start justify-between gap-3 mb-1">
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <h2 className="font-display font-bold text-xl text-[#101114]">{team.name}</h2>
-              <span className={[
-                'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium font-ui',
-                STATUS_CLASSES[team.status],
-              ].join(' ')}>
+      <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="pointer-events-none fixed inset-0 z-[110] flex items-center justify-center p-4">
+        <div className="glass-panel pointer-events-auto flex max-h-[90vh] w-full max-w-lg flex-col rounded-2xl p-6">
+          <div className="mb-2 flex items-start justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <h2 className="font-display text-xl font-bold text-ink">{team.name}</h2>
+              <span className="rounded-full border border-brand/25 bg-brand/15 px-2.5 py-0.5 text-xs font-medium text-brand-soft">
                 {STATUS_LABEL[team.status]}
               </span>
             </div>
             <button
               onClick={onClose}
-              className="flex-shrink-0 p-1.5 rounded-lg text-[#9497a9] hover:text-[#101114] hover:bg-gray-100 transition-colors"
+              className="flex-shrink-0 rounded-lg p-1.5 text-ink/46 transition-colors hover:bg-ink/10 hover:text-ink"
               aria-label="Fechar"
             >
-              <X className="w-4 h-4" />
+              <X className="h-4 w-4" />
             </button>
           </div>
-          <p className="text-sm text-[#9497a9] font-ui mb-5">
-            {team.member_count}/4 membros · {team.is_open ? 'Aberta' : 'Fechada'}
+
+          <p className="mb-5 text-sm text-ink/46">
+            {team.member_count}/4 membros - {team.is_open ? 'Aberta' : 'Fechada'}
           </p>
 
-          {/* Members list */}
           <div className="flex-1 overflow-y-auto">
-            <p className="text-xs font-ui font-medium text-[#9497a9] uppercase tracking-wider mb-3">Membros</p>
+            <p className="kicker mb-3">Membros</p>
             <ul>
-              {team.members.map((m, i) => {
-                const avatarClasses = m.id === team.leader.id
-                  ? 'bg-purple-600 text-white'
-                  : MEMBER_AVATAR_COLORS[(i - 1) % MEMBER_AVATAR_COLORS.length]
+              {team.members.map((member) => {
+                const leader = member.id === team.leader.id
                 return (
                   <li
-                    key={m.id}
-                    className="py-3 flex items-center gap-3 first:pt-0 last:pb-0 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-gray-100"
+                    key={member.id}
+                    className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-ink/10"
                   >
-                    <div className={[
-                      'w-9 h-9 rounded-full flex-shrink-0 flex items-center justify-center',
-                      avatarClasses,
-                    ].join(' ')}>
-                      <span className="text-xs font-semibold font-display">{initials(m.full_name)}</span>
+                    <div className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full ${leader ? 'bg-brand text-white' : 'bg-ink/10 text-ink'}`}>
+                      <span className="font-display text-xs font-semibold">{initials(member.full_name)}</span>
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="font-ui font-medium text-sm text-[#101114] truncate">{m.full_name}</p>
-                        {m.id === team.leader.id && (
-                          <span className="bg-purple-100 text-purple-700 text-xs font-medium px-2 py-0.5 rounded-full font-ui flex-shrink-0">
+                        <p className="truncate text-sm font-medium text-ink">{member.full_name}</p>
+                        {leader && (
+                          <span className="flex-shrink-0 rounded-full bg-brand/15 px-2 py-0.5 text-xs font-medium text-brand-soft">
                             Líder
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-[#9497a9] font-ui mt-0.5">
-                        {m.course} · {m.semester}º semestre
+                      <p className="mt-0.5 text-xs text-ink/46">
+                        {member.course} - {member.semester} semestre
                       </p>
                     </div>
                   </li>
@@ -129,16 +101,15 @@ export function TeamPreviewModal({ team, meId, meHasTeam, onClose }: Props) {
             </ul>
           </div>
 
-          {/* Footer */}
-          <div className="mt-5 pt-5 border-t border-gray-100 space-y-2">
+          <div className="mt-5 space-y-2 border-t border-ink/10 pt-5">
             {requestSent && (
-              <div className="bg-purple-50 border border-purple-200 text-purple-700 rounded-xl px-4 py-2 text-sm font-ui text-center">
+              <div className="rounded-xl border border-brand/25 bg-brand/15 px-4 py-2 text-center text-sm text-brand-soft">
                 Pedido enviado!
               </div>
             )}
 
             {hasPendingRequest && (
-              <div className="bg-amber-50 border border-amber-200 text-amber-700 rounded-xl px-4 py-2 text-sm font-ui">
+              <div className="rounded-xl border border-amber-300/25 bg-amber-400/10 px-4 py-2 text-sm text-amber-200">
                 Você já enviou um pedido pendente para esta equipe.
               </div>
             )}
@@ -156,29 +127,28 @@ export function TeamPreviewModal({ team, meId, meHasTeam, onClose }: Props) {
             )}
 
             {!hasPendingRequest && joinMutation.error && !requestSent && (
-              <p className="text-sm text-red-500 font-ui text-center">{getApiError(joinMutation.error)}</p>
+              <p className="text-center text-sm text-red-400">{getApiError(joinMutation.error)}</p>
             )}
 
             {(isMember || isLeader) && (
-              <div className="bg-purple-50 border border-purple-100 rounded-xl px-4 py-2.5 text-sm font-ui text-purple-700 text-center">
+              <div className="rounded-xl border border-brand/20 bg-brand/10 px-4 py-2.5 text-center text-sm text-brand-soft">
                 Você já faz parte desta equipe
               </div>
             )}
 
             {meHasTeam && !isMember && !isLeader && (
-              <div className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-ui text-[#686b82] text-center">
+              <div className="rounded-xl border border-ink/10 bg-ink/[0.06] px-4 py-2.5 text-center text-sm text-ink/56">
                 Você já está em uma equipe
               </div>
             )}
 
             <button
               onClick={onClose}
-              className="w-full py-2.5 rounded-xl text-sm font-ui font-medium text-[#686b82] bg-gray-50 hover:bg-gray-100 hover:text-[#101114] transition-all"
+              className="w-full rounded-xl bg-ink/[0.06] py-2.5 text-sm font-medium text-ink/62 transition-all hover:bg-ink/10 hover:text-ink"
             >
               Fechar
             </button>
           </div>
-
         </div>
       </div>
     </>

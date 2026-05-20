@@ -47,75 +47,64 @@ export function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen app-shell text-ink">
       <Header admin />
-      <main className="max-w-5xl mx-auto px-4 py-10 space-y-6">
-        <div className="flex items-end justify-between gap-4">
+      <main className="mx-auto max-w-5xl space-y-6 px-4 py-10">
+        <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="font-display text-3xl font-semibold text-near-black">
+            <p className="kicker mb-2">Administração</p>
+            <h1 className="font-display text-4xl font-semibold text-ink">
               Painel do administrador
             </h1>
-            <p className="text-sm text-silver-blue font-ui">
+            <p className="mt-2 text-sm text-ink/50">
               {approvedCount}/10 equipes aprovadas
             </p>
           </div>
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium font-ui text-near-black">Filtrar por</label>
+            <label className="text-xs font-medium text-ink/62">Filtrar por</label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as TeamStatus)}
-              className="px-3 py-2 rounded-xl border border-[#dedee5] bg-white font-ui text-sm text-near-black focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-brand"
+              className="rounded-xl border border-ink/12 bg-white px-3 py-2 text-sm text-ink focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
             >
-              {STATUS_OPTIONS.map((s) => (
-                <option key={s} value={s}>
-                  {STATUS_LABEL[s]}
+              {STATUS_OPTIONS.map((status) => (
+                <option key={status} value={status}>
+                  {STATUS_LABEL[status]}
                 </option>
               ))}
             </select>
           </div>
         </div>
 
-        {mutationError && (
-          <p className="text-sm text-red-500 font-ui">{getApiError(mutationError)}</p>
-        )}
-
-        {teamsQuery.isLoading && (
-          <p className="font-ui text-silver-blue">Carregando equipes...</p>
-        )}
+        {mutationError && <p className="text-sm text-red-400">{getApiError(mutationError)}</p>}
+        {teamsQuery.isLoading && <p className="text-ink/46">Carregando equipes...</p>}
         {teamsQuery.data && teams.length === 0 && (
-          <p className="font-ui text-silver-blue">
+          <p className="text-ink/46">
             Nenhuma equipe com status "{STATUS_LABEL[statusFilter].toLowerCase()}".
           </p>
         )}
 
         <div className="space-y-4">
           {teams.map((team) => (
-            <article
-              key={team.id}
-              className="bg-white rounded-2xl border border-[#dedee5] shadow-whisper p-6"
-            >
-              <header className="flex items-start justify-between gap-4 mb-4">
+            <article key={team.id} className="glass-panel rounded-2xl p-6">
+              <header className="mb-4 flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="font-display text-lg font-semibold text-near-black">
-                    {team.name}
-                  </h2>
-                  <p className="text-xs text-silver-blue font-ui mt-1">
-                    Líder: <span className="text-near-black">{team.leader.full_name}</span>
-                    {' · '}
+                  <h2 className="font-display text-lg font-semibold text-ink">{team.name}</h2>
+                  <p className="mt-1 text-xs text-ink/46">
+                    Líder: <span className="text-ink/80">{team.leader.full_name}</span>
+                    {' - '}
                     {team.member_count}/4 membros
                   </p>
                 </div>
-                <Badge variant={STATUS_VARIANT[team.status]}>
-                  {STATUS_LABEL[team.status]}
-                </Badge>
+                <Badge variant={STATUS_VARIANT[team.status]}>{STATUS_LABEL[team.status]}</Badge>
               </header>
 
-              <ul className="text-sm font-ui text-near-black space-y-1 mb-4">
-                {team.members.map((m) => (
-                  <li key={m.id}>
-                    {m.full_name}{' '}
-                    <span className="text-silver-blue">
-                      · {m.course} · {m.semester}º sem
+              <ul className="mb-4 space-y-1 text-sm text-ink/78">
+                {team.members.map((member) => (
+                  <li key={member.id}>
+                    {member.full_name}{' '}
+                    <span className="text-ink/42">
+                      - {member.course} - {member.semester} sem
                     </span>
                   </li>
                 ))}
@@ -126,18 +115,14 @@ export function AdminDashboardPage() {
                   <Button
                     variant="primary"
                     onClick={() => handleApprove(team)}
-                    loading={
-                      approveMutation.isPending && approveMutation.variables === team.id
-                    }
+                    loading={approveMutation.isPending && approveMutation.variables === team.id}
                   >
                     Aprovar
                   </Button>
                   <Button
                     variant="ghost"
                     onClick={() => handleReject(team)}
-                    loading={
-                      rejectMutation.isPending && rejectMutation.variables === team.id
-                    }
+                    loading={rejectMutation.isPending && rejectMutation.variables === team.id}
                   >
                     Recusar
                   </Button>

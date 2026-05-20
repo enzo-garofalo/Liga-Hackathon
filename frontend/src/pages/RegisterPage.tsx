@@ -1,6 +1,8 @@
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { Link } from 'react-router-dom'
-import { AuthLeftPanel } from '../components/AuthLeftPanel'
+import logo from '../assets/logo.svg'
+import wehandleMark from '../assets/wehandle-mark.svg'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { PasswordInput } from '../components/ui/PasswordInput'
@@ -39,6 +41,39 @@ interface FormShape {
   linkedin: string
 }
 
+function RegisterShowcase() {
+  return (
+    <aside className="aeline-floating-canvas relative hidden min-h-full overflow-hidden rounded-[1rem] text-white md:flex md:flex-col">
+      <div className="aeline-grid" />
+      <div className="aeline-particles" />
+      <div className="relative z-10 flex min-h-full flex-col justify-between p-8 xl:p-10">
+        <Link to="/" className="flex items-center gap-3">
+          <img src={logo} alt="Liga de TI" className="h-8 brightness-0 invert" />
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/72">Hackathons</span>
+        </Link>
+
+        <div />
+
+        <div className="max-w-xl pb-28">
+          <p className="font-display text-4xl font-light leading-[0.98] tracking-[-0.055em] text-white/54 xl:text-5xl">
+            Transforme
+          </p>
+          <h2 className="mt-1 font-display text-4xl font-extrabold leading-[0.98] tracking-[-0.065em] text-white xl:text-5xl">
+            ideias em código
+          </h2>
+          <p className="mt-5 max-w-sm text-base leading-7 text-white/46">
+            Hackathon Liga de TI — 13 de junho de 2026.
+          </p>
+          <div className="mt-7 flex items-center gap-3 text-white/58">
+            <img src={wehandleMark} alt="WeHandle" className="h-7 w-7 object-contain" />
+            <span className="text-sm font-semibold">Liga + WeHandle</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  )
+}
+
 export function RegisterPage() {
   const { register, handleSubmit, control, formState: { errors } } = useForm<FormShape>({
     defaultValues: {
@@ -72,131 +107,151 @@ export function RegisterPage() {
   })
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
-      <AuthLeftPanel sticky />
+    <main className="min-h-screen bg-white p-2 text-black md:p-3">
+      <div className="grid min-h-[calc(100vh-1rem)] overflow-hidden rounded-[1rem] bg-[#f2f2f2] md:min-h-[calc(100vh-1.5rem)] md:grid-cols-2">
+        <RegisterShowcase />
 
-      {/* Right panel */}
-      <div className="flex-1 bg-white flex flex-col overflow-y-auto px-6 pt-8 pb-6 md:h-screen md:py-10 md:px-12">
-        <div className="w-full max-w-xl mx-auto md:my-auto">
-          <h1 className="font-display leading-tight tracking-tight mb-2">
-            <span className="block text-3xl font-light text-[#9497a9]">Criar</span>
-            <span className="block text-3xl font-semibold text-[#101114]">sua conta</span>
-          </h1>
-          <p className="font-ui font-light text-sm text-[#9497a9] mb-8">
-            Preencha os dados abaixo para participar do hackathon
-          </p>
+        <section className="flex min-h-[calc(100vh-1rem)] flex-col overflow-y-auto px-5 py-6 md:min-h-0 md:px-10 md:py-8">
+          <div className="mb-8 flex items-center justify-between md:hidden">
+            <Link to="/" className="flex items-center gap-3">
+              <img src={logo} alt="Liga de TI" className="h-8" />
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-black/60">Hackathons</span>
+            </Link>
+            <Link to="/" className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-[0_10px_30px_rgba(20,16,30,0.08)]" aria-label="Voltar">
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </div>
 
-          <form onSubmit={onSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                label="E-mail"
-                type="email"
-                autoComplete="email"
-                className="h-12 rounded-xl focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
-                {...register('email', { required: 'Informe seu e-mail.' })}
-                error={errors.email?.message}
-              />
-              <PasswordInput
-                label="Senha"
-                autoComplete="new-password"
-                className="h-12 rounded-xl focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
-                {...register('password', {
-                  required: 'Crie uma senha.',
-                  minLength: { value: 8, message: 'Mínimo de 8 caracteres.' },
-                })}
-                error={errors.password?.message}
-              />
-              <Input
-                label="Nome completo"
-                className="h-12 rounded-xl focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
-                {...register('full_name', { required: 'Informe seu nome completo.' })}
-                error={errors.full_name?.message}
-              />
-              <Select
-                label="Curso"
-                placeholder="Selecione seu curso"
-                options={COURSES}
-                className="h-12 rounded-xl focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
-                {...register('course', { required: 'Informe seu curso.' })}
-                error={errors.course?.message}
-              />
-              {isOther && (
-                <Input
-                  label="Qual curso?"
-                  placeholder="Digite o nome do seu curso"
-                  className="h-12 rounded-xl focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
-                  {...register('course_other', { required: 'Informe o nome do curso.' })}
-                  error={errors.course_other?.message}
-                />
-              )}
-              <Input
-                label="Semestre"
-                type="number"
-                min={1}
-                max={20}
-                className="h-12 rounded-xl focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
-                {...register('semester', {
-                  required: 'Informe seu semestre.',
-                  min: { value: 1, message: 'Mínimo 1.' },
-                  max: { value: 20, message: 'Máximo 20.' },
-                })}
-                error={errors.semester?.message}
-              />
-              <Input
-                label="GitHub (opcional)"
-                placeholder="https://github.com/usuario"
-                className="h-12 rounded-xl focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
-                {...register('github')}
-              />
-              <div className="md:col-span-2">
-                <Input
-                  label="LinkedIn (opcional)"
-                  placeholder="https://linkedin.com/in/usuario"
-                  className="h-12 rounded-xl focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
-                  {...register('linkedin')}
-                />
-              </div>
-              <div className="md:col-span-2 flex flex-col gap-1">
-                <label className="text-sm font-medium font-ui text-near-black">
-                  Bio (resumo de habilidades e experiências)
-                </label>
-                <textarea
-                  rows={4}
-                  {...register('bio', { required: 'Conte um pouco sobre você.' })}
-                  className={[
-                    'w-full px-3.5 py-2.5 rounded-xl border font-ui text-sm text-near-black',
-                    'placeholder:text-silver-blue bg-white',
-                    'focus:outline-none focus:ring-2 focus:ring-[#7132f5]/50 focus:border-[#7132f5]',
-                    'transition-colors resize-y',
-                    errors.bio ? 'border-red-400' : 'border-[#dedee5]',
-                  ].join(' ')}
-                />
-                {errors.bio && <p className="text-xs text-red-500 font-ui">{errors.bio.message}</p>}
-              </div>
+          <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center">
+            <div className="mb-6 flex items-center justify-end md:justify-between">
+              <Link to="/" className="hidden items-center gap-2 text-sm font-semibold text-black/46 transition hover:text-brand md:flex">
+                <ArrowLeft className="h-4 w-4" />
+                Voltar
+              </Link>
+              <p className="ml-auto text-sm text-black/46">
+                Já tem conta?{' '}
+                <Link to="/login" className="font-semibold text-brand hover:text-brand-soft">
+                  Entrar
+                </Link>
+              </p>
             </div>
 
-            {mutation.error && (
-              <p className="text-sm text-red-500 font-ui">{getApiError(mutation.error)}</p>
-            )}
+            <div className="register-form-card bg-white/94 p-5 shadow-[0_24px_70px_rgba(20,16,30,0.08)] md:p-8">
+              <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-brand/60">Inscrição</p>
+              <h1 className="mt-3 font-display text-4xl font-extrabold leading-[0.98] tracking-[-0.06em] text-black md:text-5xl">
+                Criar sua conta
+              </h1>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-black/50">
+                Preencha seu perfil para montar equipe, receber convites e acompanhar a submissão do hackathon.
+              </p>
 
-            <Button
-              type="submit"
-              variant="primary"
-              loading={mutation.isPending}
-              className="w-full h-12 text-base font-semibold shadow-lg hover:shadow-xl hover:bg-[#5b1ecf] transition-all duration-200"
-            >
-              Criar conta
-            </Button>
-          </form>
+              <form onSubmit={onSubmit} className="mt-7 space-y-5">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <Input
+                    label="E-mail"
+                    type="email"
+                    autoComplete="email"
+                    className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
+                    {...register('email', { required: 'Informe seu e-mail.' })}
+                    error={errors.email?.message}
+                  />
+                  <PasswordInput
+                    label="Senha"
+                    autoComplete="new-password"
+                    className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
+                    {...register('password', {
+                      required: 'Crie uma senha.',
+                      minLength: { value: 8, message: 'Mínimo de 8 caracteres.' },
+                    })}
+                    error={errors.password?.message}
+                  />
+                  <Input
+                    label="Nome completo"
+                    className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
+                    {...register('full_name', { required: 'Informe seu nome completo.' })}
+                    error={errors.full_name?.message}
+                  />
+                  <Select
+                    label="Curso"
+                    placeholder="Selecione seu curso"
+                    options={COURSES}
+                    className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
+                    {...register('course', { required: 'Informe seu curso.' })}
+                    error={errors.course?.message}
+                  />
+                  {isOther && (
+                    <Input
+                      label="Qual curso?"
+                      placeholder="Digite o nome do seu curso"
+                      className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
+                      {...register('course_other', { required: 'Informe o nome do curso.' })}
+                      error={errors.course_other?.message}
+                    />
+                  )}
+                  <Input
+                    label="Semestre"
+                    type="number"
+                    min={1}
+                    max={20}
+                    className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
+                    {...register('semester', {
+                      required: 'Informe seu semestre.',
+                      min: { value: 1, message: 'Mínimo 1.' },
+                      max: { value: 20, message: 'Máximo 20.' },
+                    })}
+                    error={errors.semester?.message}
+                  />
+                  <Input
+                    label="GitHub (opcional)"
+                    placeholder="https://github.com/usuario"
+                    className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
+                    {...register('github')}
+                  />
+                  <div className="md:col-span-2">
+                    <Input
+                      label="LinkedIn (opcional)"
+                      placeholder="https://linkedin.com/in/usuario"
+                      className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
+                      {...register('linkedin')}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1 md:col-span-2">
+                    <label className="font-ui text-sm font-medium text-ink/80">
+                      Bio (resumo de habilidades e experiências)
+                    </label>
+                    <textarea
+                      rows={4}
+                      {...register('bio', { required: 'Conte um pouco sobre você.' })}
+                      className={[
+                        'auth-textarea w-full resize-y bg-transparent px-4 py-3 font-ui text-sm text-ink',
+                        'placeholder:text-ink/40',
+                        'focus:outline-none focus:ring-2 focus:ring-[#7132f5]/50 focus:border-[#7132f5]',
+                        'transition-colors',
+                        errors.bio ? 'border-red-400' : 'border-ink/20',
+                      ].join(' ')}
+                    />
+                    {errors.bio && <p className="font-ui text-xs text-red-500">{errors.bio.message}</p>}
+                  </div>
+                </div>
 
-          <p className="mt-6 text-sm font-ui text-[#9497a9] text-center">
-            Já tem conta?{' '}
-            <Link to="/login" className="text-[#7132f5] font-semibold hover:underline">
-              Entrar
-            </Link>
-          </p>
-        </div>
+                {mutation.error && (
+                  <p className="font-ui text-sm text-red-500">{getApiError(mutation.error)}</p>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  loading={mutation.isPending}
+                  className="h-12 w-full rounded-full bg-black text-base font-semibold text-white hover:bg-brand"
+                >
+                  Criar conta
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </form>
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   )
 }

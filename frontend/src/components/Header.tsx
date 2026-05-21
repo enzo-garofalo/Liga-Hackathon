@@ -31,7 +31,7 @@ export function Header({ me, admin = false }: HeaderProps) {
             </div>
           ) : me ? (
             <div className="flex items-center gap-3">
-              <NotificationBell />
+              <NotificationBell tone="dark" />
               <Link
                 to="/profile"
                 className="font-ui text-sm text-white/72 hover:text-brand-soft"

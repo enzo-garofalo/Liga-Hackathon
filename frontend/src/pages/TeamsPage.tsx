@@ -1,4 +1,4 @@
-import { Users } from 'lucide-react'
+import { MessageCircle, Users } from 'lucide-react'
 import { useState } from 'react'
 import { CreateTeamModal } from '../components/CreateTeamModal'
 import { TeamCard } from '../components/TeamCard'
@@ -23,7 +23,7 @@ export function TeamsPage() {
         <div>
           <p className="kicker mb-2">Equipes</p>
           <h1 className="font-display text-5xl font-light text-ink">Equipes abertas</h1>
-          <p className="mt-2 text-sm text-ink/46">
+          <p className="mt-2 text-sm text-ink/70">
             Equipes em formação aceitando pedidos de entrada.
           </p>
         </div>
@@ -34,8 +34,14 @@ export function TeamsPage() {
             </Button>
           )}
           {!me?.has_team && whatsappLink && (
-            <a href={whatsappLink} target="_blank" rel="noreferrer">
-              <Button variant="outlined">Grupo WhatsApp</Button>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#149e61] px-5 py-2.5 font-ui text-sm font-semibold text-white shadow-[0_14px_32px_rgba(20,158,97,0.18)] transition-colors hover:bg-[#108150]"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Grupo WhatsApp
             </a>
           )}
         </div>
@@ -55,7 +61,7 @@ export function TeamsPage() {
             <Users className="h-7 w-7 text-brand-soft" />
           </div>
           <p className="mb-1 font-display font-semibold text-ink">Nenhuma equipe aberta</p>
-          <p className="text-sm text-ink/46">Crie uma equipe e encontre seus companheiros.</p>
+          <p className="text-sm text-ink/70">Crie uma equipe e encontre seus companheiros.</p>
         </div>
       )}
 

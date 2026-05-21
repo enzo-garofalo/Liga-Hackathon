@@ -6,16 +6,21 @@ interface PasswordInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>,
 }
 
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
-  ({ label, error, className = '', ...props }, ref) => {
+  ({ label, error, className = '', required, ...props }, ref) => {
     const [visible, setVisible] = useState(false)
 
     return (
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium font-ui text-ink/80">{label}</label>
+        <label className="text-sm font-medium font-ui text-ink/80">
+          {label}
+          {required && <span className="ml-1 text-red-500">*</span>}
+        </label>
         <div className="relative">
           <input
             ref={ref}
             type={visible ? 'text' : 'password'}
+            required={required}
+            aria-required={required}
             {...props}
             className={[
               'w-full px-0 py-2.5 pr-10 rounded-none border-0 border-b font-ui text-sm text-ink',

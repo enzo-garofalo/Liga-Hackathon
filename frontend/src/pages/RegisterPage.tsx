@@ -27,18 +27,74 @@ const COURSES = [
   'Tecnologia em Gestão da Tecnologia da Informação',
   'Tecnologia em Internet das Coisas',
   'Outro',
-].map((c) => ({ value: c, label: c }))
+].map((course) => ({ value: course, label: course }))
 
 interface FormShape {
   email: string
   password: string
   full_name: string
+  phone: string
   course: string
   course_other: string
   semester: string
   bio: string
   github: string
   linkedin: string
+}
+
+function onlyDigits(value: string) {
+  return value.replace(/\D/g, '')
+}
+
+function formatPhone(value: string) {
+  const digits = onlyDigits(value).slice(0, 11)
+  if (digits.length <= 2) return digits ? `(${digits}` : ''
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+}
+
+function normalizeUrl(value: string) {
+  const trimmed = value.trim()
+  if (!trimmed) return undefined
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
+}
+
+function getUrl(value: string) {
+  const normalized = normalizeUrl(value)
+  if (!normalized) return null
+  try {
+    return new URL(normalized)
+  } catch {
+    return null
+  }
+}
+
+function validateLinkedIn(value: string) {
+  if (!value.trim()) return 'Informe seu LinkedIn.'
+  const url = getUrl(value)
+  const host = url?.hostname.replace(/^www\./, '')
+  if (!url || host !== 'linkedin.com' || !url.pathname.startsWith('/in/')) {
+    return 'Use um link válido do LinkedIn, como linkedin.com/in/seu-perfil.'
+  }
+  return true
+}
+
+function validateGitHub(value: string) {
+  if (!value.trim()) return true
+  const url = getUrl(value)
+  const host = url?.hostname.replace(/^www\./, '')
+  if (!url || host !== 'github.com' || url.pathname.split('/').filter(Boolean).length < 1) {
+    return 'Use um link válido do GitHub, como github.com/usuario.'
+  }
+  return true
+}
+
+function validatePhone(value: string) {
+  const digits = onlyDigits(value)
+  if (!digits) return 'Informe seu telefone.'
+  if (digits.length < 10 || digits.length > 11) return 'Informe um telefone com DDD.'
+  return true
 }
 
 function RegisterShowcase() {
@@ -62,7 +118,7 @@ function RegisterShowcase() {
             ideias em código
           </h2>
           <p className="mt-5 max-w-sm text-base leading-7 text-white/46">
-            Hackathon Liga de TI — 13 de junho de 2026.
+            Hackathon Liga de TI - 13 de junho de 2026.
           </p>
           <div className="mt-7 flex items-center gap-3 text-white/58">
             <img src={wehandleMark} alt="WeHandle" className="h-7 w-7 object-contain" />
@@ -75,11 +131,18 @@ function RegisterShowcase() {
 }
 
 export function RegisterPage() {
-  const { register, handleSubmit, control, formState: { errors } } = useForm<FormShape>({
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors },
+  } = useForm<FormShape>({
     defaultValues: {
       email: '',
       password: '',
       full_name: '',
+      phone: '',
       course: '',
       course_other: '',
       semester: '',
@@ -90,18 +153,21 @@ export function RegisterPage() {
   })
   const mutation = useRegister()
   const selectedCourse = useWatch({ control, name: 'course' })
+  const phoneValue = useWatch({ control, name: 'phone' }) ?? ''
   const isOther = selectedCourse === 'Outro'
+  const phoneField = register('phone', { required: 'Informe seu telefone.', validate: validatePhone })
 
   const onSubmit = handleSubmit((data) => {
     const payload: RegisterPayload = {
       email: data.email,
       password: data.password,
       full_name: data.full_name,
+      phone: onlyDigits(data.phone),
       course: isOther ? data.course_other : data.course,
       semester: Number(data.semester),
       bio: data.bio,
-      github: data.github || undefined,
-      linkedin: data.linkedin || undefined,
+      github: normalizeUrl(data.github),
+      linkedin: normalizeUrl(data.linkedin),
     }
     mutation.mutate(payload)
   })
@@ -145,12 +211,13 @@ export function RegisterPage() {
                 Preencha seu perfil para montar equipe, receber convites e acompanhar a submissão do hackathon.
               </p>
 
-              <form onSubmit={onSubmit} className="mt-7 space-y-5">
+              <form onSubmit={onSubmit} noValidate className="mt-7 space-y-5">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <Input
                     label="E-mail"
                     type="email"
                     autoComplete="email"
+                    required
                     className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
                     {...register('email', { required: 'Informe seu e-mail.' })}
                     error={errors.email?.message}
@@ -158,6 +225,7 @@ export function RegisterPage() {
                   <PasswordInput
                     label="Senha"
                     autoComplete="new-password"
+                    required
                     className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
                     {...register('password', {
                       required: 'Crie uma senha.',
@@ -167,9 +235,28 @@ export function RegisterPage() {
                   />
                   <Input
                     label="Nome completo"
+                    required
                     className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
                     {...register('full_name', { required: 'Informe seu nome completo.' })}
                     error={errors.full_name?.message}
+                  />
+                  <Input
+                    label="Telefone"
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    placeholder="(11) 99999-9999"
+                    required
+                    className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
+                    {...phoneField}
+                    value={phoneValue}
+                    onChange={(event) =>
+                      setValue('phone', formatPhone(event.target.value), {
+                        shouldDirty: true,
+                        shouldValidate: Boolean(errors.phone),
+                      })
+                    }
+                    error={errors.phone?.message}
                   />
                   <Select
                     label="Curso"
@@ -183,6 +270,7 @@ export function RegisterPage() {
                     <Input
                       label="Qual curso?"
                       placeholder="Digite o nome do seu curso"
+                      required
                       className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
                       {...register('course_other', { required: 'Informe o nome do curso.' })}
                       error={errors.course_other?.message}
@@ -193,6 +281,7 @@ export function RegisterPage() {
                     type="number"
                     min={1}
                     max={20}
+                    required
                     className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
                     {...register('semester', {
                       required: 'Informe seu semestre.',
@@ -202,22 +291,24 @@ export function RegisterPage() {
                     error={errors.semester?.message}
                   />
                   <Input
-                    label="GitHub (opcional)"
-                    placeholder="https://github.com/usuario"
+                    label="LinkedIn"
+                    placeholder="linkedin.com/in/usuario"
+                    required
                     className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
-                    {...register('github')}
+                    {...register('linkedin', { required: 'Informe seu LinkedIn.', validate: validateLinkedIn })}
+                    error={errors.linkedin?.message}
                   />
-                  <div className="md:col-span-2">
-                    <Input
-                      label="LinkedIn (opcional)"
-                      placeholder="https://linkedin.com/in/usuario"
-                      className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
-                      {...register('linkedin')}
-                    />
-                  </div>
+                  <Input
+                    label="GitHub (opcional)"
+                    placeholder="github.com/usuario"
+                    className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
+                    {...register('github', { validate: validateGitHub })}
+                    error={errors.github?.message}
+                  />
                   <div className="flex flex-col gap-1 md:col-span-2">
                     <label className="font-ui text-sm font-medium text-ink/80">
                       Bio (resumo de habilidades e experiências)
+                      <span className="ml-1 text-red-500">*</span>
                     </label>
                     <textarea
                       rows={4}

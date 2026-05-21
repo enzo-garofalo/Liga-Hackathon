@@ -36,7 +36,7 @@ export function TeamDetailPage() {
   return (
     <main className="px-4 py-6 text-ink md:px-10 md:py-10">
       <div className="mx-auto max-w-3xl space-y-6">
-        {teamQuery.isLoading && <p className="text-ink/46">Carregando equipe...</p>}
+        {teamQuery.isLoading && <p className="text-ink/70">Carregando equipe...</p>}
         {teamQuery.isError && <p className="text-red-500">Equipe não encontrada.</p>}
         {teamQuery.data && id && (
           <TeamDetail
@@ -115,7 +115,7 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
               {STATUS_LABEL[team.status]}
             </span>
           </div>
-          <p className="mt-2 text-sm text-ink/50">
+          <p className="mt-2 text-sm font-medium text-ink/70">
             {team.member_count}/4 membros - {team.is_open ? 'Aberta' : 'Fechada'}
           </p>
 
@@ -148,7 +148,7 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
       </section>
 
       {!isLeader && isMember && canMutate && team.member_count === 4 && (
-        <p className="text-sm text-ink/50">Apenas o líder da equipe pode submeter para análise.</p>
+        <p className="text-sm text-ink/70">Apenas o líder da equipe pode submeter para análise.</p>
       )}
 
       <section className="glass-panel rounded-2xl p-6">
@@ -184,7 +184,7 @@ function TeamDetail({ team, id, meId, meHasTeam }: TeamDetailProps) {
         <button
           onClick={handleLeave}
           disabled={leaveMutation.isPending}
-          className="rounded-xl border border-red-700/20 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-500/15 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center justify-center rounded-xl border border-red-700/25 bg-red-500/10 px-4 py-2 text-sm font-semibold text-red-700 transition-colors hover:bg-red-500/15 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {leaveMutation.isPending ? 'Saindo...' : 'Sair da equipe'}
         </button>
@@ -226,11 +226,11 @@ function MemberRow({ member, isLeader, canRemove, onRemove, removing }: MemberRo
             </span>
           )}
         </div>
-        <p className="mt-0.5 text-xs text-ink/46">
+        <p className="mt-0.5 text-xs font-medium text-ink/68">
           {member.course} - {member.semester} semestre
         </p>
         {(member.github || member.linkedin) && (
-          <p className="mt-0.5 flex gap-3 text-xs text-ink/46">
+          <p className="mt-0.5 flex gap-3 text-xs font-medium text-ink/68">
             {member.github && (
               <a href={member.github} target="_blank" rel="noreferrer" className="hover:text-brand-soft">
                 GitHub
@@ -249,7 +249,7 @@ function MemberRow({ member, isLeader, canRemove, onRemove, removing }: MemberRo
         <button
           onClick={onRemove}
           disabled={removing}
-          className="flex-shrink-0 rounded-lg p-1.5 text-ink/42 transition-colors hover:bg-red-500/10 hover:text-red-600 disabled:opacity-40"
+          className="flex-shrink-0 rounded-lg p-1.5 text-ink/60 transition-colors hover:bg-red-500/10 hover:text-red-600 disabled:opacity-40"
           title={`Remover ${member.full_name}`}
         >
           <X className="h-4 w-4" />

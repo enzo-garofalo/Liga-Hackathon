@@ -33,13 +33,13 @@ export function TeamCard({ team, onClick }: TeamCardProps) {
             {initials(team.leader.full_name)}
           </span>
         </div>
-        <p className="truncate text-xs text-ink/46">
+        <p className="truncate text-xs text-ink/68">
           Líder: <span className="font-medium text-ink/82">{team.leader.full_name}</span>
         </p>
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs text-ink/44">
+        <div className="flex items-center justify-between text-xs font-medium text-ink/68">
           <span>{team.member_count}/4 membros</span>
           <span>{vacancies} vaga{vacancies !== 1 ? 's' : ''}</span>
         </div>

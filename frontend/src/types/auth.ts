@@ -5,6 +5,7 @@ export interface RegisterPayload {
   course: string
   semester: number
   bio: string
+  phone?: string
   github?: string
   linkedin?: string
 }

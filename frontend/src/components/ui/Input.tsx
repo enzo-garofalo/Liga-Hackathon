@@ -6,11 +6,16 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, className = '', ...props }, ref) => (
+  ({ label, error, className = '', required, ...props }, ref) => (
     <div className="flex flex-col gap-1">
-      <label className="text-sm font-medium font-ui text-ink/80">{label}</label>
+      <label className="text-sm font-medium font-ui text-ink/80">
+        {label}
+        {required && <span className="ml-1 text-red-500">*</span>}
+      </label>
       <input
         ref={ref}
+        required={required}
+        aria-required={required}
         {...props}
         className={[
           'w-full px-0 py-2.5 rounded-none border-0 border-b font-ui text-sm text-ink',

@@ -24,9 +24,11 @@ interface Props {
 }
 
 export function TeamPreviewModal({ team, meId, meHasTeam, onClose }: Props) {
+  const members = team.members ?? []
+  const memberCount = team.member_count ?? members.length
   const isLeader = meId !== null && team.leader.id === meId
-  const isMember = meId !== null && team.members.some((m) => m.id === meId)
-  const canJoin = !isLeader && !isMember && !meHasTeam && team.is_open && team.member_count < 4
+  const isMember = meId !== null && members.some((m) => m.id === meId)
+  const canJoin = !isLeader && !isMember && !meHasTeam && team.is_open && memberCount < 4
 
   const [requestSent, setRequestSent] = useState(false)
   const [hasPendingRequest, setHasPendingRequest] = useState(false)
@@ -66,13 +68,13 @@ export function TeamPreviewModal({ team, meId, meHasTeam, onClose }: Props) {
           </div>
 
           <p className="mb-5 text-sm text-ink/46">
-            {team.member_count}/4 membros - {team.is_open ? 'Aberta' : 'Fechada'}
+            {memberCount}/4 membros - {team.is_open ? 'Aberta' : 'Fechada'}
           </p>
 
           <div className="flex-1 overflow-y-auto">
             <p className="kicker mb-3">Membros</p>
             <ul>
-              {team.members.map((member) => {
+              {members.map((member) => {
                 const leader = member.id === team.leader.id
                 return (
                   <li

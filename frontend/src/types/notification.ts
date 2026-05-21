@@ -8,6 +8,7 @@ export type NotificationType =
   | 'team_submitted'
   | 'team_approved'
   | 'team_rejected'
+  | 'team_removed'
   | 'team_disbanded'
 
 export interface Notification {

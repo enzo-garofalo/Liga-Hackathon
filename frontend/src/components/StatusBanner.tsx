@@ -1,3 +1,4 @@
+import { LogOut, Send, UserPlus } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useLeaveTeam, useSubmitTeam, useTeam } from '../hooks/useTeam'
@@ -30,15 +31,21 @@ function NoTeamBanner() {
   return (
     <Section>
       <h2 className="font-display text-2xl font-semibold text-ink">Você ainda não está em uma equipe</h2>
-      <p className="mb-6 mt-2 text-sm text-ink/52">
+      <p className="mb-6 mt-2 text-sm text-ink/70">
         Crie a sua ou explore equipes abertas que estão procurando membros.
       </p>
-      <div className="flex flex-wrap items-center gap-3">
-        <Link to="/teams">
-          <Button variant="primary">Criar equipe</Button>
+      <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center">
+        <Link
+          to="/teams"
+          className="inline-flex items-center justify-center rounded-2xl bg-brand px-5 py-2.5 font-ui text-sm font-medium text-white transition-colors hover:bg-[#5f28d4]"
+        >
+          Criar equipe
         </Link>
-        <Link to="/teams">
-          <Button variant="outlined">Explorar equipes abertas</Button>
+        <Link
+          to="/teams"
+          className="inline-flex items-center justify-center rounded-2xl border border-ink/20 px-5 py-2.5 font-ui text-sm font-medium text-ink transition-colors hover:border-brand hover:bg-brand/5 hover:text-brand"
+        >
+          Explorar equipes abertas
         </Link>
       </div>
     </Section>
@@ -55,6 +62,7 @@ function FormingBanner({ me, team }: { me: MeProfile; team: TeamMinimal }) {
   const fullTeam = teamQuery.data
   const isLeader = fullTeam ? fullTeam.leader.id === me.id : false
   const canSubmit = team.member_count === 4
+  const remainingSlots = Math.max(0, 4 - team.member_count)
 
   const handleSubmit = () => {
     if (!window.confirm('Submeter a equipe? Após submeter, ninguém pode mais entrar ou sair.')) return
@@ -68,39 +76,58 @@ function FormingBanner({ me, team }: { me: MeProfile; team: TeamMinimal }) {
 
   return (
     <Section>
-      <div className="mb-2 flex items-center justify-between gap-4">
-        <h2 className="font-display text-2xl font-semibold text-ink">{team.name}</h2>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="break-words font-display text-2xl font-semibold text-ink">{team.name}</h2>
+          <p className="mt-2 text-sm font-medium text-ink/70">
+            {team.member_count}/4 membros - {team.is_open ? 'Aceitando pedidos' : 'Fechada'}
+          </p>
+        </div>
         <Badge variant="pending">Em formação</Badge>
       </div>
-      <p className="mb-6 text-sm text-ink/52">
-        {team.member_count}/4 membros - {team.is_open ? 'Aceitando pedidos' : 'Fechada'}
-      </p>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <Link to={`/teams/${team.id}`}>
-          <Button variant="outlined">Ver equipe</Button>
+      {isLeader && remainingSlots > 0 && (
+        <div className="mb-5 rounded-2xl border border-brand/20 bg-brand/[0.07] px-4 py-3">
+          <p className="text-sm font-medium text-ink">Ainda faltam {remainingSlots} membro{remainingSlots > 1 ? 's' : ''}.</p>
+          <p className="mt-1 text-xs font-medium text-ink/68">Convide participantes agora para completar a equipe antes do prazo.</p>
+        </div>
+      )}
+
+      <div className="grid gap-3 sm:flex sm:flex-wrap sm:items-center">
+        <Link
+          to={`/teams/${team.id}`}
+          className="inline-flex h-11 items-center justify-center rounded-2xl border border-ink/20 px-5 font-ui text-sm font-medium text-ink transition-colors hover:border-brand hover:bg-brand/5 hover:text-brand"
+        >
+          Ver equipe
         </Link>
         {isLeader && (
-          <Button variant="primary" onClick={() => setInviteOpen(true)}>
+          <Button
+            variant="primary"
+            onClick={() => setInviteOpen(true)}
+            className="h-11 w-full px-6 text-base shadow-[0_16px_36px_rgba(113,50,245,0.22)] sm:w-auto"
+          >
+            <UserPlus className="h-4 w-4" />
             Convidar membro
           </Button>
         )}
         {isLeader && canSubmit && (
-          <Button variant="primary" onClick={handleSubmit} loading={submit.isPending}>
+          <Button variant="primary" onClick={handleSubmit} loading={submit.isPending} className="h-11 w-full sm:w-auto">
+            <Send className="h-4 w-4" />
             Submeter para análise
           </Button>
         )}
         <button
           onClick={handleLeave}
           disabled={leave.isPending}
-          className="ml-auto rounded-2xl border border-red-700/20 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-500/15 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl border border-red-700/25 bg-red-500/10 px-4 text-sm font-semibold text-red-700 transition-colors hover:bg-red-500/15 disabled:cursor-not-allowed disabled:opacity-40 sm:ml-auto sm:w-auto"
         >
+          <LogOut className="h-4 w-4" />
           {leave.isPending ? 'Saindo...' : 'Sair da equipe'}
         </button>
       </div>
 
       {!canSubmit && (
-        <p className="mt-3 text-xs text-ink/42">
+        <p className="mt-4 text-sm text-ink/52">
           A equipe precisa ter 4 membros para ser submetida.
         </p>
       )}
@@ -124,11 +151,14 @@ function SubmittedBanner({ team }: { team: TeamMinimal }) {
         <h2 className="font-display text-2xl font-semibold text-ink">{team.name}</h2>
         <Badge variant="pending">Submetida</Badge>
       </div>
-      <p className="mb-6 text-sm text-ink/52">
+      <p className="mb-6 text-sm text-ink/70">
         Equipe submetida para análise. Aguardem o resultado por e-mail.
       </p>
-      <Link to={`/teams/${team.id}`}>
-        <Button variant="outlined">Ver equipe</Button>
+      <Link
+        to={`/teams/${team.id}`}
+        className="inline-flex items-center justify-center rounded-2xl border border-ink/20 px-5 py-2.5 font-ui text-sm font-medium text-ink transition-colors hover:border-brand hover:bg-brand/5 hover:text-brand"
+      >
+        Ver equipe
       </Link>
     </Section>
   )
@@ -144,8 +174,11 @@ function ApprovedBanner({ team }: { team: TeamMinimal }) {
       <p className="mb-6 text-sm text-ink/72">
         Parabéns! A equipe foi selecionada para o Hackathon.
       </p>
-      <Link to={`/teams/${team.id}`}>
-        <Button variant="primary">Ver equipe</Button>
+      <Link
+        to={`/teams/${team.id}`}
+        className="inline-flex items-center justify-center rounded-2xl bg-brand px-5 py-2.5 font-ui text-sm font-medium text-white transition-colors hover:bg-[#5f28d4]"
+      >
+        Ver equipe
       </Link>
     </Section>
   )
@@ -158,11 +191,14 @@ function RejectedBanner({ team }: { team: TeamMinimal }) {
         <h2 className="font-display text-2xl font-semibold text-ink">{team.name}</h2>
         <Badge variant="neutral">Não selecionada</Badge>
       </div>
-      <p className="mb-6 text-sm text-ink/52">
+      <p className="mb-6 text-sm text-ink/70">
         A equipe não foi selecionada nesta edição. Esperamos vocês nas próximas.
       </p>
-      <Link to={`/teams/${team.id}`}>
-        <Button variant="outlined">Ver equipe</Button>
+      <Link
+        to={`/teams/${team.id}`}
+        className="inline-flex items-center justify-center rounded-2xl border border-ink/20 px-5 py-2.5 font-ui text-sm font-medium text-ink transition-colors hover:border-brand hover:bg-brand/5 hover:text-brand"
+      >
+        Ver equipe
       </Link>
     </Section>
   )
@@ -172,7 +208,7 @@ function Section({ children, tone }: { children: React.ReactNode; tone?: 'succes
   return (
     <section
       className={[
-        'relative overflow-hidden rounded-[32px] p-8',
+        'relative overflow-hidden rounded-[32px] p-6 md:p-8',
         tone === 'success' ? 'border border-green-700/20 bg-green-500/10' : 'glass-panel',
       ].join(' ')}
     >

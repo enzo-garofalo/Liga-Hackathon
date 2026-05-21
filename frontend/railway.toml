@@ -2,5 +2,9 @@
 builder = "dockerfile"
 dockerfilePath = "frontend/Dockerfile.prod"
 
+[build.buildArgs]
+VITE_API_URL = "$VITE_API_URL"
+VITE_WHATSAPP_LINK = "$VITE_WHATSAPP_LINK"
+
 [deploy]
 restartPolicyType = "on_failure"

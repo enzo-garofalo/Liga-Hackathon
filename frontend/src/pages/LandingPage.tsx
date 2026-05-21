@@ -390,7 +390,7 @@ function HowItWorks() {
 function Schedule() {
   return (
     <section id="cronograma" className="bg-[#f2f2f2] px-5 py-14 text-black md:px-10">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-7xl">
         <div className="mx-auto mb-8 max-w-3xl text-center">
           <h2 className="font-display text-[clamp(1.55rem,8vw,2.2rem)] font-semibold leading-[1.08] tracking-[-0.045em] md:text-[clamp(1.8rem,3.25vw,3.35rem)] md:tracking-[-0.06em]">
             Local e Cronograma
@@ -398,15 +398,15 @@ function Schedule() {
           <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-black/48">
           </p>
         </div>
-        <div className="grid gap-3 overflow-hidden rounded-[1.8rem] bg-[#eeeeee] p-3 md:grid-cols-2">
-          <div className="rounded-[1.15rem] border border-black/10 bg-white p-4 shadow-[0_18px_45px_rgba(20,16,30,0.04)] md:col-span-2">
-            <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand/10 text-brand">
+        <div className="grid gap-3 overflow-hidden rounded-[1.35rem] bg-[#eeeeee] p-3 md:grid-cols-4 md:rounded-[1.8rem]">
+          <div className="rounded-[1.1rem] border border-black/10 bg-white p-5 shadow-[0_18px_45px_rgba(20,16,30,0.04)] md:col-span-4 md:rounded-[1.2rem] md:p-6">
+            <div className="flex items-start gap-4 md:items-center">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-brand/10 text-brand md:h-14 md:w-14">
                 <MapPin className="h-4 w-4" />
               </div>
               <div>
                 <p className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-brand/60">Local do evento</p>
-                <h3 className="mt-1 text-sm font-semibold tracking-[-0.03em] text-black md:text-base">WeHandle</h3>
+                <h3 className="mt-1 text-base font-semibold tracking-[-0.03em] text-black md:text-xl">WeHandle</h3>
                 <p className="mt-1 text-xs leading-5 text-black/50 md:text-sm">Av. Alan Turing, 776 - Campinas/SP</p>
               </div>
             </div>
@@ -415,15 +415,15 @@ function Schedule() {
             <article
               key={time}
               className={[
-                'group relative overflow-hidden rounded-[1.15rem] border p-4 shadow-[0_18px_45px_rgba(20,16,30,0.04)] transition duration-300',
+                'group relative min-h-[10.5rem] overflow-hidden rounded-[1.1rem] border p-5 shadow-[0_18px_45px_rgba(20,16,30,0.04)] transition duration-300 md:min-h-[13rem] md:rounded-[1.2rem] md:p-5',
                 highlight
                   ? 'border-black bg-black text-white'
                   : 'border-black/10 bg-white hover:-translate-y-1 hover:border-black/16',
               ].join(' ')}
             >
               {highlight && <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-brand/10 blur-2xl transition duration-300" />}
-              <div className="relative flex items-start gap-4">
-                <div className={['flex h-14 w-20 shrink-0 items-center justify-center rounded-2xl font-display text-xl font-semibold tabular-nums transition duration-300', highlight ? 'bg-white text-black' : 'bg-white text-brand group-hover:text-black'].join(' ')}>
+              <div className="relative flex h-full flex-col justify-between gap-5">
+                <div className={['flex h-11 w-20 shrink-0 items-center justify-center rounded-2xl font-display text-lg font-semibold tabular-nums transition duration-300 md:h-12 md:text-xl', highlight ? 'bg-white text-black' : 'bg-brand/10 text-brand group-hover:text-black'].join(' ')}>
                   {time}
                 </div>
                 <div>
@@ -434,7 +434,7 @@ function Schedule() {
                     {highlight && <span className="rounded-full bg-brand px-2 py-0.5 text-[0.6rem] font-semibold text-white">Encerramento</span>}
                   </div>
                   <h3 className={['text-sm font-semibold tracking-[-0.03em] md:text-base', highlight ? 'text-white' : 'text-black'].join(' ')}>{label}</h3>
-                  <p className={['mt-1 text-xs md:text-sm', highlight ? 'text-white/50' : 'text-black/50'].join(' ')}>{desc}</p>
+                  <p className={['mt-2 text-xs leading-5 md:text-sm md:leading-6', highlight ? 'text-white/50' : 'text-black/50'].join(' ')}>{desc}</p>
                 </div>
               </div>
             </article>
@@ -450,23 +450,25 @@ function FAQ() {
 
   return (
     <section id="faq" className="bg-white px-5 py-14 text-black md:px-10">
-      <div className="mx-auto max-w-3xl">
-        <h2 className="mb-8 text-center font-display text-[clamp(1.55rem,8vw,2.2rem)] font-semibold leading-[1.08] tracking-[-0.045em] md:text-[clamp(1.8rem,3.25vw,3.35rem)] md:tracking-[-0.06em]">
-          Regras e FAQ
-        </h2>
-        <div className="overflow-hidden rounded-2xl border border-black/8 bg-[#f8f8f8] shadow-[0_18px_50px_rgba(20,16,30,0.05)]">
+      <div className="mx-auto max-w-7xl">
+        <div className="mx-auto mb-8 max-w-3xl text-center">
+          <h2 className="font-display text-[clamp(1.55rem,8vw,2.2rem)] font-semibold leading-[1.08] tracking-[-0.045em] md:text-[clamp(1.8rem,3.25vw,3.35rem)] md:tracking-[-0.06em]">
+            Regras e FAQ
+          </h2>
+        </div>
+        <div className="overflow-hidden rounded-[1.35rem] border border-black/8 bg-[#f8f8f8] shadow-[0_18px_50px_rgba(20,16,30,0.05)] md:rounded-[1.8rem]">
           {FAQS.map(({ q, a }, index) => {
             const isOpen = open === index
             return (
               <div key={q} className={index > 0 ? 'border-t border-black/8' : ''}>
-                <button className="flex w-full items-center gap-3 px-4 py-4 text-left md:gap-4 md:px-6" onClick={() => setOpen(isOpen ? null : index)}>
+                <button className="flex w-full items-center gap-3 px-4 py-4 text-left md:gap-5 md:px-8 md:py-5" onClick={() => setOpen(isOpen ? null : index)}>
                   <span className="text-xs text-brand/32">{String(index + 1).padStart(2, '0')}</span>
-                  <span className="flex-1 text-sm font-semibold tracking-[-0.02em] text-black">{q}</span>
+                  <span className="flex-1 text-sm font-semibold tracking-[-0.02em] text-black md:text-base">{q}</span>
                   <ChevronDown className={['h-4 w-4 text-brand transition-transform', isOpen ? 'rotate-180' : ''].join(' ')} />
                 </button>
                 <div className="grid transition-all" style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}>
                   <div className="overflow-hidden">
-                    <p className="px-4 pb-4 text-sm leading-7 text-black/48 md:px-14">{a}</p>
+                    <p className="px-4 pb-5 text-sm leading-7 text-black/48 md:px-[4.6rem] md:pb-6 md:text-base md:leading-8">{a}</p>
                   </div>
                 </div>
               </div>

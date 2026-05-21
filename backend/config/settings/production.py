@@ -59,7 +59,3 @@ LOGGING = {
     'handlers': {'console': {'class': 'logging.StreamHandler'}},
     'root': {'handlers': ['console'], 'level': 'WARNING'},
 }
-
-import sys
-print(f"[CORS DEBUG] raw env: {os.environ.get('CORS_ALLOWED_ORIGINS')!r}", file=sys.stderr)
-print(f"[CORS DEBUG] parsed: {CORS_ALLOWED_ORIGINS}", file=sys.stderr)

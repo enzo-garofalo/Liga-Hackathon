@@ -1,31 +1,64 @@
 import logging
 
-from apps.teams import emails
+from django.db import transaction
+
+from apps.teams import tasks
 from apps.teams.models import Notification, NotificationType
 
 logger = logging.getLogger(__name__)
 
-
-EMAIL_DISPATCH = {
-    NotificationType.TEAM_INVITE: emails.send_invite_received,
-    NotificationType.JOIN_REQUEST: emails.send_join_request_received,
-    NotificationType.INVITE_ACCEPTED: emails.send_invite_accepted,
-    NotificationType.INVITE_DECLINED: emails.send_invite_declined,
-    NotificationType.JOIN_ACCEPTED: emails.send_join_accepted,
-    NotificationType.JOIN_DECLINED: emails.send_join_declined,
-    NotificationType.TEAM_SUBMITTED: emails.send_team_submitted,
-    NotificationType.TEAM_APPROVED: emails.send_team_approved,
-    NotificationType.TEAM_REJECTED: emails.send_team_rejected,
-    NotificationType.TEAM_DISBANDED: emails.send_team_disbanded,
+# Maps each notification type to its Celery task and a function that extracts
+# JSON-serializable kwargs from the email_context dict (which holds model instances).
+_TASK_DISPATCH: dict[NotificationType, tuple] = {
+    NotificationType.TEAM_INVITE: (
+        tasks.send_invite_received,
+        lambda pid, ctx: {'participant_id': pid, 'invite_id': ctx['invite'].pk},
+    ),
+    NotificationType.JOIN_REQUEST: (
+        tasks.send_join_request_received,
+        lambda pid, ctx: {'participant_id': pid, 'join_request_id': ctx['join_request'].pk},
+    ),
+    NotificationType.INVITE_ACCEPTED: (
+        tasks.send_invite_accepted,
+        lambda pid, ctx: {'participant_id': pid, 'invite_id': ctx['invite'].pk},
+    ),
+    NotificationType.INVITE_DECLINED: (
+        tasks.send_invite_declined,
+        lambda pid, ctx: {'participant_id': pid, 'invite_id': ctx['invite'].pk},
+    ),
+    NotificationType.JOIN_ACCEPTED: (
+        tasks.send_join_accepted,
+        lambda pid, ctx: {'participant_id': pid, 'join_request_id': ctx['join_request'].pk},
+    ),
+    NotificationType.JOIN_DECLINED: (
+        tasks.send_join_declined,
+        lambda pid, ctx: {'participant_id': pid, 'join_request_id': ctx['join_request'].pk},
+    ),
+    NotificationType.TEAM_SUBMITTED: (
+        tasks.send_team_submitted,
+        lambda pid, ctx: {'participant_id': pid, 'team_id': ctx['team'].pk},
+    ),
+    NotificationType.TEAM_APPROVED: (
+        tasks.send_team_approved,
+        lambda pid, ctx: {'participant_id': pid, 'team_id': ctx['team'].pk},
+    ),
+    NotificationType.TEAM_REJECTED: (
+        tasks.send_team_rejected,
+        lambda pid, ctx: {'participant_id': pid, 'team_id': ctx['team'].pk},
+    ),
+    NotificationType.TEAM_DISBANDED: (
+        tasks.send_team_disbanded,
+        lambda pid, ctx: {'participant_id': pid, 'team_id': ctx['team'].pk},
+    ),
 }
 
 
 def notify(participant, notification_type, message, *, link_to='', **email_context):
-    """Cria uma Notification para o participante e dispara o e-mail correspondente.
+    """Cria uma Notification e enfileira o e-mail correspondente via Celery.
 
-    A criação da Notification participa da transação chamadora — se algo
-    falhar antes do commit, a notification é desfeita junto com tudo. O
-    envio do e-mail é best-effort: falhas são logadas e não propagadas.
+    A Notification participa da transação chamadora. O .delay() só é
+    enfileirado no Redis após o commit, evitando a race condition onde a
+    task roda antes do dado estar visível no banco.
     """
     notification = Notification.objects.create(
         participant=participant,
@@ -33,20 +66,20 @@ def notify(participant, notification_type, message, *, link_to='', **email_conte
         message=message,
         link_to=link_to or '',
     )
-    fn = EMAIL_DISPATCH.get(notification_type)
-    if fn is None:
-        logger.warning('No email template registered for type=%s', notification_type)
+
+    entry = _TASK_DISPATCH.get(notification_type)
+    if entry is None:
+        logger.warning(
+            'No email task registered for notification_type=%s — e-mail not sent',
+            notification_type,
+        )
         return notification
 
-    try:
-        fn(participant=participant, **email_context)
-    except Exception:
-        logger.exception(
-            'Falha ao enviar e-mail para notificação %s (type=%s, participant=%s)',
-            notification.id,
-            notification_type,
-            participant.id,
-        )
+    task_fn, extract_kwargs = entry
+    kwargs = extract_kwargs(participant.pk, email_context)
+
+    transaction.on_commit(lambda: task_fn.delay(**kwargs))
+
     return notification
 
 

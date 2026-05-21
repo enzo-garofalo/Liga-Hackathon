@@ -45,6 +45,10 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
+# ── Celery ────────────────────────────────────────────────────────
+CELERY_BROKER_URL = os.environ['REDIS_URL']
+CELERY_RESULT_BACKEND = os.environ['REDIS_URL']
+
 # ── Email ─────────────────────────────────────────────────────────
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 

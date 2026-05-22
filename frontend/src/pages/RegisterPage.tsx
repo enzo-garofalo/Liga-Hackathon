@@ -118,7 +118,7 @@ function RegisterShowcase() {
             ideias em código
           </h2>
           <p className="mt-5 max-w-sm text-base leading-7 text-white/46">
-            Hackathon Liga de TI - 13 de junho de 2026.
+            Hackathon Liga de TI - 20 de junho de 2026.
           </p>
           <div className="mt-7 flex items-center gap-3 text-white/58">
             <img src={wehandleMark} alt="WeHandle" className="h-7 w-7 object-contain" />

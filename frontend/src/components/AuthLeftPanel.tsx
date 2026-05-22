@@ -33,7 +33,7 @@ export function AuthLeftPanel({ sticky = false }: { sticky?: boolean }) {
             <span className="block text-6xl font-semibold text-white">em código</span>
           </h2>
           <p className="font-ui text-base text-white/52 mt-5">
-            13 de junho de 2026. Equipes de 4 pessoas, uma maratona para construir sob pressão real.
+            20 de junho de 2026. Equipes de 4 pessoas, uma maratona para construir sob pressão real.
           </p>
         </div>
       </div>

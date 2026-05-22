@@ -20,7 +20,7 @@ import wehandleMark from '../assets/wehandle-mark.svg'
 import { Button } from '../components/ui/Button'
 
 const WHATSAPP_LINK = (import.meta as unknown as { env: Record<string, string> }).env.VITE_WHATSAPP_LINK || '#'
-const EVENT_DATE = new Date('2026-06-13T10:00:00')
+const EVENT_DATE = new Date('2026-06-20T10:00:00')
 
 const SCHEDULE = [
   { time: '09:00', label: 'Recepção dos participantes', desc: 'Credenciamento e boas-vindas.' },
@@ -124,7 +124,7 @@ function HeroDashboard() {
 
       <div className="floating-countdown absolute bottom-2 left-[9%] right-[9%] z-20 rounded-[1.2rem] border border-white/14 bg-[#0b0714]/80 p-2.5 shadow-[0_34px_100px_rgba(0,0,0,0.34)] backdrop-blur-2xl md:bottom-8 md:left-[12%] md:right-[12%] md:rounded-[1.45rem] md:p-4">
         <div className="mb-2 flex items-center justify-between md:mb-3">
-          <span className="font-mono text-[0.55rem] uppercase tracking-[0.18em] text-white/48 md:text-[0.62rem] md:tracking-[0.2em]">13 junho 2026</span>
+          <span className="font-mono text-[0.55rem] uppercase tracking-[0.18em] text-white/48 md:text-[0.62rem] md:tracking-[0.2em]">20 junho 2026</span>
           <span className="rounded-full border border-white/10 bg-white/8 px-2.5 py-1 font-mono text-[0.5rem] uppercase tracking-[0.14em] text-brand-soft md:px-3 md:text-[0.58rem] md:tracking-[0.16em]">contagem</span>
         </div>
         <div className="grid grid-cols-4 overflow-hidden rounded-[1.1rem] border border-white/10 bg-white/[0.04] text-center">
@@ -186,7 +186,7 @@ function Hero() {
 
           <div className="relative z-20 mb-5 grid grid-cols-2 justify-items-center gap-x-4 gap-y-3 text-center text-white/70 md:flex md:flex-wrap md:items-center md:justify-center md:gap-x-6 md:gap-y-2 md:text-left">
             {[
-              { icon: Calendar, text: '13 junho 2026' },
+              { icon: Calendar, text: '20 junho 2026' },
               { icon: Clock, text: '10h às 19h' },
               { icon: MapPin, text: 'Av. Alan Turing, 776' },
               { icon: Users, text: '10 times de 4 pessoas' },
@@ -592,7 +592,7 @@ function Footer() {
             <div className="col-span-2 md:col-span-1">
               <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/36">Detalhes deste hackathon</h3>
               <div className="mt-5 space-y-4 text-sm text-white/54">
-                <p>13 de junho de 2026</p>
+                <p>20 de junho de 2026</p>
                 <p>10h às 19h</p>
                 <p>Av. Alan Turing, 776 - WeHandle, Campinas/SP</p>
               </div>

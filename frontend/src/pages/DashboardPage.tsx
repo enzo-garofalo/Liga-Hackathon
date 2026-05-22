@@ -12,7 +12,7 @@ import { useProfile } from '../hooks/useProfile'
 import { useOpenTeams } from '../hooks/useTeams'
 
 const WHATSAPP_LINK = (import.meta as unknown as { env: Record<string, string> }).env.VITE_WHATSAPP_LINK || '#'
-const EVENT_DATE = new Date('2026-06-13T10:00:00')
+const EVENT_DATE = new Date('2026-06-20T10:00:00')
 
 function daysUntil(date: Date) {
   return Math.max(0, Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
@@ -184,7 +184,7 @@ export function DashboardPage() {
           <Clock className="h-6 w-6 flex-shrink-0 text-brand-soft" />
           <div>
             <p className="kicker">Evento em</p>
-            <p className="font-display text-lg font-semibold text-ink">{daysEvent} dias - 13 de junho de 2026</p>
+            <p className="font-display text-lg font-semibold text-ink">{daysEvent} dias - 20 de junho de 2026</p>
           </div>
         </div>
       )}

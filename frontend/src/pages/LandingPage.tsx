@@ -354,7 +354,7 @@ function HowItWorks() {
     { n: '01', icon: UserPlus, title: 'Crie sua conta', desc: 'Cadastre-se e deixe seu perfil pronto para formar equipe.' },
     { n: '02', icon: Users, title: 'Monte sua equipe', desc: 'Convide membros ou entre em uma equipe com vagas abertas.' },
     { n: '03', icon: Send, title: 'Submeta no prazo', desc: 'Com os 4 integrantes confirmados, submeta até 30/05/2026.' },
-    { n: '04', icon: Code2, title: 'Participe do hackathon', desc: 'Compareça no dia 13/06, desenvolva sua solução e apresente para a banca.' },
+    { n: '04', icon: Code2, title: 'Participe do hackathon', desc: 'Compareça no dia 20/06, desenvolva sua solução e apresente para a banca.' },
   ]
 
   return (

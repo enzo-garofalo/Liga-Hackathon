@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import type { ElementType } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { GitBranch, Link2, Lock, User, CheckCircle2 } from 'lucide-react'
 import { Button } from '../components/ui/Button'
 import { useProfile, useUpdateProfile } from '../hooks/useProfile'
@@ -9,11 +9,31 @@ import { getApiError } from '../utils/errors'
 
 interface FormShape {
   full_name: string
+  phone: string
   course: string
   semester: string
   bio: string
   github: string
   linkedin: string
+}
+
+function onlyDigits(value: string) {
+  return value.replace(/\D/g, '')
+}
+
+function formatPhone(value: string) {
+  const digits = onlyDigits(value).slice(0, 11)
+  if (digits.length <= 2) return digits ? `(${digits}` : ''
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+}
+
+function validatePhone(value: string) {
+  if (!value.trim()) return true
+  const digits = onlyDigits(value)
+  if (digits.length < 10 || digits.length > 11) return 'Informe um telefone com DDD.'
+  return true
 }
 
 function initials(name: string) {
@@ -68,10 +88,15 @@ export function ProfilePage() {
     handleSubmit,
     reset,
     watch,
+    control,
+    setValue,
     formState: { errors, isDirty },
   } = useForm<FormShape>({
-    defaultValues: { full_name: '', course: '', semester: '', bio: '', github: '', linkedin: '' },
+    defaultValues: { full_name: '', phone: '', course: '', semester: '', bio: '', github: '', linkedin: '' },
   })
+
+  const phoneValue = useWatch({ control, name: 'phone' }) ?? ''
+  const phoneField = register('phone', { validate: validatePhone })
 
   const watchedName = watch('full_name')
   const watchedBio = watch('bio')
@@ -80,6 +105,7 @@ export function ProfilePage() {
     if (meQuery.data) {
       reset({
         full_name: meQuery.data.full_name,
+        phone: meQuery.data.phone ? formatPhone(meQuery.data.phone) : '',
         course: meQuery.data.course,
         semester: String(meQuery.data.semester),
         bio: meQuery.data.bio,
@@ -92,6 +118,7 @@ export function ProfilePage() {
   const onSubmit = handleSubmit((data) => {
     const payload: UpdateMePayload = {
       full_name: data.full_name,
+      phone: onlyDigits(data.phone) || null,
       course: data.course,
       semester: Number(data.semester),
       bio: data.bio,
@@ -114,6 +141,7 @@ export function ProfilePage() {
     if (meQuery.data) {
       reset({
         full_name: meQuery.data.full_name,
+        phone: meQuery.data.phone ? formatPhone(meQuery.data.phone) : '',
         course: meQuery.data.course,
         semester: String(meQuery.data.semester),
         bio: meQuery.data.bio,
@@ -214,6 +242,26 @@ export function ProfilePage() {
                         />
                         {errors.full_name && (
                           <p className="text-xs text-red-500 mt-1 font-ui">{errors.full_name.message}</p>
+                        )}
+                      </div>
+
+                      {/* Phone */}
+                      <div>
+                        <label className={labelCls}>Telefone</label>
+                        <input
+                          {...phoneField}
+                          type="tel"
+                          inputMode="numeric"
+                          placeholder="(11) 99999-9999"
+                          value={formatPhone(phoneValue)}
+                          onChange={(e) => {
+                            phoneField.onChange(e)
+                            setValue('phone', onlyDigits(e.target.value), { shouldDirty: true })
+                          }}
+                          className={fieldCls(!!errors.phone)}
+                        />
+                        {errors.phone && (
+                          <p className="text-xs text-red-500 mt-1 font-ui">{errors.phone.message}</p>
                         )}
                       </div>
 

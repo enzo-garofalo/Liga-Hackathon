@@ -3,6 +3,7 @@ import type { TeamMinimal } from './team'
 export interface ParticipantSummary {
   id: string
   full_name: string
+  phone: string | null
   course: string
   semester: number
   bio: string
@@ -20,6 +21,7 @@ export interface MeProfile extends ParticipantSummary {
 
 export interface UpdateMePayload {
   full_name?: string
+  phone?: string | null
   course?: string
   semester?: number
   bio?: string

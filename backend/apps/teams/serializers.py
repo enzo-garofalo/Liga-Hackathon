@@ -31,6 +31,7 @@ class ParticipantPublicSerializer(serializers.ModelSerializer):
             'id',
             'email',
             'full_name',
+            'phone',
             'course',
             'semester',
             'bio',
@@ -53,6 +54,7 @@ class MeSerializer(serializers.ModelSerializer):
             'id',
             'email',
             'full_name',
+            'phone',
             'course',
             'semester',
             'bio',
@@ -292,6 +294,7 @@ class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True, min_length=8, max_length=128)
     full_name = serializers.CharField(max_length=255)
+    phone = serializers.CharField(max_length=20, required=False, allow_blank=True, allow_null=True)
     course = serializers.CharField(max_length=255)
     semester = serializers.IntegerField(min_value=1, max_value=20)
     bio = serializers.CharField()
@@ -324,6 +327,7 @@ class RegisterSerializer(serializers.Serializer):
         return Participant.objects.create(
             user=user,
             full_name=validated_data['full_name'],
+            phone=validated_data.get('phone') or None,
             course=validated_data['course'],
             semester=validated_data['semester'],
             bio=validated_data['bio'],

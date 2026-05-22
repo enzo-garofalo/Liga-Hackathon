@@ -12,6 +12,7 @@ class Participant(models.Model):
         related_name='participant',
     )
     full_name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20, blank=True, null=True)
     github = models.URLField(blank=True, null=True)
     linkedin = models.URLField(blank=True, null=True)
     course = models.CharField(max_length=255)

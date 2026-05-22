@@ -40,7 +40,7 @@ const FAQS = [
   },
   {
     q: 'Qual o prazo para formar e submeter a equipe?',
-    a: 'Até 30/05/2026. Após essa data, equipes incompletas serão descartadas automaticamente.',
+    a: 'Até 13/06/2026. Após essa data, equipes incompletas serão descartadas automaticamente.',
   },
   {
     q: 'Quantas equipes serão aprovadas?',

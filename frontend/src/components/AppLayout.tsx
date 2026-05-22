@@ -37,7 +37,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
       <div className="flex h-16 flex-shrink-0 items-center gap-3 border-b border-white/10 px-4">
         <Link to="/" className="flex min-w-0 flex-1 items-center gap-2.5">
           <img src={logo} alt="Liga de TI" className="h-7 flex-shrink-0 brightness-0 invert" />
-          <span className="whitespace-nowrap font-clash text-lg font-semibold text-white">Hackathon</span>
+          <span className="whitespace-nowrap font-clash text-lg font-semibold text-white">Arena</span>
         </Link>
         {onClose ? (
           <button onClick={onClose} className="ml-auto text-white/50 transition-colors hover:text-white" aria-label="Fechar menu">

@@ -111,7 +111,7 @@ export function InviteMembersModal({ teamId, maxInvitees, meId, onClose }: Props
             </button>
           </div>
 
-          <div className="flex-1 space-y-5 overflow-y-auto pr-0.5">
+          <div className="space-y-5">
             {selected.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {selected.map((participant) => (

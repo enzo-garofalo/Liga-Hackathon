@@ -149,7 +149,7 @@ function Hero() {
         <nav className="relative z-30 mx-auto mt-5 flex h-12 w-[min(90vw,74rem)] items-center justify-between px-1 text-[0.66rem] uppercase tracking-[0.18em] text-white/58">
           <Link to="/" aria-label="Liga de TI" className="flex items-center gap-3">
             <img src={logo} alt="Liga de TI" className="h-7 brightness-0 invert" />
-            <span className="hidden font-semibold text-white/78 sm:inline">Hackathons</span>
+            <span className="hidden font-semibold text-white/78 sm:inline">Arena</span>
           </Link>
           <div className="hidden items-center gap-7 md:flex">
             <a href="#sobre" className="transition hover:text-white">Sobre</a>
@@ -568,7 +568,7 @@ function Footer() {
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-3">
                 <img src={logo} alt="Liga de TI" className="h-7 brightness-0 invert" />
-                <span className="font-semibold">Hackathons</span>
+                <span className="font-semibold">Arena</span>
               </div>
               <p className="mt-6 max-w-sm text-sm leading-7 text-white/46">
                 Plataforma oficial para formar equipes, gerenciar convites e acompanhar o fluxo de submissão do evento com nossos parceiros.

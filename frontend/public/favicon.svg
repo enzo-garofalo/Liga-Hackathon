@@ -1,0 +1,38 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="38%" cy="28%" r="75%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="#7B45F5"/>
+      <stop offset="55%" stop-color="#4A1FB8"/>
+      <stop offset="100%" stop-color="#0E0629"/>
+    </radialGradient>
+    <pattern id="dots" x="0" y="0" width="5" height="5" patternUnits="userSpaceOnUse">
+      <circle cx="0.75" cy="0.75" r="0.65" fill="white" fill-opacity="0.13"/>
+    </pattern>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="0" stdDeviation="2.2" flood-color="#A87FFF" flood-opacity="0.7"/>
+    </filter>
+    <clipPath id="rounded">
+      <rect width="64" height="64" rx="14"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <!-- Dot grid -->
+  <rect width="64" height="64" rx="14" fill="url(#dots)"/>
+  <!-- Top-left ambient bloom -->
+  <ellipse cx="14" cy="10" rx="18" ry="12" fill="#9B6FFF" fill-opacity="0.22"/>
+  <!-- Bottom-right dark anchor -->
+  <ellipse cx="52" cy="56" rx="16" ry="10" fill="#06021A" fill-opacity="0.35"/>
+
+  <!-- Liga logo — white, glowing, centered -->
+  <g clip-path="url(#rounded)">
+    <g transform="translate(10, 18) scale(0.1002)" filter="url(#glow)">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M96.2432 6.99686C94.3195 31.1498 84.8683 51.7102 67.883 68.6931C51.5665 85.0064 30.2655 94.6835 7.04236 96.3318L0 96.8314V135.823V174.815L4.19045 174.818C10.6701 174.823 22.7753 177.03 30.4778 179.61C45.1084 184.512 57.2863 192.078 68.2837 203.097C84.9186 219.764 94.4544 240.681 96.2871 264.521L96.8155 271.395H141.637H186.459L235.869 185.79C263.045 138.706 286.408 98.2969 287.786 95.9901L290.293 91.7957L294.744 98.4829C302.394 109.979 316.037 125.123 326.318 133.532L328.973 135.704L326.318 137.876C315.011 147.123 301.98 161.902 292.888 175.79C275.776 201.926 266.63 229.992 264.529 262.814L263.98 271.395H303.053H342.125L343.068 262.355C345.206 241.839 351.692 225.981 364.454 210.057C380.441 190.11 405.795 176.913 431.617 175.098L439 174.579V135.704V96.8282L431.617 96.3094C405.795 94.4943 380.441 81.2972 364.454 61.3498C351.69 45.4245 345.206 29.5686 343.067 9.04579L342.125 0L297.418 0.205931L252.711 0.411862L200.819 90.272L148.926 180.132L145.813 175.317C138.136 163.437 122.283 145.499 112.682 137.826L110.027 135.704L112.682 133.589C118.439 129.004 133.996 112.552 139.366 105.373C160.753 76.7707 172.22 45.2896 174.472 8.99232L175.029 0.0127709H135.914H96.7995L96.2432 6.99686Z" fill="white"/>
+      <path d="M252.625 0.399091L96.9792 271.382H186.376L342.021 0L252.625 0.399091Z" fill="white" fill-opacity="0.6"/>
+    </g>
+  </g>
+
+  <!-- Subtle inner border -->
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="13.5" fill="none" stroke="white" stroke-opacity="0.1" stroke-width="1.5"/>
+</svg>

@@ -6,6 +6,7 @@ import {
   rejectTeam,
 } from '../api/admin'
 import { getAccessToken, getSessionKind } from '../auth/storage'
+import type { AdminParticipant } from '../types/participant'
 import type { TeamStatus } from '../types/team'
 
 const adminEnabled = () =>
@@ -40,7 +41,7 @@ export function useRejectTeam() {
 }
 
 export function useAdminParticipants() {
-  return useQuery({
+  return useQuery<AdminParticipant[]>({
     queryKey: ['admin-participants'],
     queryFn: listParticipants,
     enabled: adminEnabled(),

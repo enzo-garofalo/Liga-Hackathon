@@ -1,4 +1,4 @@
-import type { MeProfile } from '../types/participant'
+import type { AdminParticipant } from '../types/participant'
 import type { Team, TeamStatus } from '../types/team'
 import client from './client'
 
@@ -14,4 +14,4 @@ export const rejectTeam = (id: string) =>
   client.patch<Team>(`/admin/teams/${id}/reject/`).then((r) => r.data)
 
 export const listParticipants = () =>
-  client.get<MeProfile[]>('/admin/participants/').then((r) => r.data)
+  client.get<AdminParticipant[]>('/admin/participants/').then((r) => r.data)

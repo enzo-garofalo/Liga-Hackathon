@@ -24,6 +24,8 @@ User = get_user_model()
 
 class ParticipantPublicSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', read_only=True)
+    has_team = serializers.SerializerMethodField()
+    team_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Participant
@@ -37,10 +39,23 @@ class ParticipantPublicSerializer(serializers.ModelSerializer):
             'bio',
             'github',
             'linkedin',
+            'has_team',
+            'team_name',
             'created_at',
             'updated_at',
         ]
         read_only_fields = fields
+
+    def get_has_team(self, obj):
+        return obj.has_team
+
+    def get_team_name(self, obj):
+        membership = (
+            TeamMembership.objects.filter(participant=obj)
+            .select_related('team')
+            .first()
+        )
+        return membership.team.name if membership else None
 
 
 class MeSerializer(serializers.ModelSerializer):

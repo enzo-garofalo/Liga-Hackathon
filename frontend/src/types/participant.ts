@@ -19,6 +19,22 @@ export interface MeProfile extends ParticipantSummary {
   updated_at: string
 }
 
+export interface AdminParticipant {
+  id: string
+  email: string
+  full_name: string
+  phone: string | null
+  course: string
+  semester: number
+  bio: string
+  github: string | null
+  linkedin: string | null
+  has_team: boolean
+  team_name: string | null
+  created_at: string
+  updated_at: string
+}
+
 export interface UpdateMePayload {
   full_name?: string
   phone?: string | null

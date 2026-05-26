@@ -112,8 +112,6 @@ function HeroDashboard() {
 
   return (
     <div className="floating-stage relative mx-auto min-h-[18rem] w-full max-w-[38rem] md:min-h-[26rem]">
-      <div className="floating-depth-glow" />
-
       <div className="floating-panel floating-panel-liga absolute left-[13%] top-[12%] z-0 flex h-24 w-24 items-center justify-center rounded-[1.2rem] bg-white shadow-[0_38px_120px_rgba(168,135,255,0.3)] md:left-[8%] md:top-[6%] md:h-48 md:w-48 md:rounded-[1.45rem]">
         <img src={logo} alt="Liga de TI" className="h-[4.25rem] w-[4.75rem] object-contain md:h-[7.5rem] md:w-[8.5rem]" />
       </div>

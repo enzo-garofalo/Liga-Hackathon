@@ -50,7 +50,7 @@ CELERY_BROKER_URL = os.environ['REDIS_URL']
 CELERY_RESULT_BACKEND = os.environ['REDIS_URL']
 
 # ── Email ─────────────────────────────────────────────────────────
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'core.email_backend.ResendEmailBackend'
 
 # ── Logging ───────────────────────────────────────────────────────
 LOGGING = {

@@ -9,6 +9,7 @@ dj-database-url==2.2.0
 whitenoise==6.7.0
 celery==5.4.0
 redis==5.1.1
+resend==2.30.1
 pytest==8.3.3
 pytest-django==4.9.0
 factory-boy==3.3.1

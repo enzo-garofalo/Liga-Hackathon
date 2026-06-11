@@ -1,6 +1,6 @@
 # Liga Hackathon
 
-Plataforma oficial do Hackathon da Liga de TI, em parceria com a WeHandle.
+Plataforma oficial do Hackathon da Liga de TI.
 
 O sistema cobre o fluxo completo do evento: cadastro de participantes, login por JWT,
 formacao de equipes, convites, pedidos de entrada, submissao para analise, painel

@@ -44,7 +44,7 @@ const FAQS = [
   },
   {
     q: 'Quantas equipes serão aprovadas?',
-    a: 'No máximo 10 equipes. As equipes são aprovadas por ordem de submissão.',
+    a: 'No máximo 6 equipes. As equipes são aprovadas por ordem de submissão.',
   },
   {
     q: 'Posso participar de mais de uma equipe?',
@@ -187,7 +187,7 @@ function Hero() {
               { icon: Calendar, text: '20 junho 2026' },
               { icon: Clock, text: '10h às 19h' },
               { icon: MapPin, text: 'Av. Alan Turing, 776' },
-              { icon: Users, text: '10 times de 4 pessoas' },
+              { icon: Users, text: '6 times de 4 pessoas' },
             ].map(({ icon: Icon, text }, index) => (
               <div key={text} className="flex min-w-0 items-center justify-center gap-2 md:justify-start">
                 <Icon className="h-3.5 w-3.5 text-white/40" />

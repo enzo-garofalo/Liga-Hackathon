@@ -579,7 +579,7 @@ export function AdminDashboardPage() {
               <span className="font-semibold text-[#101114]">administrador</span>
             </h1>
             <p className="mt-2 text-sm text-[#9497a9]">
-              {approvedCount}/10 equipes aprovadas · {totalParticipants} participantes cadastrados
+              {approvedCount}/6 equipes aprovadas · {totalParticipants} participantes cadastrados
             </p>
           </div>
         </div>

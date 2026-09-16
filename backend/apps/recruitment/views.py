@@ -8,7 +8,10 @@ from rest_framework.views import APIView
 
 from apps.recruitment.models import Application, Process, Stage
 from apps.recruitment.serializers import (
+    AdminApplicationDetailSerializer,
     ApplicationListSerializer,
+    BulkActionSerializer,
+    EvaluationInputSerializer,
     MyApplicationDetailSerializer,
     MyApplicationListSerializer,
     ProcessDetailSerializer,
@@ -20,6 +23,11 @@ from apps.recruitment.serializers import (
 from apps.recruitment.services.applications import (
     apply_to_process,
     published_processes,
+    run_bulk_action,
+)
+from apps.recruitment.services.evaluations import (
+    evaluation_summary,
+    save_evaluation,
 )
 from apps.recruitment.services.processes import (
     assert_process_deletable,
@@ -294,3 +302,70 @@ class MyApplicationDetailView(generics.RetrieveAPIView):
             .select_related('process', 'current_stage')
             .prefetch_related('process__stages', 'deliverables')
         )
+
+
+# ── Avaliação e fluxo entre etapas ────────────────────────────────
+
+
+class AdminApplicationDetailView(generics.RetrieveAPIView):
+    serializer_class = AdminApplicationDetailSerializer
+    permission_classes = [IsAdminUser]
+    queryset = Application.objects.select_related(
+        'participant', 'participant__user', 'current_stage', 'process'
+    ).prefetch_related('deliverables', 'current_stage__criteria')
+
+
+class AdminEvaluationView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, pk):
+        application = get_object_or_404(Application, pk=pk)
+        return Response(evaluation_summary(application))
+
+    def post(self, request, pk):
+        application = get_object_or_404(
+            Application.objects.select_related('process'), pk=pk
+        )
+        payload = EvaluationInputSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+
+        stage = get_object_or_404(Stage, pk=payload.validated_data['stage'])
+        save_evaluation(
+            application,
+            stage,
+            request.user,
+            payload.validated_data['scores'],
+            payload.validated_data.get('notes', ''),
+        )
+        return Response(evaluation_summary(application), status=status.HTTP_200_OK)
+
+
+class AdminBulkActionView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, pk):
+        process = get_object_or_404(Process, pk=pk)
+        payload = BulkActionSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+
+        applications = list(
+            Application.objects.filter(
+                process=process, id__in=payload.validated_data['applications']
+            ).select_related('participant', 'participant__user', 'process', 'current_stage')
+        )
+        if len(applications) != len(set(payload.validated_data['applications'])):
+            raise Http404('Alguma das candidaturas não pertence a este processo.')
+
+        target_stage = None
+        if payload.validated_data.get('target_stage'):
+            target_stage = get_object_or_404(
+                Stage, pk=payload.validated_data['target_stage'], process=process
+            )
+
+        run_bulk_action(
+            process,
+            applications,
+            payload.validated_data['action'],
+            target_stage=target_stage,
+        )
+        return Response({'updated': len(applications)})

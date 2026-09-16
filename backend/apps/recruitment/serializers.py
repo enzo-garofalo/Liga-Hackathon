@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from apps.recruitment.models import (
     Application,
+    Deliverable,
     EvaluationCriterion,
     Process,
     ProcessStatus,
@@ -349,3 +350,98 @@ class MyApplicationDetailSerializer(MyApplicationListSerializer):
             many=True,
             context={**self.context, 'application': application},
         ).data
+
+
+# ── Avaliação (organizador) ───────────────────────────────────────
+
+
+class DeliverableSerializer(serializers.ModelSerializer):
+    stage_name = serializers.CharField(source='stage.name')
+
+    class Meta:
+        model = Deliverable
+        fields = ['id', 'stage', 'stage_name', 'file', 'uploaded_at']
+        read_only_fields = fields
+
+
+class AdminApplicationDetailSerializer(serializers.ModelSerializer):
+    """Ficha completa do candidato, como o modal de perfil exibe."""
+
+    participant_name = serializers.CharField(source='participant.full_name')
+    email = serializers.EmailField(source='participant.user.email')
+    course = serializers.CharField(source='participant.course')
+    semester = serializers.IntegerField(source='participant.semester')
+    phone = serializers.CharField(source='participant.phone', default=None)
+    github = serializers.CharField(source='participant.github', default=None)
+    linkedin = serializers.CharField(source='participant.linkedin', default=None)
+    bio = serializers.CharField(source='participant.bio', default='')
+    current_stage_name = serializers.CharField(
+        source='current_stage.name', default=None
+    )
+    deliverables = DeliverableSerializer(many=True, read_only=True)
+    criteria = serializers.SerializerMethodField()
+    my_scores = serializers.SerializerMethodField()
+    final_score = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Application
+        fields = [
+            'id',
+            'participant_name',
+            'email',
+            'course',
+            'semester',
+            'phone',
+            'github',
+            'linkedin',
+            'bio',
+            'status',
+            'current_stage',
+            'current_stage_name',
+            'deliverables',
+            'criteria',
+            'my_scores',
+            'final_score',
+            'submitted_at',
+            'updated_at',
+        ]
+        read_only_fields = fields
+
+    def get_criteria(self, application):
+        """Critérios da etapa atual — vêm da configuração, não são fixos."""
+        if application.current_stage is None:
+            return []
+        return [
+            {'id': str(criterion.id), 'name': criterion.name, 'order': criterion.order}
+            for criterion in application.current_stage.criteria.order_by('order')
+        ]
+
+    def get_my_scores(self, application):
+        """Notas que o organizador autenticado já deu na etapa atual."""
+        request = self.context.get('request')
+        if request is None or application.current_stage is None:
+            return {}
+        rows = application.evaluations.filter(
+            stage=application.current_stage, evaluator=request.user
+        )
+        return {str(row.criterion_id): float(row.score) for row in rows}
+
+    def get_final_score(self, application):
+        score = application.final_score
+        return round(float(score), 2) if score is not None else None
+
+
+class EvaluationInputSerializer(serializers.Serializer):
+    """Payload do botão 'Salvar Avaliação'."""
+
+    stage = serializers.UUIDField()
+    scores = serializers.ListField(child=serializers.DictField(), allow_empty=False)
+    notes = serializers.CharField(required=False, allow_blank=True, default='')
+
+
+class BulkActionSerializer(serializers.Serializer):
+    applications = serializers.ListField(
+        child=serializers.UUIDField(), allow_empty=False
+    )
+    action = serializers.CharField()
+    target_stage = serializers.UUIDField(required=False, allow_null=True)

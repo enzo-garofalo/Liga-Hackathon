@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from apps.recruitment.models import (
     Application,
+    Communication,
     Deliverable,
     EvaluationCriterion,
     Process,
@@ -445,3 +446,57 @@ class BulkActionSerializer(serializers.Serializer):
     )
     action = serializers.CharField()
     target_stage = serializers.UUIDField(required=False, allow_null=True)
+
+
+# ── Comunicações ──────────────────────────────────────────────────
+
+
+class CommunicationListSerializer(serializers.ModelSerializer):
+    recipient_count = serializers.SerializerMethodField()
+    audience_stage_name = serializers.CharField(
+        source='audience_stage.name', default=None
+    )
+
+    class Meta:
+        model = Communication
+        fields = [
+            'id',
+            'type',
+            'subject',
+            'audience',
+            'audience_stage',
+            'audience_stage_name',
+            'recipient_count',
+            'status',
+            'sent_at',
+        ]
+        read_only_fields = fields
+
+    def get_recipient_count(self, communication):
+        return communication.recipients.count()
+
+
+class CommunicationDetailSerializer(CommunicationListSerializer):
+    recipients = serializers.SerializerMethodField()
+
+    class Meta(CommunicationListSerializer.Meta):
+        fields = CommunicationListSerializer.Meta.fields + ['message', 'recipients']
+        read_only_fields = fields
+
+    def get_recipients(self, communication):
+        return [
+            {'id': str(p.id), 'full_name': p.full_name}
+            for p in communication.recipients.all()
+        ]
+
+
+class CommunicationInputSerializer(serializers.Serializer):
+    """Payload do modal 'Nova comunicação'."""
+
+    audience = serializers.CharField()
+    audience_stage = serializers.UUIDField(required=False, allow_null=True)
+    recipients = serializers.ListField(
+        child=serializers.UUIDField(), required=False, allow_empty=False
+    )
+    subject = serializers.CharField(max_length=255)
+    message = serializers.CharField()

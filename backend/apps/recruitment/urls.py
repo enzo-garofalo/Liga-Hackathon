@@ -9,9 +9,29 @@ from .views import (
     AdminStageDetailView,
     AdminStageListCreateView,
     AdminStageReorderView,
+    MyApplicationDetailView,
+    MyApplicationListView,
+    ProcessApplyView,
+    ProcessDetailView,
+    ProcessListView,
 )
 
 urlpatterns = [
+    # ── Candidato ────────────────────────────────────────────────
+    path('processes/', ProcessListView.as_view(), name='processes'),
+    path('processes/<uuid:pk>/', ProcessDetailView.as_view(), name='process-detail'),
+    path(
+        'processes/<uuid:pk>/apply/',
+        ProcessApplyView.as_view(),
+        name='process-apply',
+    ),
+    path('me/applications/', MyApplicationListView.as_view(), name='my-applications'),
+    path(
+        'me/applications/<uuid:pk>/',
+        MyApplicationDetailView.as_view(),
+        name='my-application-detail',
+    ),
+    # ── Organizador ──────────────────────────────────────────────
     path(
         'admin/processes/',
         AdminProcessListCreateView.as_view(),

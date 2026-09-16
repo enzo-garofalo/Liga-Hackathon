@@ -200,3 +200,152 @@ class ApplicationListSerializer(serializers.ModelSerializer):
         scores = self.context.get('final_scores', {})
         score = scores.get(application.id)
         return round(float(score), 2) if score is not None else None
+
+
+# ── Área do candidato ─────────────────────────────────────────────
+
+
+class PublicStageSerializer(serializers.ModelSerializer):
+    """Etapa como o candidato vê: sem critérios de avaliação, que são internos."""
+
+    class Meta:
+        model = Stage
+        fields = ['id', 'name', 'description', 'order', 'start_at', 'end_at']
+        read_only_fields = fields
+
+
+class PublicProcessListSerializer(serializers.ModelSerializer):
+    short_description = serializers.SerializerMethodField()
+    registration_open = serializers.SerializerMethodField()
+    stage_count = serializers.IntegerField(source='stages.count', read_only=True)
+    already_applied = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Process
+        fields = [
+            'id',
+            'name',
+            'short_description',
+            'banner',
+            'registration_start',
+            'registration_end',
+            'registration_open',
+            'stage_count',
+            'already_applied',
+        ]
+        read_only_fields = fields
+
+    def get_short_description(self, process):
+        text = process.description or ''
+        return text if len(text) <= 160 else f'{text[:157]}...'
+
+    def get_registration_open(self, process):
+        from apps.recruitment.services.applications import registration_is_open
+
+        return registration_is_open(process)
+
+    def get_already_applied(self, process):
+        return process.id in self.context.get('applied_process_ids', set())
+
+
+class PublicProcessDetailSerializer(PublicProcessListSerializer):
+    stages = PublicStageSerializer(many=True, read_only=True)
+
+    class Meta(PublicProcessListSerializer.Meta):
+        fields = PublicProcessListSerializer.Meta.fields + [
+            'description',
+            'highlight_message',
+            'stages',
+        ]
+        read_only_fields = fields
+
+
+class MyApplicationListSerializer(serializers.ModelSerializer):
+    process_name = serializers.CharField(source='process.name')
+    process_id = serializers.UUIDField(source='process.id')
+    current_stage_name = serializers.CharField(
+        source='current_stage.name', default=None
+    )
+    stage_count = serializers.IntegerField(source='process.stages.count')
+
+    class Meta:
+        model = Application
+        fields = [
+            'id',
+            'process_id',
+            'process_name',
+            'status',
+            'current_stage',
+            'current_stage_name',
+            'stage_count',
+            'submitted_at',
+            'updated_at',
+        ]
+        read_only_fields = fields
+
+
+class ApplicationTimelineStageSerializer(PublicStageSerializer):
+    """Etapa dentro da linha do tempo da candidatura."""
+
+    state = serializers.SerializerMethodField()
+    deliverables = serializers.SerializerMethodField()
+
+    class Meta(PublicStageSerializer.Meta):
+        fields = PublicStageSerializer.Meta.fields + [
+            'allows_file_upload',
+            'max_files',
+            'allowed_file_types',
+            'state',
+            'deliverables',
+        ]
+        read_only_fields = fields
+
+    def get_state(self, stage):
+        application = self.context['application']
+        current = application.current_stage
+        if current is None:
+            return 'upcoming'
+        if stage.order < current.order:
+            return 'done'
+        if stage.order == current.order:
+            return 'current'
+        return 'upcoming'
+
+    def get_deliverables(self, stage):
+        application = self.context['application']
+        return [
+            {
+                'id': str(deliverable.id),
+                'file': deliverable.file.url if deliverable.file else None,
+                'uploaded_at': deliverable.uploaded_at,
+            }
+            for deliverable in application.deliverables.all()
+            if deliverable.stage_id == stage.id
+        ]
+
+
+class MyApplicationDetailSerializer(MyApplicationListSerializer):
+    """Detalhe da candidatura.
+
+    Não expõe nota nem observação: avaliação é interna ao organizador.
+    """
+
+    stages = serializers.SerializerMethodField()
+    highlight_message = serializers.CharField(
+        source='process.highlight_message', read_only=True
+    )
+
+    class Meta(MyApplicationListSerializer.Meta):
+        fields = MyApplicationListSerializer.Meta.fields + [
+            'stages',
+            'highlight_message',
+        ]
+        read_only_fields = fields
+
+    def get_stages(self, application):
+        stages = application.process.stages.order_by('order')
+        return ApplicationTimelineStageSerializer(
+            stages,
+            many=True,
+            context={**self.context, 'application': application},
+        ).data

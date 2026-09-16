@@ -101,6 +101,10 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_TASK_TRACK_STARTED = True
 # Acknowledge tasks only after they complete so a worker crash causes requeue
 CELERY_TASK_ACKS_LATE = True
+# Em desenvolvimento sem Redis: CELERY_TASK_ALWAYS_EAGER=True roda a task no
+# próprio processo e o e-mail sai direto no console, sem broker.
+CELERY_TASK_ALWAYS_EAGER = os.environ.get('CELERY_TASK_ALWAYS_EAGER', 'False') == 'True'
+CELERY_TASK_EAGER_PROPAGATES = CELERY_TASK_ALWAYS_EAGER
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),

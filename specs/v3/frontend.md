@@ -202,12 +202,20 @@ src/types/
 - **Upload fora do prazo** mostra o motivo (prazo encerrado, tipo não permitido, limite de
   arquivos atingido) em vez de falhar silenciosamente.
 
-## O que não muda
+## Arquivos do hackathon que a v3 encosta
 
-Nenhuma página, hook, componente ou tipo do hackathon é removido ou alterado nesta versão.
-`TeamsPage`, `TeamDetailPage`, `StatusBanner`, `DeadlineBanner`, `NotificationBell` e os
-hooks de equipe continuam como estão.
+Nenhuma página, hook ou componente do hackathon é **removido**, mas alguns arquivos em
+produção são alterados (quatro, contando a tipagem). Cada um precisa ser conferido no
+fluxo do hackathon depois de mexido:
 
-`NotificationBell` passa a receber também as notificações do seletivo — como os tipos novos
-seguem o mesmo formato (`type`, `message`, `read`, `link_to`), o componente funciona sem
-alteração, desde que `link_to` aponte para as rotas novas.
+| Arquivo | Alteração | Risco |
+|---------|-----------|-------|
+| `pages/DashboardPage.tsx` | Ganha as seções "Meus processos" e "Processos disponíveis" | Regressão no `StatusBanner` e no fluxo de equipe, que vivem nessa mesma página |
+| `pages/AdminDashboardPage.tsx` | Ganha a lista de processos seletivos e "+ Novo Processo" | Regressão na tabela de equipes submetidas e nas ações de aprovar/recusar |
+| `types/notification.ts` | Union `NotificationType` ganha os 5 tipos novos | Baixo — só tipagem |
+| `components/NotificationBell.tsx` | `notificationTone()` precisa cobrir os tipos novos | **Sem isso a bolinha renderiza sem cor**: a função retorna `undefined` para tipo desconhecido e o `className` fica vazio |
+
+`TeamsPage`, `TeamDetailPage`, `StatusBanner`, `DeadlineBanner` e todos os hooks de equipe
+continuam exatamente como estão.
+
+Fora esses quatro arquivos, a v3 só adiciona páginas, componentes, hooks e tipos novos.

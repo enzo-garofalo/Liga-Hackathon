@@ -62,8 +62,8 @@ etapa está.
 - Exibição dos arquivos na ficha do candidato
 - `tests/test_views_deliverables.py`
 
-**Bloqueio:** exige a decisão de storage de produção
-([decisions.md](decisions.md) §5). Em desenvolvimento, storage local resolve.
+**Produção:** `MEDIA_ROOT` num volume do Railway ([decisions.md](decisions.md) §5). Em
+desenvolvimento, storage local resolve. Não há mais bloqueio para esta fase.
 
 ---
 
@@ -140,9 +140,10 @@ com e-mail em cada transição.
 
 ---
 
-## Pendências que precisam de decisão antes das fases indicadas
+## Pendências
 
-| Pendência | Bloqueia | Onde está registrada |
-|-----------|----------|----------------------|
-| Storage de arquivos em produção | Fase 4 | [decisions.md](decisions.md) §5 |
-| Quem pode avaliar (qualquer organizador vs. designado) | Fase 5 | [models.md](models.md) |
+Nenhuma pendência bloqueia as fases restantes.
+
+- Storage: resolvido — volume do Railway ([decisions.md](decisions.md) §5).
+- Quem pode avaliar: resolvido — avaliador designado ([decisions.md](decisions.md) §10).
+- Formato de `allowed_file_types`: resolvido — `ArrayField` do Postgres.

@@ -1,0 +1,159 @@
+# Modelos de dados — v3 (Processo Seletivo)
+
+> Baseado nos wireframes de frontend (dashboard candidato/organizador, gerenciar processo,
+> modais de avaliação/comunicação) e no material de produto da Liga (visão, MVP, arquitetura,
+> database, roadmap) resumido em [overview.md](overview.md).
+> Reaproveita ao máximo o que já existe em `backend/apps/teams/`.
+>
+> Decisões que sustentam este modelo estão registradas em [decisions.md](decisions.md).
+
+## Reaproveitado sem alteração de estrutura
+- **`Participant`** — já cobre os campos do modal "Perfil do candidato" (full_name, github,
+  linkedin, course, semester, phone). Passa a ser também o "candidato" do seletivo.
+- **`Notification`** + pipeline de e-mail (notificação e e-mail sempre disparados juntos) —
+  reaproveitado para comunicações automáticas do seletivo.
+- **`Team`, `TeamMembership`, `TeamInvite`, `JoinRequest`, `HackathonInfo`** — intocados.
+  O seletivo é individual (sem equipes), então esse fluxo não é usado por ele.
+
+## Modelos novos (app novo: `apps/recruitment/`)
+
+### Process (Processo Seletivo)
+| Campo | Tipo | Obs |
+|---|---|---|
+| id | UUID PK | |
+| name | CharField | ex.: "Processo Seletivo Liga de TI 2026.2" |
+| description | TextField | texto livre ("Sobre o processo") |
+| banner | ImageField | opcional |
+| status | CharField | `draft / published / closed` |
+| registration_start | DateTimeField | |
+| registration_end | DateTimeField | |
+| published_at | DateTimeField | null=True, preenchido ao publicar |
+| highlight_message | CharField | blank=True — mensagem opcional do modal "Abrir inscrições", exibida aos candidatos |
+| created_at / updated_at | | |
+
+Regras:
+- Só processo `published` aparece para candidatos (tela "Processos disponíveis").
+- Publicar (`draft → published`) é ação explícita ("Abrir Inscrições"), preenche `published_at`.
+- Sem teto de aprovados (diferente do hackathon) — decisão confirmada com a Liga.
+- `short_description` em [api.md](api.md) não é campo: é `description` truncada para o card.
+
+### Stage (Etapa)
+| Campo | Tipo | Obs |
+|---|---|---|
+| id | UUID PK | |
+| process | FK → Process | |
+| name | CharField | ex.: "Inscrição", "Resolução do Caso", "Pitch", "Entrevista" |
+| description | TextField | |
+| order | PositiveSmallIntegerField | define a sequência |
+| start_at / end_at | DateTimeField | |
+| accepts_late_submission | BooleanField | default=False |
+| allows_file_upload | BooleanField | default=False |
+| max_files | PositiveSmallIntegerField | null=True |
+| allowed_file_types | CharField/ArrayField | ex.: `pdf,zip,pptx` |
+| created_at / updated_at | | |
+
+Constraint: `unique_together(process, order)`.
+
+### EvaluationCriterion (Critério de avaliação da etapa)
+| Campo | Tipo | Obs |
+|---|---|---|
+| id | UUID PK | |
+| stage | FK → Stage | |
+| name | CharField | ex.: "Pensamento crítico", "Comunicação" |
+| order | PositiveSmallIntegerField | |
+
+### Application (Candidatura)
+| Campo | Tipo | Obs |
+|---|---|---|
+| id | UUID PK | |
+| process | FK → Process | |
+| participant | FK → Participant | |
+| current_stage | FK → Stage | null=True (null antes da 1ª etapa iniciar) |
+| status | CharField | `in_progress / approved / rejected / discarded` |
+| submitted_at | DateTimeField | |
+| created_at / updated_at | | |
+
+Constraint: `unique_together(process, participant)` — um participante tem só uma
+candidatura ativa por processo (equivalente à "uma membership ativa" do Team).
+
+Propriedade derivada:
+- `final_score` → média das médias de etapa (calculado a partir de `Evaluation`).
+
+### Deliverable (Entregável)
+| Campo | Tipo | Obs |
+|---|---|---|
+| id | UUID PK | |
+| application | FK → Application | |
+| stage | FK → Stage | |
+| file | FileField | |
+| uploaded_at | DateTimeField | auto_now_add |
+
+Validação: só aceita upload se `stage.allows_file_upload=True`, tipo em
+`allowed_file_types`, e dentro de `stage.end_at` (a menos que
+`accepts_late_submission=True`).
+
+### Evaluation (Avaliação — nota por avaliador × critério)
+| Campo | Tipo | Obs |
+|---|---|---|
+| id | UUID PK | |
+| application | FK → Application | |
+| stage | FK → Stage | |
+| criterion | FK → EvaluationCriterion | |
+| evaluator | FK → Participant (organizador) | |
+| score | DecimalField | ex.: 0.0–10.0 |
+| notes | TextField | blank=True — "Observações" do avaliador |
+| created_at / updated_at | | |
+
+Constraint: `unique_together(application, criterion, evaluator)` — um avaliador dá
+uma nota por critério (pode editar, não duplicar).
+
+Cálculo (feito em service, não em campo persistido):
+- Média por critério = média de `score` entre avaliadores.
+- Média final da etapa = média das médias de critério.
+- Isso bate com o modal "Avaliação de etapa: Case/Pitch" que mostra nota por
+  avaliador e "Média automática final".
+
+### Communication (Comunicação em massa do processo)
+| Campo | Tipo | Obs |
+|---|---|---|
+| id | UUID PK | |
+| process | FK → Process | |
+| type | CharField | `auto / manual` |
+| subject | CharField | |
+| message | TextField | |
+| audience | CharField | `all / stage / approved / rejected / specific` |
+| audience_stage | FK → Stage | null=True, usado quando audience=`stage` |
+| recipients | M2M → Participant | resolvido no envio (specific) ou calculado (all/stage/approved/rejected) |
+| status | CharField | `sent / failed` |
+| sent_at | DateTimeField | |
+
+Toda `Communication` dispara `Notification` + e-mail para cada destinatário
+resolvido, seguindo a regra existente de "nunca um sem o outro".
+
+### OrganizerProfile (perfil de organizador)
+| Campo | Tipo | Obs |
+|---|---|---|
+| id | UUID PK | |
+| user | OneToOne → User | organizadores continuam sendo `is_staff=True` |
+| role_title | CharField | ex.: "Diretor de Operações" — **informativo apenas no MVP, sem RBAC** |
+| phone / github / linkedin | | mesmos campos do modal "Perfil organizador" |
+
+> Decisão confirmada: sem RBAC real no MVP. Qualquer `is_staff=True` pode criar
+> processo, avaliar, mover etapa e enviar comunicado. `role_title` é só exibido na UI.
+
+## Reconciliação com o hackathon existente
+`Team`/`TeamMembership` continuam existindo do jeito que estão — não fazem parte do
+domínio `recruitment`. Não há FK entre os dois domínios nesta v3; se no futuro a Liga
+quiser rodar hackathon como um "tipo" de processo seletivo, isso vira uma v4 com o
+`Process` genérico proposto na conversa anterior (`type: hackathon | selective`). Por
+ora, manter os dois domínios paralelos e independentes é a opção mais simples e sem
+risco para os dados de produção do hackathon.
+
+## Pendências antes de gerar migrations
+Os enums de `Process.status` e `Application.status` estão definidos em [overview.md](overview.md) — ciclo de vida.
+
+- [ ] Confirmar se `allowed_file_types` vira `ArrayField` (Postgres-only, mais simples)
+      ou model `AllowedFileType` à parte (mais normalizado, mais tabela).
+- [ ] Confirmar regra de quem pode ser `evaluator` (qualquer `is_staff` ou precisa
+      estar "designado" pra etapa) — nos wireframes aparecem 2 avaliadores fixos por
+      etapa, pode ser só quem avaliou primeiro, sem atribuição prévia.

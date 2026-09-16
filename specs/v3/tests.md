@@ -1,0 +1,172 @@
+# Testes — v3 (Processo Seletivo)
+
+Os testes do hackathon continuam em `backend/apps/teams/tests/` e não são alterados.
+Os novos ficam em `backend/apps/recruitment/tests/`, com `conftest.py` e `factories.py`
+próprios, seguindo o padrão já usado no app `teams`.
+
+## Backend
+
+### tests/test_models.py
+```python
+test_process_default_status_is_draft
+test_stage_order_unique_per_process
+test_application_unique_per_process_and_participant
+test_application_final_score_is_none_without_evaluations
+test_application_final_score_averages_stage_averages
+test_evaluation_unique_per_criterion_and_evaluator
+```
+
+### tests/test_views_processes.py
+```python
+test_list_processes_returns_only_published
+test_list_processes_marks_already_applied
+test_detail_returns_404_for_draft_process
+test_detail_does_not_expose_evaluation_criteria
+test_apply_creates_application_in_first_stage
+test_apply_fails_when_process_is_draft
+test_apply_fails_before_registration_start
+test_apply_fails_after_registration_end
+test_apply_fails_when_already_applied
+test_apply_sends_email_and_creates_notification
+```
+
+### tests/test_views_applications.py
+```python
+test_my_applications_lists_only_own_applications
+test_application_detail_returns_stage_timeline
+test_application_detail_does_not_expose_scores_to_candidate
+test_application_detail_returns_403_for_other_participant
+```
+
+### tests/test_views_deliverables.py
+```python
+test_upload_succeeds_within_deadline
+test_upload_fails_when_stage_does_not_allow_files
+test_upload_fails_with_disallowed_extension
+test_upload_fails_when_max_files_reached
+test_upload_fails_after_stage_end
+test_upload_succeeds_after_end_when_late_submission_allowed
+test_delete_deliverable_only_by_owner
+test_delete_deliverable_fails_after_deadline
+```
+
+### tests/test_views_admin_processes.py
+```python
+test_list_requires_staff
+test_create_process_as_draft
+test_create_process_published_sets_published_at
+test_publish_fails_without_stages
+test_publish_fails_when_not_draft
+test_delete_allowed_only_for_draft
+test_close_blocks_new_applications
+test_detail_returns_correct_stats
+```
+
+### tests/test_views_stages.py
+```python
+test_create_stage_assigns_next_order
+test_create_stage_with_nested_criteria
+test_patch_stage_cannot_remove_criterion_with_evaluations
+test_patch_stage_can_rename_criterion
+test_delete_stage_fails_with_applications_in_it
+test_reorder_fails_with_applications_in_progress
+```
+
+### tests/test_views_evaluations.py
+```python
+test_save_evaluation_creates_scores_for_each_criterion
+test_save_evaluation_twice_updates_instead_of_duplicating
+test_two_evaluators_scores_are_averaged
+test_stage_average_is_mean_of_criteria_averages
+test_evaluation_fails_when_criterion_not_in_stage
+test_evaluation_fails_with_score_out_of_range
+test_evaluation_fails_when_process_closed
+test_candidate_cannot_access_evaluation_endpoints
+```
+
+### tests/test_views_bulk_actions.py
+```python
+test_move_stage_updates_current_stage
+test_move_stage_sends_email_to_each_candidate
+test_approve_fails_when_not_in_last_stage
+test_approve_succeeds_in_last_stage
+test_reject_sets_status_and_sends_email
+test_discard_does_not_send_email
+test_bulk_action_fails_on_finished_application
+test_bulk_action_creates_notification_for_each_candidate
+```
+
+### tests/test_views_communications.py
+```python
+test_send_to_all_resolves_every_applicant
+test_send_to_stage_resolves_only_that_stage
+test_send_to_approved_resolves_only_approved
+test_send_to_specific_resolves_listed_participants
+test_stage_audience_requires_stage_id
+test_message_placeholder_replaced_with_candidate_name
+test_communication_creates_notification_per_recipient
+test_communication_appears_in_history
+test_auto_communication_is_recorded_on_bulk_action
+```
+
+### tests/test_filters.py
+```python
+test_search_filters_by_name
+test_filter_by_stage
+test_filter_by_status
+test_filter_by_course
+test_ordering_by_score_desc
+test_filters_combine
+```
+
+## Frontend
+
+### hooks
+```typescript
+// useProcesses
+test_lists_only_published_processes
+test_marks_already_applied_process
+
+// useApplication
+test_returns_stage_timeline_with_current_stage
+test_upload_disabled_after_deadline
+
+// useBulkActions
+test_approve_disabled_when_selection_outside_last_stage
+test_move_stage_invalidates_applications_query
+
+// useEvaluations
+test_save_evaluation_posts_all_criteria
+test_average_recalculated_after_save
+```
+
+### components
+```typescript
+// ProcessCard
+test_shows_ver_detalhes_for_available_process
+test_shows_ver_candidatura_for_applied_process
+test_shows_abrir_inscricoes_for_draft_process
+
+// StageTimeline
+test_marks_stages_as_done_current_and_upcoming
+test_shows_deliverable_requirements_on_current_stage
+
+// CandidatesTable
+test_renders_average_score_column
+test_bulk_menu_enabled_only_with_selection
+test_approve_option_hidden_outside_last_stage
+
+// CandidateProfileModal
+test_renders_criteria_from_stage_config
+test_save_evaluation_sends_scores_and_notes
+
+// NewCommunicationModal
+test_stage_selector_visible_only_for_stage_audience
+test_candidate_search_visible_only_for_specific_audience
+```
+
+## Regressão do hackathon
+
+A v3 não pode quebrar o que está em produção. A suíte existente em
+`backend/apps/teams/tests/` precisa continuar passando inteira a cada fase do roadmap —
+é o critério de que os domínios realmente estão isolados.

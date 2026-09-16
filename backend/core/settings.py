@@ -88,7 +88,11 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 MEDIA_URL = 'media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# Em produção aponta para o volume do Railway montado no serviço; em
+# desenvolvimento cai no diretório local.
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT') or (BASE_DIR / 'media')
+# Teto por arquivo enviado pelo candidato.
+MAX_UPLOAD_BYTES = int(os.environ.get('MAX_UPLOAD_BYTES', 10 * 1024 * 1024))
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ── Celery ────────────────────────────────────────────────────────

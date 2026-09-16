@@ -83,8 +83,20 @@ Validações:
 - Quantidade de arquivos da etapa < `stage.max_files` — senão 400.
 - Agora <= `stage.end_at`, exceto se `stage.accepts_late_submission=True` — senão 400.
 
+Validação adicional: tamanho do arquivo até `MAX_UPLOAD_BYTES` (padrão 10 MB) — o
+endpoint é aberto a qualquer candidato autenticado.
+
+Resposta 201 traz `filename`, `size` e `download_url`.
+
 ## DELETE /api/v1/me/applications/{id}/deliverables/{deliverable_id}/
 Remove um entregável. Só antes de `stage.end_at` e só o dono.
+
+## GET /api/v1/deliverables/{id}/download/
+Baixa o arquivo. Permitido ao dono da candidatura e a qualquer organizador
+(`is_staff`) — 403 para os demais, 401 sem autenticação.
+
+Os arquivos **não são servidos por URL pública**: são material de candidatura e o caminho
+em `/media/` seria adivinhável. Todo acesso passa por este endpoint.
 
 ## GET /api/v1/me/notifications/
 Reaproveita o endpoint da v2. Ganha os tipos novos listados em [email.md](email.md).

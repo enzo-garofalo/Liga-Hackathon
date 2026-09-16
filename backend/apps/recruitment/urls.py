@@ -16,8 +16,11 @@ from .views import (
     AdminStageDetailView,
     AdminStageListCreateView,
     AdminStageReorderView,
+    DeliverableDownloadView,
     MyApplicationDetailView,
     MyApplicationListView,
+    MyDeliverableDetailView,
+    MyDeliverableView,
     ProcessApplyView,
     ProcessDetailView,
     ProcessListView,
@@ -37,6 +40,21 @@ urlpatterns = [
         'me/applications/<uuid:pk>/',
         MyApplicationDetailView.as_view(),
         name='my-application-detail',
+    ),
+    path(
+        'me/applications/<uuid:pk>/deliverables/',
+        MyDeliverableView.as_view(),
+        name='my-deliverables',
+    ),
+    path(
+        'me/applications/<uuid:pk>/deliverables/<uuid:deliverable_id>/',
+        MyDeliverableDetailView.as_view(),
+        name='my-deliverable-detail',
+    ),
+    path(
+        'deliverables/<uuid:pk>/download/',
+        DeliverableDownloadView.as_view(),
+        name='deliverable-download',
     ),
     # ── Organizador ──────────────────────────────────────────────
     path(

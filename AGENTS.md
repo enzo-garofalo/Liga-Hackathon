@@ -69,11 +69,23 @@ Pendente para a v3:
 - Storage de arquivos em produção (entregáveis dos candidatos). Railway não tem disco
   persistente — precisa de bucket externo. Ver `specs/v3/decisions.md` §5.
 
-## Migração v2 → v3
+## Fronteira entre hackathon e processo seletivo
 A v3 **não migra nem altera nenhuma tabela existente** — só cria tabelas novas no app
 `recruitment`. Os dados de produção do hackathon ficam intactos.
 
 Ao implementar:
-1. Nunca alterar modelos em `apps/teams/` para acomodar o seletivo.
+1. Não alterar a **estrutura** dos modelos em `apps/teams/` (campos, constraints,
+   relacionamentos) para acomodar o seletivo. Acrescentar entradas em
+   `NotificationType.CHOICES` é permitido — gera um `AlterField` que é no-op no Postgres,
+   já que `choices` é validação do Django e não constraint de banco. Conferir que o valor
+   novo cabe em `max_length=30`.
 2. `Participant` e `Notification` são importados de `apps.teams` e reaproveitados.
-3. A suíte de testes do hackathon precisa continuar passando inteira a cada fase.
+3. **Não chamar `apps.teams.services.notifications.notify()` com tipos do seletivo.**
+   Essa função tem um `_TASK_DISPATCH` que só conhece os tipos do hackathon: com um tipo
+   não registrado ela cria a notificação, loga um warning e **retorna sem enviar e-mail**,
+   silenciosamente. O `recruitment` precisa do seu próprio
+   `services/notifications.py` com o dispatch dos tipos dele.
+4. A suíte de testes do hackathon precisa continuar passando inteira a cada fase.
+5. Ao mexer em página compartilhada do frontend (`DashboardPage`, `AdminDashboardPage`,
+   `NotificationBell`), conferir que o fluxo do hackathon continua funcionando — são
+   telas em produção.

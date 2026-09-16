@@ -119,6 +119,19 @@ test_ordering_by_score_desc
 test_filters_combine
 ```
 
+### tests/test_notifications.py
+```python
+test_every_recruitment_notification_type_has_an_email_task
+test_notify_creates_notification_and_queues_email
+test_notification_is_created_even_when_email_fails
+test_recruitment_types_are_not_dispatched_by_teams_notify
+```
+
+`test_every_recruitment_notification_type_has_an_email_task` é o teste que impede a
+regressão silenciosa descrita em [email.md](email.md): ele varre os tipos de notificação
+do seletivo e falha se algum não estiver registrado no dispatch de e-mail. Sem ele, um
+tipo esquecido só apareceria quando um candidato não recebesse o resultado.
+
 ## Frontend
 
 ### hooks

@@ -21,7 +21,7 @@ duplicidade ou desistência.
 
 ## Tipos de notificação
 
-Adicionar a `NotificationType`:
+Adicionar a `NotificationType` em `apps/teams/models.py`:
 
 ```
 application_confirmed   — Inscrição confirmada
@@ -32,6 +32,23 @@ custom_communication    — Comunicado do processo seletivo
 ```
 
 `link_to` aponta para `/applications/{id}` em todos eles.
+
+Acrescentar choices é a única alteração permitida em `apps/teams/models.py` — gera um
+`AlterField` que é no-op no Postgres. Todos os valores acima cabem no `max_length=30`
+do campo (o maior tem 20 caracteres).
+
+> ### Atenção: não reaproveitar o `notify()` do hackathon
+>
+> `apps/teams/services/notifications.py` tem um `_TASK_DISPATCH` que mapeia cada tipo de
+> notificação à sua task de e-mail. Quando o tipo **não está no dicionário**, a função
+> cria a `Notification`, loga um warning e **retorna sem enviar e-mail nenhum**.
+>
+> Chamar esse `notify()` com um tipo do seletivo quebraria a regra de "nunca notificação
+> sem e-mail" de forma silenciosa: sem exceção, sem teste vermelho, e o problema só
+> apareceria quando um candidato reclamasse de não ter recebido o resultado.
+>
+> O app `recruitment` precisa do seu próprio `services/notifications.py`, com o dispatch
+> dos tipos dele.
 
 ---
 

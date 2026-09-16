@@ -162,6 +162,11 @@ class NotificationType:
     TEAM_APPROVED = 'team_approved'
     TEAM_REJECTED = 'team_rejected'
     TEAM_DISBANDED = 'team_disbanded'
+    APPLICATION_CONFIRMED = 'application_confirmed'
+    STAGE_ADVANCED = 'stage_advanced'
+    APPLICATION_APPROVED = 'application_approved'
+    APPLICATION_REJECTED = 'application_rejected'
+    CUSTOM_COMMUNICATION = 'custom_communication'
     CHOICES = [
         (TEAM_INVITE, 'Convite para equipe'),
         (JOIN_REQUEST, 'Pedido de entrada'),
@@ -173,6 +178,11 @@ class NotificationType:
         (TEAM_APPROVED, 'Equipe aprovada'),
         (TEAM_REJECTED, 'Equipe recusada'),
         (TEAM_DISBANDED, 'Equipe descartada'),
+        (APPLICATION_CONFIRMED, 'Inscrição confirmada'),
+        (STAGE_ADVANCED, 'Convocação para próxima etapa'),
+        (APPLICATION_APPROVED, 'Aprovado no processo seletivo'),
+        (APPLICATION_REJECTED, 'Não aprovado no processo seletivo'),
+        (CUSTOM_COMMUNICATION, 'Comunicado do processo seletivo'),
     ]
 
 

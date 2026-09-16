@@ -23,7 +23,7 @@
 | id | UUID PK | |
 | name | CharField | ex.: "Processo Seletivo Liga de TI 2026.2" |
 | description | TextField | texto livre ("Sobre o processo") |
-| banner | ImageField | opcional |
+| banner | FileField | opcional — `FileField` e não `ImageField` para não exigir Pillow |
 | status | CharField | `draft / published / closed` |
 | registration_start | DateTimeField | |
 | registration_end | DateTimeField | |
@@ -49,7 +49,7 @@ Regras:
 | accepts_late_submission | BooleanField | default=False |
 | allows_file_upload | BooleanField | default=False |
 | max_files | PositiveSmallIntegerField | null=True |
-| allowed_file_types | CharField/ArrayField | ex.: `pdf,zip,pptx` |
+| allowed_file_types | ArrayField(CharField) | Postgres; ex.: `["pdf", "zip", "pptx"]` |
 | created_at / updated_at | | |
 
 Constraint: `unique_together(process, order)`.
@@ -99,10 +99,14 @@ Validação: só aceita upload se `stage.allows_file_upload=True`, tipo em
 | application | FK → Application | |
 | stage | FK → Stage | |
 | criterion | FK → EvaluationCriterion | |
-| evaluator | FK → Participant (organizador) | |
+| evaluator | FK → User (`is_staff=True`) | organizador não tem `Participant` — ver nota abaixo |
 | score | DecimalField | ex.: 0.0–10.0 |
 | notes | TextField | blank=True — "Observações" do avaliador |
 | created_at / updated_at | | |
+
+> `evaluator` aponta para `User`, não para `Participant`: organizador é um usuário com
+> `is_staff=True` e pode não ter cadastro de participante (que é o perfil de candidato do
+> hackathon). Usar `Participant` impediria um diretor sem inscrição de avaliar.
 
 Constraint: `unique_together(application, criterion, evaluator)` — um avaliador dá
 uma nota por critério (pode editar, não duplicar).
@@ -135,6 +139,7 @@ resolvido, seguindo a regra existente de "nunca um sem o outro".
 |---|---|---|
 | id | UUID PK | |
 | user | OneToOne → User | organizadores continuam sendo `is_staff=True` |
+| full_name | CharField | blank=True |
 | role_title | CharField | ex.: "Diretor de Operações" — **informativo apenas no MVP, sem RBAC** |
 | phone / github / linkedin | | mesmos campos do modal "Perfil organizador" |
 
@@ -152,8 +157,6 @@ risco para os dados de produção do hackathon.
 ## Pendências antes de gerar migrations
 Os enums de `Process.status` e `Application.status` estão definidos em [overview.md](overview.md) — ciclo de vida.
 
-- [ ] Confirmar se `allowed_file_types` vira `ArrayField` (Postgres-only, mais simples)
-      ou model `AllowedFileType` à parte (mais normalizado, mais tabela).
 - [ ] Confirmar regra de quem pode ser `evaluator` (qualquer `is_staff` ou precisa
       estar "designado" pra etapa) — nos wireframes aparecem 2 avaliadores fixos por
       etapa, pode ser só quem avaliou primeiro, sem atribuição prévia.

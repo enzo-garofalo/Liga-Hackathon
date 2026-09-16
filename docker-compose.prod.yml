@@ -13,13 +13,48 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redisdata_prod:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   backend:
     build:
       context: .
       dockerfile: backend/Dockerfile.prod
     env_file: .env
+    volumes:
+      # Entregáveis dos candidatos — precisa persistir entre deploys.
+      - media_prod:/app/media
+    environment:
+      MEDIA_ROOT: /app/media
     depends_on:
       db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Sem este serviço os e-mails do processo seletivo não são enviados.
+  worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.prod
+    command: celery -A core worker --loglevel=info
+    env_file: .env
+    volumes:
+      - media_prod:/app/media
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.production
+      MEDIA_ROOT: /app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   frontend:
@@ -33,3 +68,5 @@ services:
 
 volumes:
   pgdata_prod:
+  redisdata_prod:
+  media_prod:

@@ -35,9 +35,16 @@ menor risco: a v3 só cria tabelas novas, não migra nem altera nada existente.
 **Consequência:** se no futuro a Liga quiser rodar o hackathon como um "tipo" de processo
 seletivo, isso vira uma v4 com unificação explícita. Não é objetivo agora.
 
-**Status:** assumida com base no material novo. Contraria a preferência inicial por
-"domínio generalizado" — se o time quiser reverter, é melhor decidir antes de gerar as
-migrations.
+**Status:** confirmada. A preferência inicial era "domínio generalizado", mas o critério
+que a Liga colocou foi reaproveitar o máximo possível **sem risco de quebrar o hackathon**
+— e é justamente unificar que exigiria alterar a tabela `Team`, que tem dados em produção.
+Domínios paralelos só criam tabelas novas.
+
+Reaproveitar não depende de unificar: `Participant`, `Notification`, os endpoints de
+autenticação, Celery, o backend de e-mail, o `client.ts`, `ProtectedRoute`, `AppLayout`,
+`NotificationBell` e o design system são todos usados pelo seletivo sem reescrita. O que é
+código novo (etapas, critérios, avaliações, entregáveis, comunicação em massa) não tem
+equivalente no hackathon para reaproveitar.
 
 ---
 

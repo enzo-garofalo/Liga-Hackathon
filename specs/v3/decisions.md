@@ -62,6 +62,9 @@ permanece intocada no domínio do hackathon.
 
 ## 4. Sem RBAC entre organizadores no MVP
 
+> **Emendada pela decisão §10:** existe uma distinção de papel (`is_coordinator`) para
+> correção anônima e designação de avaliadores. O resto desta decisão continua valendo.
+
 **Decisão:** qualquer usuário com `is_staff=True` pode criar processo, configurar etapas,
 avaliar candidatos, mover entre etapas e enviar comunicados. `OrganizerProfile.role_title`
 ("Diretor de Operações") é apenas exibido na interface.
@@ -142,3 +145,44 @@ de performance.
 
 **Consequência:** se a listagem de candidatos ficar lenta com volume real, a saída é
 anotar a média na query (`annotate`), não criar campo desnormalizado.
+
+---
+
+## 10. Baremas ponderados, escala 1–5, correção anônima e designação
+
+**Decisão:** implementar as quatro regras que o *Planejamento do Processo Seletivo* da
+Liga define e que a implementação inicial contrariava.
+
+**Motivo:** o documento de planejamento chegou depois das fases 1 a 6, e a comparação
+apontou cinco divergências. Três delas mudavam a **nota do candidato**:
+
+1. **Peso por critério.** O barema dá 20% a "Pensamento crítico" e 10% a "Estrutura e
+   clareza"; o código fazia média simples. Agora `EvaluationCriterion.weight` e média
+   ponderada.
+2. **Peso por etapa.** `Case 35% + Pitch 30% + Entrevista 35%`; o código fazia média das
+   médias. Agora `Stage.weight`.
+3. **Escala 1–5.** O planejamento argumenta explicitamente contra "falsa precisão como
+   7,3"; o código aceitava 0–10 com duas casas. Agora `Process.score_min/score_max`,
+   configurável por processo, com 0 reservado para ausência de entrega.
+
+As outras duas são estruturais:
+
+4. **Correção anônima.** "O avaliador verá apenas um identificador do candidato." A ficha
+   mostrava nome, e-mail, telefone e redes na mesma tela da nota. Agora `Application.code`
+   e anonimização automática, ligável por processo.
+5. **Designação de avaliadores.** "Cada entrega avaliada por dois corretores", "avaliadores
+   distribuídos entre diferentes candidatos", terceiro avaliador quando a diferença passa
+   de 1,5. Agora `StageAssignment`, distribuição automática em rodízio e
+   `needs_third_review` no resumo.
+
+**Consequência:** peso zero em tudo mantém o comportamento antigo (peso igual), então um
+processo montado sem barema continua funcionando. Pesos configurados precisam somar 100% —
+somar 90 produziria nota diferente da comunicada aos candidatos, e o erro passaria
+despercebido porque a média ponderada continua devolvendo um número plausível.
+
+**Isto emenda a decisão §4.** Continua não havendo RBAC por funcionalidade — qualquer
+`is_staff` cria processo, move etapa e envia comunicado. Mas passa a existir **uma**
+distinção de papel: `OrganizerProfile.is_coordinator`. O coordenador vê a identidade dos
+candidatos e administra as designações; o avaliador comum vê códigos e só pontua quem lhe
+foi designado. Sem essa distinção, correção anônima seria decorativa — bastaria abrir a
+ficha do candidato para ver quem é.

@@ -21,7 +21,7 @@ class EvaluationCriterionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EvaluationCriterion
-        fields = ['id', 'name', 'order']
+        fields = ['id', 'name', 'order', 'weight']
 
 
 class StageSerializer(serializers.ModelSerializer):
@@ -37,6 +37,7 @@ class StageSerializer(serializers.ModelSerializer):
             'order',
             'start_at',
             'end_at',
+            'weight',
             'accepts_late_submission',
             'allows_file_upload',
             'max_files',
@@ -51,6 +52,9 @@ class StageSerializer(serializers.ModelSerializer):
         return stage.current_applications.count()
 
     def validate(self, attrs):
+        if attrs.get('criteria') is not None:
+            validate_weights(attrs['criteria'], 'dos critérios da etapa')
+
         start_at = attrs.get('start_at', getattr(self.instance, 'start_at', None))
         end_at = attrs.get('end_at', getattr(self.instance, 'end_at', None))
         if start_at and end_at and end_at <= start_at:
@@ -119,6 +123,10 @@ class ProcessSerializer(serializers.ModelSerializer):
             'registration_end',
             'published_at',
             'highlight_message',
+            'score_min',
+            'score_max',
+            'divergence_threshold',
+            'anonymous_evaluation',
             'application_count',
             'stage_count',
             'created_at',
@@ -196,6 +204,13 @@ class ApplicationListSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
         read_only_fields = fields
+
+    def to_representation(self, application):
+        """Na correção anônima, o avaliador vê só o código do candidato."""
+        data = super().to_representation(application)
+        if hide_identity(self, application):
+            return anonymize(data, application)
+        return data
 
     def get_final_score(self, application):
         """Lido do mapa montado em uma query só pela view (evita N+1)."""
@@ -427,6 +442,13 @@ class AdminApplicationDetailSerializer(serializers.ModelSerializer):
         )
         return {str(row.criterion_id): float(row.score) for row in rows}
 
+    def to_representation(self, application):
+        """Na correção anônima, o avaliador vê só o código do candidato."""
+        data = super().to_representation(application)
+        if hide_identity(self, application):
+            return anonymize(data, application)
+        return data
+
     def get_final_score(self, application):
         score = application.final_score
         return round(float(score), 2) if score is not None else None
@@ -500,3 +522,64 @@ class CommunicationInputSerializer(serializers.Serializer):
     )
     subject = serializers.CharField(max_length=255)
     message = serializers.CharField()
+
+
+# ── Anonimato na correção ─────────────────────────────────────────
+
+
+def hide_identity(serializer, application):
+    """True quando este leitor não pode ver quem é o candidato.
+
+    A correção anônima do planejamento existe para a nota não ser influenciada
+    por quem escreveu. O coordenador enxerga a identidade porque é quem
+    distribui as correções e revisa divergências.
+    """
+    from apps.recruitment.services.evaluations import is_coordinator
+
+    if not application.process.anonymous_evaluation:
+        return False
+
+    request = serializer.context.get('request')
+    if request is None:
+        return False
+    return not is_coordinator(request.user)
+
+
+# Campos que revelam quem é o candidato. Nem todo serializer tem todos — o
+# anonimizador limpa só os que existirem no payload.
+IDENTITY_FIELDS = (
+    'participant_name',
+    'participant_email',
+    'email',
+    'phone',
+    'github',
+    'linkedin',
+    'bio',
+)
+
+
+def anonymize(data, application):
+    """Substitui a identidade pelo código da candidatura."""
+    for field in IDENTITY_FIELDS:
+        if field in data:
+            data[field] = None
+    data['participant_name'] = application.code or 'Candidato anônimo'
+    return data
+
+
+def validate_weights(items, label):
+    """Pesos precisam somar 100 — ou serem todos zero.
+
+    Barema com pesos somando 90 ou 110 produziria nota que não corresponde ao
+    que foi comunicado aos candidatos, e o erro passaria despercebido porque a
+    média ponderada continua retornando um número plausível.
+    """
+    weights = [float(item.get('weight') or 0) for item in items]
+    if not weights or not any(weights):
+        return
+
+    total = round(sum(weights), 2)
+    if total != 100:
+        raise serializers.ValidationError(
+            f'Os pesos {label} devem somar 100%. Soma atual: {total}%.'
+        )

@@ -9,6 +9,7 @@ from .models import (
     OrganizerProfile,
     Process,
     Stage,
+    StageAssignment,
 )
 
 
@@ -96,3 +97,11 @@ class OrganizerProfileAdmin(admin.ModelAdmin):
     list_display = ['full_name', 'user', 'role_title']
     search_fields = ['full_name', 'user__email', 'role_title']
     readonly_fields = ['id', 'created_at', 'updated_at']
+
+
+@admin.register(StageAssignment)
+class StageAssignmentAdmin(admin.ModelAdmin):
+    list_display = ['stage', 'application', 'evaluator', 'created_at']
+    list_filter = ['stage__process', 'stage', 'evaluator']
+    search_fields = ['application__code', 'application__participant__full_name']
+    readonly_fields = ['id', 'created_at']

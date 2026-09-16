@@ -20,11 +20,17 @@ def stage(process):
 
 @pytest.fixture
 def admin_user(db):
+    """Coordenador do processo: vê identidade e avalia sem designação."""
     from apps.teams.tests.factories import UserFactory
+
+    from apps.recruitment.models import OrganizerProfile
 
     user = UserFactory()
     user.is_staff = True
     user.save(update_fields=['is_staff'])
+    OrganizerProfile.objects.create(
+        user=user, full_name='Coordenador', is_coordinator=True
+    )
     return user
 
 
@@ -55,4 +61,31 @@ def candidate_client(db):
     token = RefreshToken.for_user(participant.user).access_token
     client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
     client.participant = participant
+    return client
+
+
+@pytest.fixture
+def evaluator_user(db):
+    """Avaliador comum: sem acesso à identidade e limitado às designações."""
+    from apps.recruitment.models import OrganizerProfile
+    from apps.teams.tests.factories import UserFactory
+
+    user = UserFactory()
+    user.is_staff = True
+    user.save(update_fields=['is_staff'])
+    OrganizerProfile.objects.create(
+        user=user, full_name='Avaliador', is_coordinator=False
+    )
+    return user
+
+
+@pytest.fixture
+def evaluator_client(evaluator_user):
+    from rest_framework.test import APIClient
+    from rest_framework_simplejwt.tokens import RefreshToken
+
+    client = APIClient()
+    token = RefreshToken.for_user(evaluator_user).access_token
+    client.credentials(HTTP_AUTHORIZATION=f'Bearer {token}')
+    client.user = evaluator_user
     return client

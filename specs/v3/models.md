@@ -28,7 +28,11 @@
 | registration_start | DateTimeField | |
 | registration_end | DateTimeField | |
 | published_at | DateTimeField | null=True, preenchido ao publicar |
-| highlight_message | CharField | blank=True — mensagem opcional do modal "Abrir inscrições", exibida aos candidatos |
+| highlight_message | CharField | blank=True — mensagem opcional do modal "Abrir inscrições" |
+| score_min | PositiveSmallIntegerField | default=1 — menor nota da escala |
+| score_max | PositiveSmallIntegerField | default=5 — maior nota da escala |
+| divergence_threshold | DecimalField | default=1.5 — diferença entre avaliadores que aciona terceiro |
+| anonymous_evaluation | BooleanField | default=True — avaliador vê só o código do candidato |
 | created_at / updated_at | | |
 
 Regras:
@@ -46,6 +50,7 @@ Regras:
 | description | TextField | |
 | order | PositiveSmallIntegerField | define a sequência |
 | start_at / end_at | DateTimeField | |
+| weight | DecimalField | peso da etapa na nota final, em % (ex.: 35). Zero em todas = peso igual |
 | accepts_late_submission | BooleanField | default=False |
 | allows_file_upload | BooleanField | default=False |
 | max_files | PositiveSmallIntegerField | null=True |
@@ -61,6 +66,7 @@ Constraint: `unique_together(process, order)`.
 | stage | FK → Stage | |
 | name | CharField | ex.: "Pensamento crítico", "Comunicação" |
 | order | PositiveSmallIntegerField | |
+| weight | DecimalField | peso do critério na etapa, em % (ex.: 20). Zero em todos = peso igual |
 
 ### Application (Candidatura)
 | Campo | Tipo | Obs |
@@ -70,6 +76,7 @@ Constraint: `unique_together(process, order)`.
 | participant | FK → Participant | |
 | current_stage | FK → Stage | null=True (null antes da 1ª etapa iniciar) |
 | status | CharField | `in_progress / approved / rejected / discarded` |
+| code | CharField | identificador anônimo sequencial (C-0001) mostrado ao avaliador |
 | submitted_at | DateTimeField | |
 | created_at / updated_at | | |
 
@@ -100,7 +107,7 @@ Validação: só aceita upload se `stage.allows_file_upload=True`, tipo em
 | stage | FK → Stage | |
 | criterion | FK → EvaluationCriterion | |
 | evaluator | FK → User (`is_staff=True`) | organizador não tem `Participant` — ver nota abaixo |
-| score | DecimalField | ex.: 0.0–10.0 |
+| score | DecimalField | dentro de `process.score_min`..`score_max` (padrão 1–5). O 0 é sempre aceito: ausência de entrega |
 | notes | TextField | blank=True — "Observações" do avaliador |
 | created_at / updated_at | | |
 
@@ -111,11 +118,15 @@ Validação: só aceita upload se `stage.allows_file_upload=True`, tipo em
 Constraint: `unique_together(application, criterion, evaluator)` — um avaliador dá
 uma nota por critério (pode editar, não duplicar).
 
-Cálculo (feito em service, não em campo persistido):
-- Média por critério = média de `score` entre avaliadores.
-- Média final da etapa = média das médias de critério.
-- Isso bate com o modal "Avaliação de etapa: Case/Pitch" que mostra nota por
-  avaliador e "Média automática final".
+Cálculo (feito em service, nunca persistido — ver `services/scoring.py`):
+- Nota do critério = média de `score` entre os avaliadores.
+- Nota da etapa = **média ponderada** dos critérios, pelo `weight` de cada um.
+- Nota final = **média ponderada** das etapas, pelo `weight` de cada uma.
+- Peso zero em tudo significa peso igual — processo sem barema continua funcionando.
+
+Divergência entre corretores: quando a diferença entre as notas de etapa de dois
+avaliadores passa de `process.divergence_threshold`, o resumo marca
+`needs_third_review`. O planejamento da Liga pede revisão de um terceiro nesse caso.
 
 ### Communication (Comunicação em massa do processo)
 | Campo | Tipo | Obs |
@@ -140,11 +151,29 @@ resolvido, seguindo a regra existente de "nunca um sem o outro".
 | id | UUID PK | |
 | user | OneToOne → User | organizadores continuam sendo `is_staff=True` |
 | full_name | CharField | blank=True |
-| role_title | CharField | ex.: "Diretor de Operações" — **informativo apenas no MVP, sem RBAC** |
+| role_title | CharField | ex.: "Diretor de Operações" — informativo |
+| is_coordinator | BooleanField | default=False — vê identidade e administra designações |
 | phone / github / linkedin | | mesmos campos do modal "Perfil organizador" |
 
-> Decisão confirmada: sem RBAC real no MVP. Qualquer `is_staff=True` pode criar
-> processo, avaliar, mover etapa e enviar comunicado. `role_title` é só exibido na UI.
+> `role_title` é informativo e não concede permissão. `is_coordinator` **concede**: o
+> coordenador enxerga a identidade dos candidatos na correção anônima e administra a
+> distribuição de avaliadores. Ver [decisions.md](decisions.md) §10.
+
+### StageAssignment (designação de avaliador)
+| Campo | Tipo | Obs |
+|---|---|---|
+| id | UUID PK | |
+| stage | FK → Stage | |
+| application | FK → Application | |
+| evaluator | FK → User (`is_staff=True`) | |
+| created_at | DateTimeField | auto_now_add |
+
+Constraint: `unique_together(stage, application, evaluator)`.
+
+O planejamento prevê dois corretores independentes por case, distribuídos entre
+candidatos diferentes. Sem designação, a correção vira "quem pegar primeiro" e não há
+como garantir dois pareceres. Avaliador só pontua quem lhe foi designado; o coordenador
+escapa da regra porque é quem distribui e revisa divergências.
 
 ## Reconciliação com o hackathon existente
 `Team`/`TeamMembership` continuam existindo do jeito que estão — não fazem parte do
@@ -157,6 +186,5 @@ risco para os dados de produção do hackathon.
 ## Pendências antes de gerar migrations
 Os enums de `Process.status` e `Application.status` estão definidos em [overview.md](overview.md) — ciclo de vida.
 
-- [ ] Confirmar regra de quem pode ser `evaluator` (qualquer `is_staff` ou precisa
-      estar "designado" pra etapa) — nos wireframes aparecem 2 avaliadores fixos por
-      etapa, pode ser só quem avaliou primeiro, sem atribuição prévia.
+Resolvido: o planejamento do processo seletivo define correção por dois avaliadores
+designados, então existe `StageAssignment` e avaliador não designado recebe 403.

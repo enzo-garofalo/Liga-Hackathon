@@ -80,17 +80,28 @@ evolução com modelo próprio.
 
 ---
 
-## 5. Entregáveis usam `FileField` com storage local em desenvolvimento
+## 5. Entregáveis usam `FileField` com volume do Railway em produção
 
-**Decisão:** `Deliverable.file` é um `FileField` padrão do Django. Em desenvolvimento,
-storage local em `MEDIA_ROOT`. Em produção, é preciso um bucket externo.
+**Decisão:** `Deliverable.file` é um `FileField` padrão do Django, gravando em
+`MEDIA_ROOT`. Em produção, `MEDIA_ROOT` aponta para um **volume do Railway** montado no
+serviço do backend.
 
-**Motivo:** o Railway não garante disco persistente entre deploys — arquivo salvo em disco
-some no próximo deploy. Como o candidato envia PDF/ZIP/PPTX que o organizador precisa
-abrir semanas depois, isso não pode ficar em disco efêmero.
+**Motivo:** o arquivo não pode viver no sistema de arquivos comum do container, que é
+recriado a cada deploy — o candidato envia o case na semana 2 e os avaliadores precisam
+abri-lo na semana 3. O [Railway oferece volumes](https://docs.railway.com/volumes) que
+persistem entre deploys e restarts, o que resolve isso sem dependência nova.
 
-**Pendência:** escolher o storage de produção (S3, Cloudflare R2 ou Supabase Storage) e
-adicionar `django-storages`. **Isto bloqueia a Fase 4 do roadmap**, não as anteriores.
+Bucket externo (S3, Cloudflare R2, Supabase Storage) resolveria o mesmo problema ao custo
+de mais uma conta, mais credenciais e `django-storages`. O volume de dados é de centenas
+de megabytes no pior caso — não justifica.
+
+**Correção de rumo:** as versões anteriores deste documento afirmavam que o Railway não
+tem disco persistente. Era informação errada, e ela superdimensionou esta decisão durante
+várias fases do projeto.
+
+**Ressalvas do volume:** liga-se a um único serviço, e o backup é responsabilidade da
+Liga. Como os cases são a entrega que não pode ser perdida, vale um management command
+que baixe uma cópia ao fim de cada etapa.
 
 ---
 

@@ -75,9 +75,9 @@ Existentes (v2):
 - `TEAM_DEADLINE=2026-05-30` — data de corte para formação de equipes
 - `VITE_WHATSAPP_LINK=https://chat.whatsapp.com/...` — link fixo do grupo
 
-Pendente para a v3:
-- Storage de arquivos em produção (entregáveis dos candidatos). Railway não tem disco
-  persistente — precisa de bucket externo. Ver `specs/v3/decisions.md` §5.
+Para a v3 (entregáveis, Fase 4):
+- `MEDIA_ROOT` deve apontar para um volume do Railway em produção. Ver
+  `specs/v3/decisions.md` §5.
 
 ## Fronteira entre hackathon e processo seletivo
 A v3 **não migra nem altera nenhuma tabela existente** — só cria tabelas novas no app

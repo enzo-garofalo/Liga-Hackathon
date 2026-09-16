@@ -4,6 +4,8 @@ from .views import (
     AdminApplicationDetailView,
     AdminApplicationListView,
     AdminBulkActionView,
+    AdminCommunicationDetailView,
+    AdminCommunicationListCreateView,
     AdminEvaluationView,
     AdminProcessCloseView,
     AdminProcessDetailView,
@@ -89,5 +91,15 @@ urlpatterns = [
         'admin/processes/<uuid:pk>/applications/bulk-action/',
         AdminBulkActionView.as_view(),
         name='admin-bulk-action',
+    ),
+    path(
+        'admin/processes/<uuid:pk>/communications/',
+        AdminCommunicationListCreateView.as_view(),
+        name='admin-communications',
+    ),
+    path(
+        'admin/communications/<uuid:pk>/',
+        AdminCommunicationDetailView.as_view(),
+        name='admin-communication-detail',
     ),
 ]

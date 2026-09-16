@@ -6,11 +6,14 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.recruitment.models import Application, Process, Stage
+from apps.recruitment.models import Application, Communication, Process, Stage
 from apps.recruitment.serializers import (
     AdminApplicationDetailSerializer,
     ApplicationListSerializer,
     BulkActionSerializer,
+    CommunicationDetailSerializer,
+    CommunicationInputSerializer,
+    CommunicationListSerializer,
     EvaluationInputSerializer,
     MyApplicationDetailSerializer,
     MyApplicationListSerializer,
@@ -25,6 +28,7 @@ from apps.recruitment.services.applications import (
     published_processes,
     run_bulk_action,
 )
+from apps.recruitment.services.communications import send_communication
 from apps.recruitment.services.evaluations import (
     evaluation_summary,
     save_evaluation,
@@ -369,3 +373,65 @@ class AdminBulkActionView(APIView):
             target_stage=target_stage,
         )
         return Response({'updated': len(applications)})
+
+
+# ── Comunicações ──────────────────────────────────────────────────
+
+
+class AdminCommunicationListCreateView(generics.ListCreateAPIView):
+    permission_classes = [IsAdminUser]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CommunicationInputSerializer
+        return CommunicationListSerializer
+
+    def get_process(self):
+        return get_object_or_404(Process, pk=self.kwargs['pk'])
+
+    def get_queryset(self):
+        params = self.request.query_params
+        queryset = Communication.objects.filter(
+            process=self.get_process()
+        ).select_related('audience_stage').prefetch_related('recipients')
+
+        if params.get('type'):
+            queryset = queryset.filter(type=params['type'])
+        if params.get('stage'):
+            queryset = queryset.filter(audience_stage_id=params['stage'])
+        if params.get('status'):
+            queryset = queryset.filter(status=params['status'])
+        return queryset
+
+    def create(self, request, *args, **kwargs):
+        process = self.get_process()
+        payload = CommunicationInputSerializer(data=request.data)
+        payload.is_valid(raise_exception=True)
+        data = payload.validated_data
+
+        stage = None
+        if data.get('audience_stage'):
+            stage = get_object_or_404(
+                Stage, pk=data['audience_stage'], process=process
+            )
+
+        communication = send_communication(
+            process,
+            audience=data['audience'],
+            subject=data['subject'],
+            message=data['message'],
+            stage=stage,
+            recipient_ids=data.get('recipients'),
+        )
+        return Response(
+            CommunicationDetailSerializer(communication).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class AdminCommunicationDetailView(generics.RetrieveAPIView):
+    serializer_class = CommunicationDetailSerializer
+    permission_classes = [IsAdminUser]
+    queryset = Communication.objects.select_related(
+        'process', 'audience_stage'
+    ).prefetch_related('recipients')

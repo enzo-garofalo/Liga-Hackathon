@@ -10,6 +10,7 @@ from apps.recruitment.models import (
     Process,
     ProcessStatus,
 )
+from apps.recruitment.services.communications import record_auto_communication
 from apps.recruitment.services.notifications import notify
 from apps.teams.models import NotificationType
 
@@ -55,6 +56,13 @@ def apply_to_process(process, participant):
         f'Sua inscrição no {process.name} foi confirmada.',
         link_to=f'/applications/{application.id}',
         subject_id=application.id,
+    )
+    record_auto_communication(
+        process,
+        'Inscrição confirmada',
+        'Confirmação automática de inscrição no processo seletivo.',
+        [participant],
+        aggregate=True,
     )
     return application
 
@@ -145,6 +153,16 @@ def discard(application):
     return application
 
 
+# Assunto do registro no histórico de comunicações. Descarte não aparece:
+# é ação administrativa e não dispara e-mail.
+def _auto_subject(action, target_stage):
+    if action == MOVE_STAGE:
+        return f'Convocação para {target_stage.name}'
+    if action == APPROVE:
+        return 'Aprovados no processo seletivo'
+    return 'Resultado: não aprovados'
+
+
 @transaction.atomic
 def run_bulk_action(process, applications, action, target_stage=None):
     """Aplica a ação a todas as candidaturas, ou a nenhuma.
@@ -160,7 +178,17 @@ def run_bulk_action(process, applications, action, target_stage=None):
     if action == MOVE_STAGE:
         if target_stage is None:
             raise ValidationError('Informe a etapa de destino.')
-        return [move_to_stage(app, target_stage) for app in applications]
+        updated = [move_to_stage(app, target_stage) for app in applications]
+    else:
+        handler = {APPROVE: approve, REJECT: reject, DISCARD: discard}[action]
+        updated = [handler(app) for app in applications]
 
-    handler = {APPROVE: approve, REJECT: reject, DISCARD: discard}[action]
-    return [handler(app) for app in applications]
+    if action != DISCARD:
+        record_auto_communication(
+            process,
+            _auto_subject(action, target_stage),
+            'Comunicação automática disparada pela ação do organizador.',
+            [app.participant for app in updated],
+        )
+
+    return updated

@@ -1,5 +1,6 @@
+from django.http import Http404
 from django.shortcuts import get_object_or_404
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -8,9 +9,17 @@ from rest_framework.views import APIView
 from apps.recruitment.models import Application, Process, Stage
 from apps.recruitment.serializers import (
     ApplicationListSerializer,
+    MyApplicationDetailSerializer,
+    MyApplicationListSerializer,
     ProcessDetailSerializer,
     ProcessSerializer,
+    PublicProcessDetailSerializer,
+    PublicProcessListSerializer,
     StageSerializer,
+)
+from apps.recruitment.services.applications import (
+    apply_to_process,
+    published_processes,
 )
 from apps.recruitment.services.processes import (
     assert_process_deletable,
@@ -194,3 +203,94 @@ class AdminApplicationListView(generics.ListAPIView):
             ).values_list('id', flat=True)
         )
         return context
+
+
+# ── Área do candidato ─────────────────────────────────────────────
+
+
+def _participant_or_404(request):
+    participant = getattr(request.user, 'participant', None)
+    if participant is None:
+        raise Http404('Usuário autenticado não possui perfil de participante.')
+    return participant
+
+
+class ProcessListView(generics.ListAPIView):
+    """Processos publicados, para a seção 'Processos disponíveis'."""
+
+    serializer_class = PublicProcessListSerializer
+
+    def get_queryset(self):
+        return published_processes().prefetch_related('stages')
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        participant = getattr(self.request.user, 'participant', None)
+        context['applied_process_ids'] = (
+            set(
+                Application.objects.filter(
+                    participant=participant
+                ).values_list('process_id', flat=True)
+            )
+            if participant
+            else set()
+        )
+        return context
+
+
+class ProcessDetailView(generics.RetrieveAPIView):
+    """Detalhe público. Rascunho responde 404 — não existe para o candidato."""
+
+    serializer_class = PublicProcessDetailSerializer
+
+    def get_queryset(self):
+        return published_processes().prefetch_related('stages')
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        participant = getattr(self.request.user, 'participant', None)
+        context['applied_process_ids'] = (
+            set(
+                Application.objects.filter(
+                    participant=participant
+                ).values_list('process_id', flat=True)
+            )
+            if participant
+            else set()
+        )
+        return context
+
+
+class ProcessApplyView(APIView):
+    def post(self, request, pk):
+        process = get_object_or_404(Process, pk=pk)
+        participant = _participant_or_404(request)
+        application = apply_to_process(process, participant)
+        return Response(
+            MyApplicationDetailSerializer(application).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class MyApplicationListView(generics.ListAPIView):
+    serializer_class = MyApplicationListSerializer
+
+    def get_queryset(self):
+        participant = _participant_or_404(self.request)
+        return (
+            Application.objects.filter(participant=participant)
+            .select_related('process', 'current_stage')
+            .order_by('-submitted_at')
+        )
+
+
+class MyApplicationDetailView(generics.RetrieveAPIView):
+    serializer_class = MyApplicationDetailSerializer
+
+    def get_queryset(self):
+        participant = _participant_or_404(self.request)
+        return (
+            Application.objects.filter(participant=participant)
+            .select_related('process', 'current_stage')
+            .prefetch_related('process__stages', 'deliverables')
+        )

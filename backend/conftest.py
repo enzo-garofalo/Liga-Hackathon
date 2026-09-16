@@ -26,16 +26,24 @@ def immediate_on_commit(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
-def celery_eager():
-    """Roda as tasks Celery no próprio processo, sem precisar de broker.
+def celery_eager(settings):
+    """Roda as tasks Celery no próprio processo, sem broker nem Redis.
 
-    Sem isto, o .delay() disparado pelo on_commit tentaria conectar no Redis,
-    que não sobe em ambiente de teste (nem existe no docker-compose).
+    Precisa mexer no settings do Django e forçar o Celery a reler: atribuir
+    direto em `app.conf` não gruda, porque o Celery resolve a configuração a
+    partir de `django.conf:settings` e o valor de lá vence. O broker e o
+    backend de resultado também vão para memória — senão o Celery tenta gravar
+    o resultado no Redis e o erro real fica escondido atrás de 20 tentativas de
+    reconexão.
     """
+    settings.CELERY_TASK_ALWAYS_EAGER = True
+    settings.CELERY_TASK_EAGER_PROPAGATES = True
+    settings.CELERY_BROKER_URL = 'memory://'
+    settings.CELERY_RESULT_BACKEND = 'cache+memory://'
+
     from core.celery import app
 
-    app.conf.task_always_eager = True
-    app.conf.task_eager_propagates = True
+    app.config_from_object('django.conf:settings', namespace='CELERY', force=True)
 
 
 @pytest.fixture(autouse=True)

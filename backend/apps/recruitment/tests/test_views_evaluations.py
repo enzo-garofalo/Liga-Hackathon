@@ -30,7 +30,7 @@ def scenario(process):
     }
 
 
-def payload(scenario, first_score=9, second_score=7, notes='Boa entrega.'):
+def payload(scenario, first_score=5, second_score=3, notes='Boa entrega.'):
     return {
         'stage': str(scenario['stage'].id),
         'scores': [
@@ -53,51 +53,50 @@ def test_save_evaluation_twice_updates_instead_of_duplicating(admin_client, scen
     admin_client.post(url(scenario['application'].id), payload(scenario), format='json')
     admin_client.post(
         url(scenario['application'].id),
-        payload(scenario, first_score=5, second_score=5),
+        payload(scenario, first_score=2, second_score=2),
         format='json',
     )
 
     assert Evaluation.objects.count() == 2
-    assert {float(e.score) for e in Evaluation.objects.all()} == {5.0}
+    assert {float(e.score) for e in Evaluation.objects.all()} == {2.0}
 
 
-def test_two_evaluators_scores_are_averaged(admin_client, admin_user, scenario):
-    from apps.teams.tests.factories import UserFactory
-    from rest_framework.test import APIClient
-    from rest_framework_simplejwt.tokens import RefreshToken
+def test_two_evaluators_scores_are_averaged(
+    admin_client, evaluator_client, evaluator_user, scenario
+):
+    """Dois corretores independentes, como o planejamento exige."""
+    from apps.recruitment.models import StageAssignment
 
     admin_client.post(url(scenario['application'].id), payload(scenario), format='json')
 
-    other = UserFactory()
-    other.is_staff = True
-    other.save(update_fields=['is_staff'])
-    other_client = APIClient()
-    other_client.credentials(
-        HTTP_AUTHORIZATION=f'Bearer {RefreshToken.for_user(other).access_token}'
+    StageAssignment.objects.create(
+        stage=scenario['stage'],
+        application=scenario['application'],
+        evaluator=evaluator_user,
     )
-    other_client.post(
+    evaluator_client.post(
         url(scenario['application'].id),
-        payload(scenario, first_score=7, second_score=9),
+        payload(scenario, first_score=3, second_score=5),
         format='json',
     )
 
     r = admin_client.get(url(scenario['application'].id))
     block = r.data[0]
     averages = {c['name']: c['average'] for c in block['criteria']}
-    assert averages['Pensamento crítico'] == 8.0
-    assert averages['Criatividade'] == 8.0
-    assert block['stage_average'] == 8.0
+    assert averages['Pensamento crítico'] == 4.0
+    assert averages['Criatividade'] == 4.0
+    assert block['stage_average'] == 4.0
     assert len(block['notes']) == 2
 
 
 def test_stage_average_is_mean_of_criteria_averages(admin_client, scenario):
     admin_client.post(
         url(scenario['application'].id),
-        payload(scenario, first_score=10, second_score=6),
+        payload(scenario, first_score=5, second_score=3),
         format='json',
     )
     r = admin_client.get(url(scenario['application'].id))
-    assert r.data[0]['stage_average'] == 8.0
+    assert r.data[0]['stage_average'] == 4.0
 
 
 def test_evaluation_fails_when_criterion_not_in_stage(admin_client, scenario, process):
@@ -108,7 +107,7 @@ def test_evaluation_fails_when_criterion_not_in_stage(admin_client, scenario, pr
         url(scenario['application'].id),
         {
             'stage': str(scenario['stage'].id),
-            'scores': [{'criterion': str(outsider.id), 'score': 8}],
+            'scores': [{'criterion': str(outsider.id), 'score': 4}],
         },
         format='json',
     )
@@ -119,7 +118,7 @@ def test_evaluation_fails_when_criterion_not_in_stage(admin_client, scenario, pr
 def test_evaluation_fails_with_score_out_of_range(admin_client, scenario):
     r = admin_client.post(
         url(scenario['application'].id),
-        payload(scenario, first_score=11),
+        payload(scenario, first_score=6),
         format='json',
     )
     assert r.status_code == 400
@@ -163,5 +162,5 @@ def test_application_detail_returns_my_scores(admin_client, scenario):
     admin_client.post(url(scenario['application'].id), payload(scenario), format='json')
 
     r = admin_client.get(f'/api/v1/admin/applications/{scenario["application"].id}/')
-    assert r.data['my_scores'][str(scenario['first'].id)] == 9.0
-    assert r.data['final_score'] == 8.0
+    assert r.data['my_scores'][str(scenario['first'].id)] == 5.0
+    assert r.data['final_score'] == 4.0

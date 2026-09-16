@@ -11,6 +11,8 @@ from .views import (
     AdminProcessDetailView,
     AdminProcessListCreateView,
     AdminProcessPublishView,
+    AdminStageAssignmentView,
+    AdminStageAutoDistributeView,
     AdminStageDetailView,
     AdminStageListCreateView,
     AdminStageReorderView,
@@ -101,5 +103,15 @@ urlpatterns = [
         'admin/communications/<uuid:pk>/',
         AdminCommunicationDetailView.as_view(),
         name='admin-communication-detail',
+    ),
+    path(
+        'admin/stages/<uuid:pk>/assignments/',
+        AdminStageAssignmentView.as_view(),
+        name='admin-stage-assignments',
+    ),
+    path(
+        'admin/stages/<uuid:pk>/assignments/auto/',
+        AdminStageAutoDistributeView.as_view(),
+        name='admin-stage-auto-distribute',
     ),
 ]

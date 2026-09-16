@@ -41,13 +41,23 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
 - Processo só pode ser publicado se tiver pelo menos uma etapa.
 - Processo só pode ser excluído enquanto estiver em `draft`.
 - Etapas são ordenadas. Cada etapa tem seus próprios critérios de avaliação.
-- Vários organizadores podem avaliar o mesmo candidato; a nota exibida é a média.
+- Cada etapa tem barema com peso por critério; a nota da etapa é média ponderada.
+- A nota final é a média ponderada das etapas, pelo peso de cada uma.
+- Pesos configurados precisam somar 100%. Peso zero em tudo significa peso igual.
+- A escala de notas é configurável por processo (padrão 1 a 5). O 0 é sempre aceito e
+  significa ausência de entrega, não faz parte da escala.
+- Vários organizadores avaliam o mesmo candidato; a nota do critério é a média entre eles.
 - Médias são calculadas em service, nunca persistidas em campo.
+- Correção é anônima por padrão: o avaliador vê o código da candidatura, não a pessoa.
+- Avaliador só pontua candidato que lhe foi designado (`StageAssignment`).
+- Divergência acima do limiar do processo marca `needs_third_review`.
 - Aprovação final só é permitida para candidatos na última etapa.
 - Candidato nunca vê nota nem observação de avaliador.
 - Sem teto de aprovados no seletivo (o limite de 10 é regra só do hackathon).
 - Notificações são criadas no banco junto com o disparo de e-mail — nunca um sem o outro.
-- Todo organizador (`is_staff=True`) pode tudo. `role_title` é informativo, sem RBAC.
+- Todo organizador (`is_staff=True`) cria processo, move etapa e envia comunicado.
+  `role_title` é informativo. A única distinção de papel é `is_coordinator`: coordenador
+  vê a identidade na correção anônima e administra as designações de avaliador.
 
 ## Regras de negócio — Hackathon (v2, em produção)
 - Participantes têm cadastro próprio (e-mail + senha) e fazem login via JWT.

@@ -1,4 +1,5 @@
 import uuid
+from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
@@ -36,6 +37,17 @@ class Process(models.Model):
     registration_end = models.DateTimeField()
     published_at = models.DateTimeField(null=True, blank=True)
     highlight_message = models.CharField(max_length=255, blank=True)
+    # Escala das notas. O planejamento da Liga usa 1 a 5 para evitar falsa
+    # precisão do tipo "7,3". O 0 é sempre aceito, reservado para ausência de
+    # entrega ou impossibilidade de avaliar.
+    score_min = models.PositiveSmallIntegerField(default=1)
+    score_max = models.PositiveSmallIntegerField(default=5)
+    # Diferença entre avaliadores que aciona revisão de um terceiro.
+    divergence_threshold = models.DecimalField(
+        max_digits=4, decimal_places=2, default=Decimal('1.5')
+    )
+    # Correção anônima: avaliador vê só o código do candidato.
+    anonymous_evaluation = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -66,6 +78,9 @@ class Stage(models.Model):
     order = models.PositiveSmallIntegerField()
     start_at = models.DateTimeField(null=True, blank=True)
     end_at = models.DateTimeField(null=True, blank=True)
+    # Peso da etapa na nota final, em porcentagem (ex.: 35 para 35%).
+    # Zero em todas as etapas significa peso igual entre elas.
+    weight = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     accepts_late_submission = models.BooleanField(default=False)
     allows_file_upload = models.BooleanField(default=False)
     max_files = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -99,6 +114,9 @@ class EvaluationCriterion(models.Model):
     stage = models.ForeignKey(Stage, on_delete=models.CASCADE, related_name='criteria')
     name = models.CharField(max_length=255)
     order = models.PositiveSmallIntegerField(default=1)
+    # Peso do critério dentro da etapa, em porcentagem (ex.: 20 para 20%).
+    # Zero em todos os critérios significa peso igual entre eles.
+    weight = models.DecimalField(max_digits=5, decimal_places=2, default=0)
 
     class Meta:
         ordering = ['order']
@@ -150,6 +168,8 @@ class Application(models.Model):
         choices=ApplicationStatus.CHOICES,
         default=ApplicationStatus.IN_PROGRESS,
     )
+    # Identificador mostrado ao avaliador na correção anônima (ex.: C-0007).
+    code = models.CharField(max_length=20, blank=True)
     submitted_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -342,6 +362,9 @@ class OrganizerProfile(models.Model):
     )
     full_name = models.CharField(max_length=255, blank=True)
     role_title = models.CharField(max_length=255, blank=True)
+    # Coordenador do processo: enxerga a identidade dos candidatos mesmo na
+    # correção anônima e administra a distribuição de avaliadores.
+    is_coordinator = models.BooleanField(default=False)
     phone = models.CharField(max_length=20, blank=True)
     github = models.URLField(blank=True)
     linkedin = models.URLField(blank=True)
@@ -355,3 +378,40 @@ class OrganizerProfile(models.Model):
 
     def __str__(self):
         return self.full_name or self.user.get_username()
+
+
+class StageAssignment(models.Model):
+    """Avaliador designado para corrigir uma candidatura numa etapa.
+
+    O planejamento da Liga prevê dois corretores por case, distribuídos entre
+    candidatos diferentes. Sem designação, a correção vira "quem pegar
+    primeiro" e não há como garantir dois pareceres independentes.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    stage = models.ForeignKey(Stage, on_delete=models.CASCADE, related_name='assignments')
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name='assignments',
+    )
+    evaluator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='stage_assignments',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['stage__order', 'created_at']
+        verbose_name = 'Designação de avaliador'
+        verbose_name_plural = 'Designações de avaliador'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['stage', 'application', 'evaluator'],
+                name='unique_assignment_per_stage_application_evaluator',
+            ),
+        ]
+
+    def __str__(self):
+        return f'{self.evaluator} -> {self.application} ({self.stage.name})'

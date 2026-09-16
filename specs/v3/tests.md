@@ -119,6 +119,52 @@ test_ordering_by_score_desc
 test_filters_combine
 ```
 
+### tests/test_weighted_scoring.py
+```python
+test_stage_average_uses_criterion_weights
+test_final_score_uses_stage_weights
+test_zero_weights_fall_back_to_equal_weight
+test_criterion_average_still_means_across_evaluators
+test_weights_must_sum_to_100
+test_weights_summing_100_are_accepted
+test_criteria_without_weights_are_accepted
+```
+
+### tests/test_score_scale.py
+```python
+test_default_scale_is_one_to_five
+test_score_above_scale_is_rejected
+test_score_inside_scale_is_accepted
+test_zero_is_always_accepted
+test_scale_is_configurable_per_process
+test_negative_score_is_rejected
+```
+
+### tests/test_anonymous_evaluation.py
+```python
+test_evaluator_sees_code_instead_of_name
+test_coordinator_sees_identity
+test_candidate_list_is_anonymous_for_evaluator
+test_identity_is_visible_when_anonymity_is_off
+test_application_gets_sequential_code_on_apply
+```
+
+### tests/test_assignments.py
+```python
+test_evaluator_cannot_grade_without_assignment
+test_evaluator_can_grade_when_assigned
+test_coordinator_grades_without_assignment
+test_auto_distribute_gives_two_evaluators_per_candidate
+test_auto_distribute_balances_workload
+test_auto_distribute_requires_enough_evaluators
+test_redistributing_replaces_previous_assignments
+test_assignment_list_shows_workload
+test_divergence_between_evaluators
+test_small_difference_does_not_need_third_review
+test_single_evaluator_never_needs_third_review
+test_summary_flags_divergence
+```
+
 ### tests/test_notifications.py
 ```python
 test_every_recruitment_notification_type_has_an_email_task

@@ -176,16 +176,21 @@ Cria etapa (modal de configuração de etapa). Critérios vão aninhados:
   "allows_file_upload": true,
   "max_files": 3,
   "allowed_file_types": ["pdf", "zip", "pptx"],
+  "weight": 35,
   "criteria": [
-    { "name": "Pensamento crítico", "order": 1 },
-    { "name": "Clareza da solução", "order": 2 },
-    { "name": "Criatividade", "order": 3 },
-    { "name": "Viabilidade", "order": 4 }
+    { "name": "Pensamento crítico", "order": 1, "weight": 20 },
+    { "name": "Clareza da solução", "order": 2, "weight": 15 },
+    { "name": "Criatividade", "order": 3, "weight": 10 },
+    { "name": "Viabilidade", "order": 4, "weight": 55 }
   ]
 }
 ```
 
 `order` da etapa é atribuído automaticamente (última posição) se não enviado.
+
+`weight` é o peso na nota final e os `weight` dos critérios são o barema da etapa.
+Quando algum peso é informado, a soma precisa dar 100 — senão 400. Todos zerados
+significa peso igual.
 
 ### PATCH /api/v1/admin/stages/{id}/
 Edita a etapa e seus critérios.
@@ -241,10 +246,14 @@ observações e as médias calculadas.
     "notes": [
       { "evaluator": "Ana", "text": "Boa estruturação do problema." }
     ],
-    "stage_average": 8.4
+    "stage_average": 8.4,
+    "needs_third_review": false
   }
 ]
 ```
+
+`needs_third_review` fica `true` quando a diferença entre as notas de etapa de dois
+avaliadores passa de `process.divergence_threshold` (padrão 1,5).
 
 ### POST /api/v1/admin/applications/{id}/evaluations/
 Salva a avaliação do organizador autenticado para uma etapa (botão "Salvar Avaliação").
@@ -263,8 +272,10 @@ Salva a avaliação do organizador autenticado para uma etapa (botão "Salvar Av
 Comportamento: upsert por (application, criterion, evaluator) — reenviar sobrescreve a
 nota do mesmo avaliador em vez de duplicar.
 
-Validações: `score` entre 0 e 10; critérios pertencem à etapa informada; processo não
-está `closed`.
+Validações: `score` dentro de `score_min`..`score_max` do processo (padrão 1 a 5), com 0
+sempre aceito para ausência de entrega; critérios pertencem à etapa informada; processo
+não está `closed`; e **o avaliador precisa estar designado** para esta candidatura nesta
+etapa — senão 403. O coordenador (`is_coordinator`) não depende de designação.
 
 ### POST /api/v1/admin/processes/{id}/applications/bulk-action/
 Ações em massa da tabela de candidatos.
@@ -326,3 +337,44 @@ Perfil do organizador autenticado: nome, e-mail, `role_title`, telefone, github,
 Atualiza os campos editáveis do perfil.
 `role_title` é informativo — não concede nem restringe permissão (ver
 [decisions.md](decisions.md) §4).
+
+## Designação de avaliadores
+
+O planejamento prevê dois corretores independentes por case, distribuídos entre
+candidatos diferentes. Sem designação, avaliador não consegue pontuar (403).
+
+### GET /api/v1/admin/stages/{id}/assignments/
+Distribuição atual da etapa: a carga de cada avaliador e a lista de designações
+(candidatura, código e avaliador).
+
+### POST /api/v1/admin/stages/{id}/assignments/
+Designa avaliadores para uma candidatura específica.
+```json
+{ "application": "uuid", "evaluators": ["user_id", "user_id"] }
+```
+
+### DELETE /api/v1/admin/stages/{id}/assignments/
+Remove uma designação. Body: `{ "application": "uuid", "evaluator": "user_id" }`.
+
+### POST /api/v1/admin/stages/{id}/assignments/auto/
+Distribui automaticamente, em rodízio, equilibrando a carga.
+```json
+{ "evaluators": ["user_id", "user_id", "user_id"], "per_application": 2 }
+```
+
+Cada candidatura recebe `per_application` avaliadores **distintos**, e o rodízio evita
+que a mesma dupla se repita em todos os candidatos. Redistribuir substitui a distribuição
+anterior da etapa, mas **não apaga avaliação já registrada** — as notas permanecem no
+banco.
+
+Validação: são necessários ao menos `per_application` avaliadores — senão 400.
+
+## Correção anônima
+
+Quando `process.anonymous_evaluation` é `true` (padrão), os endpoints
+`/admin/applications/` e `/admin/processes/{id}/applications/` devolvem `null` nos campos
+de identidade (e-mail, telefone, GitHub, LinkedIn, bio) e substituem `participant_name`
+pelo `code` da candidatura (`C-0001`).
+
+O coordenador (`OrganizerProfile.is_coordinator=True`) enxerga a identidade normalmente,
+porque é quem distribui as correções e revisa divergências.

@@ -6,7 +6,15 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from apps.recruitment.models import Application, Communication, Process, Stage
+from django.contrib.auth import get_user_model
+
+from apps.recruitment.models import (
+    Application,
+    Communication,
+    Process,
+    Stage,
+    StageAssignment,
+)
 from apps.recruitment.serializers import (
     AdminApplicationDetailSerializer,
     ApplicationListSerializer,
@@ -28,6 +36,12 @@ from apps.recruitment.services.applications import (
     published_processes,
     run_bulk_action,
 )
+from apps.recruitment.services.assignments import (
+    assign,
+    auto_distribute,
+    unassign,
+    workload,
+)
 from apps.recruitment.services.communications import send_communication
 from apps.recruitment.services.evaluations import (
     evaluation_summary,
@@ -42,6 +56,8 @@ from apps.recruitment.services.processes import (
     reorder_stages,
 )
 from apps.recruitment.services.scoring import final_scores
+
+User = get_user_model()
 
 
 class ApplicationPagination(PageNumberPagination):
@@ -435,3 +451,66 @@ class AdminCommunicationDetailView(generics.RetrieveAPIView):
     queryset = Communication.objects.select_related(
         'process', 'audience_stage'
     ).prefetch_related('recipients')
+
+
+# ── Designação de avaliadores ─────────────────────────────────────
+
+
+class AdminStageAssignmentView(APIView):
+    """Distribuição de correções de uma etapa entre os avaliadores."""
+
+    permission_classes = [IsAdminUser]
+
+    def get(self, request, pk):
+        stage = get_object_or_404(Stage, pk=pk)
+        rows = StageAssignment.objects.filter(stage=stage).select_related(
+            'application', 'application__participant', 'evaluator'
+        )
+        return Response(
+            {
+                'workload': workload(stage),
+                'assignments': [
+                    {
+                        'application': str(row.application_id),
+                        'code': row.application.code,
+                        'evaluator': row.evaluator.get_username(),
+                    }
+                    for row in rows
+                ],
+            }
+        )
+
+    def post(self, request, pk):
+        """Designa avaliadores para uma candidatura específica."""
+        stage = get_object_or_404(Stage, pk=pk)
+        application = get_object_or_404(
+            Application, pk=request.data.get('application')
+        )
+        evaluators = User.objects.filter(id__in=request.data.get('evaluators') or [])
+        assign(stage, application, list(evaluators))
+        return Response({'assigned': len(evaluators)}, status=status.HTTP_201_CREATED)
+
+    def delete(self, request, pk):
+        stage = get_object_or_404(Stage, pk=pk)
+        application = get_object_or_404(
+            Application, pk=request.data.get('application')
+        )
+        evaluator = get_object_or_404(User, pk=request.data.get('evaluator'))
+        unassign(stage, application, evaluator)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AdminStageAutoDistributeView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def post(self, request, pk):
+        stage = get_object_or_404(Stage, pk=pk)
+        assignments = auto_distribute(
+            stage,
+            request.data.get('evaluators') or [],
+            int(request.data.get('per_application') or 2),
+        )
+        return Response(
+            {'created': len(assignments), 'workload': workload(stage)},
+            status=status.HTTP_201_CREATED,
+        )

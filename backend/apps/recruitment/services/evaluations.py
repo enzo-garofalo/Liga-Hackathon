@@ -3,17 +3,45 @@
 from decimal import Decimal
 
 from django.db import transaction
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from apps.recruitment.models import (
     Evaluation,
     EvaluationCriterion,
+    StageAssignment,
     ProcessStatus,
 )
-from apps.recruitment.services.scoring import stage_average
+from apps.recruitment.services.scoring import (
+    evaluator_stage_scores,
+    needs_third_review,
+    stage_average,
+)
 
-MIN_SCORE = Decimal('0')
-MAX_SCORE = Decimal('10')
+
+
+def is_coordinator(user):
+    profile = getattr(user, 'organizer_profile', None)
+    return bool(profile and profile.is_coordinator)
+
+
+def assert_can_evaluate(application, stage, evaluator):
+    """Avaliador só corrige quem lhe foi designado.
+
+    Sem isso, a distribuição entre corretores vira sugestão: qualquer
+    organizador poderia avaliar qualquer candidato e não haveria como garantir
+    dois pareceres independentes. O coordenador escapa da regra porque é quem
+    administra a distribuição e faz a revisão de divergência.
+    """
+    if is_coordinator(evaluator):
+        return
+
+    assigned = StageAssignment.objects.filter(
+        stage=stage, application=application, evaluator=evaluator
+    ).exists()
+    if not assigned:
+        raise PermissionDenied(
+            'Você não foi designado para avaliar este candidato nesta etapa.'
+        )
 
 
 @transaction.atomic
@@ -27,10 +55,15 @@ def save_evaluation(application, stage, evaluator, scores, notes=''):
     A observação é gravada em todas as linhas da etapa para aquele avaliador —
     na interface ela é uma só por etapa, não por critério.
     """
+    assert_can_evaluate(application, stage, evaluator)
+
     if application.process.status == ProcessStatus.CLOSED:
         raise ValidationError('Processo encerrado não aceita novas avaliações.')
     if stage.process_id != application.process_id:
         raise ValidationError('A etapa não pertence ao processo desta candidatura.')
+
+    scale_min = Decimal(application.process.score_min)
+    scale_max = Decimal(application.process.score_max)
 
     valid_criteria = {
         str(criterion.id): criterion
@@ -47,8 +80,13 @@ def save_evaluation(application, stage, evaluator, scores, notes=''):
             )
 
         score = Decimal(str(entry.get('score')))
-        if score < MIN_SCORE or score > MAX_SCORE:
-            raise ValidationError('A nota deve estar entre 0 e 10.')
+        # O 0 é sempre aceito: representa ausência de entrega ou
+        # impossibilidade de avaliar, não faz parte da escala.
+        if score != 0 and (score < scale_min or score > scale_max):
+            raise ValidationError(
+                f'A nota deve estar entre {scale_min} e {scale_max}, '
+                f'ou 0 para ausência de entrega.'
+            )
 
         evaluation, _ = Evaluation.objects.update_or_create(
             application=application,
@@ -79,6 +117,7 @@ def evaluation_summary(application):
                     'name': evaluation.stage.name,
                     'order': evaluation.stage.order,
                 },
+                'instance': evaluation.stage,
                 'criteria': {},
                 'notes': {},
             },
@@ -121,6 +160,9 @@ def evaluation_summary(application):
                 'criteria': criteria,
                 'notes': list(block['notes'].values()),
                 'stage_average': round(float(average), 2) if average else None,
+                'needs_third_review': needs_third_review(
+                    application, block['instance']
+                ),
             }
         )
 

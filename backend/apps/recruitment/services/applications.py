@@ -15,6 +15,14 @@ from apps.recruitment.services.notifications import notify
 from apps.teams.models import NotificationType
 
 
+def next_application_code(process):
+    """Código sequencial da candidatura no processo (C-0001, C-0002...).
+
+    É o identificador que o avaliador vê na correção anônima.
+    """
+    return f'C-{Application.objects.filter(process=process).count() + 1:04d}'
+
+
 def registration_is_open(process):
     now = timezone.now()
     return (
@@ -46,6 +54,7 @@ def apply_to_process(process, participant):
         process=process,
         participant=participant,
         current_stage=process.first_stage,
+        code=next_application_code(process),
         status=ApplicationStatus.IN_PROGRESS,
         submitted_at=now,
     )

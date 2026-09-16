@@ -34,32 +34,53 @@ STAGES = [
     {
         'name': 'Inscrição',
         'description': 'Preenchimento do formulário de inscrição.',
+        'weight': 0,
         'criteria': [],
         'allows_file_upload': False,
     },
     {
         'name': 'Resolução do Case',
         'description': 'Entrega de um case prático em até 7 dias.',
+        'weight': 35,
         'criteria': [
-            'Pensamento crítico',
-            'Clareza da solução',
-            'Criatividade',
-            'Viabilidade',
+            ('Compreensão do problema', 15),
+            ('Pensamento crítico', 20),
+            ('Qualidade da solução', 15),
+            ('Viabilidade', 15),
+            ('Justificativa das decisões', 15),
+            ('Estrutura e clareza', 10),
+            ('Criatividade e iniciativa', 10),
         ],
         'allows_file_upload': True,
-        'max_files': 3,
-        'allowed_file_types': ['pdf', 'zip', 'pptx'],
+        'max_files': 1,
+        'allowed_file_types': ['pdf'],
     },
     {
         'name': 'Pitch',
-        'description': 'Apresentação da solução em 10 minutos.',
-        'criteria': ['Comunicação', 'Argumentação', 'Postura'],
+        'description': 'Apresentação da solução em 5 minutos, com 3 de perguntas.',
+        'weight': 30,
+        'criteria': [
+            ('Clareza da comunicação', 20),
+            ('Capacidade de síntese', 15),
+            ('Argumentação', 20),
+            ('Domínio da solução', 20),
+            ('Resposta às perguntas', 15),
+            ('Organização da apresentação', 10),
+        ],
         'allows_file_upload': False,
     },
     {
         'name': 'Entrevista',
-        'description': 'Conversa final com a diretoria.',
-        'criteria': ['Alinhamento com a Liga', 'Disponibilidade'],
+        'description': 'Entrevista individual estruturada com a comissão.',
+        'weight': 35,
+        'criteria': [
+            ('Motivação', 20),
+            ('Comprometimento', 25),
+            ('Trabalho em equipe', 20),
+            ('Iniciativa', 15),
+            ('Capacidade de aprendizado', 10),
+            ('Alinhamento com o propósito da Liga', 10),
+        ],
         'allows_file_upload': False,
     },
 ]
@@ -89,18 +110,24 @@ FINISHED = {
 SCORES = {
     'ana.lima@aluno.dev': {
         'Resolução do Case': {
-            'Pensamento crítico': [9.0, 8.0],
-            'Clareza da solução': [8.5, 9.0],
-            'Criatividade': [9.5, 8.0],
-            'Viabilidade': [8.0, 8.5],
+            'Compreensão do problema': [5, 4],
+            'Pensamento crítico': [5, 4],
+            'Qualidade da solução': [4, 5],
+            'Viabilidade': [4, 4],
+            'Justificativa das decisões': [5, 4],
+            'Estrutura e clareza': [4, 5],
+            'Criatividade e iniciativa': [5, 5],
         },
     },
     'joao.silva@aluno.dev': {
         'Resolução do Case': {
-            'Pensamento crítico': [7.0, 6.5],
-            'Clareza da solução': [7.5, 7.0],
-            'Criatividade': [6.0, 7.0],
-            'Viabilidade': [8.0, 7.5],
+            'Compreensão do problema': [3, 3],
+            'Pensamento crítico': [4, 2],
+            'Qualidade da solução': [3, 3],
+            'Viabilidade': [4, 3],
+            'Justificativa das decisões': [3, 2],
+            'Estrutura e clareza': [4, 4],
+            'Criatividade e iniciativa': [3, 3],
         },
     },
 }
@@ -184,14 +211,17 @@ class Command(BaseCommand):
                     'description': data['description'],
                     'start_at': process.registration_start + timedelta(days=order * 5),
                     'end_at': process.registration_start + timedelta(days=order * 5 + 4),
+                    'weight': data['weight'],
                     'allows_file_upload': data.get('allows_file_upload', False),
                     'max_files': data.get('max_files'),
                     'allowed_file_types': data.get('allowed_file_types', []),
                 },
             )
-            for criterion_order, name in enumerate(data['criteria'], start=1):
+            for criterion_order, (name, weight) in enumerate(data['criteria'], start=1):
                 EvaluationCriterion.objects.get_or_create(
-                    stage=stage, name=name, defaults={'order': criterion_order}
+                    stage=stage,
+                    name=name,
+                    defaults={'order': criterion_order, 'weight': weight},
                 )
             stages[data['name']] = stage
         return stages
@@ -221,7 +251,9 @@ class Command(BaseCommand):
 
     def _create_applications(self, process, stages):
         applications = {}
-        for email, full_name, course, semester, stage_name in CANDIDATES:
+        for index, (email, full_name, course, semester, stage_name) in enumerate(
+            CANDIDATES, start=1
+        ):
             user = self._user(email, full_name)
             participant, _ = Participant.objects.get_or_create(
                 user=user,
@@ -238,6 +270,7 @@ class Command(BaseCommand):
                 defaults={
                     'current_stage': stages[stage_name],
                     'status': FINISHED.get(email, ApplicationStatus.IN_PROGRESS),
+                    'code': f'C-{index:04d}',
                     'submitted_at': process.registration_start + timedelta(days=1),
                 },
             )

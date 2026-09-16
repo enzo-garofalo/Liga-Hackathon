@@ -145,6 +145,5 @@ com e-mail em cada transição.
 | Pendência | Bloqueia | Onde está registrada |
 |-----------|----------|----------------------|
 | Storage de arquivos em produção | Fase 4 | [decisions.md](decisions.md) §5 |
-| Confirmar domínios paralelos vs. modelo unificado | Fase 1 | [decisions.md](decisions.md) §2 |
 | Formato de `allowed_file_types` (ArrayField vs. tabela) | Fase 1 | [models.md](models.md) |
 | Quem pode avaliar (qualquer organizador vs. designado) | Fase 5 | [models.md](models.md) |

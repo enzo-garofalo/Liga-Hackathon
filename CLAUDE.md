@@ -82,6 +82,14 @@ Para a v3 (entregáveis):
   Ver `specs/v3/decisions.md` §5.
 - `MAX_UPLOAD_BYTES` — teto por arquivo enviado pelo candidato (padrão 10 MB).
 
+## E-mail depende de worker
+Todo e-mail e enfileirado no Celery. Sao necessarios tres processos: backend, redis e
+worker. Sem worker, as tasks ficam na fila, a requisicao responde 200 e o e-mail nunca
+sai — sem erro visivel. `manage.py check_email_pipeline` verifica broker, workers e
+backend de e-mail; rode antes de abrir inscricoes.
+
+Em desenvolvimento sem Redis, use `CELERY_TASK_ALWAYS_EAGER=True`.
+
 ## Fronteira entre hackathon e processo seletivo
 A v3 **não migra nem altera nenhuma tabela existente** — só cria tabelas novas no app
 `recruitment`. Os dados de produção do hackathon ficam intactos.

@@ -165,6 +165,65 @@ npm run dev
 
 O Vite roda em http://localhost:5173.
 
+## E-mail, Celery e Redis
+
+Todo e-mail do sistema (convites do hackathon, confirmacoes e resultados do
+processo seletivo) e enfileirado no Celery e enviado por um **worker**, nunca
+pela requisicao web.
+
+Isso significa que sao necessarios **tres** processos, nao dois:
+
+| Processo | Papel |
+|----------|-------|
+| `backend` | responde a API e enfileira as tarefas de e-mail |
+| `redis`   | guarda a fila |
+| `worker`  | consome a fila e envia os e-mails |
+
+### A falha que nao da erro
+
+Se o Redis estiver acessivel mas **nenhum worker estiver rodando**, as tarefas
+entram na fila e ficam la. A requisicao responde 200, a notificacao aparece no
+banco e o e-mail nunca sai. Nao ha excecao, nao ha log de erro, e o problema so
+aparece quando um candidato reclama de nao ter recebido o resultado.
+
+Para nao descobrir isso no dia do processo, rode:
+
+```bash
+docker compose exec backend python manage.py check_email_pipeline
+```
+
+O comando checa broker, workers respondendo, backend de e-mail e tipos de
+notificacao registrados. **Rode antes de abrir as inscricoes e antes de cada
+envio em massa.**
+
+### Desenvolvimento sem Redis
+
+Se voce nao quiser subir o Redis localmente, ligue o modo eager: as tarefas
+rodam no proprio processo web e o e-mail sai direto no console.
+
+```
+CELERY_TASK_ALWAYS_EAGER=True
+```
+
+Isso e aceitavel em desenvolvimento e **nunca** em producao — o envio passa a
+bloquear a requisicao.
+
+### Producao
+
+O worker precisa existir como processo separado. No `docker-compose.prod.yml`
+ele e o servico `worker`. No Railway, precisa ser um **servico proprio** no
+mesmo projeto, apontando para o mesmo repositorio, com:
+
+```
+Start command: celery -A core worker --loglevel=info
+```
+
+e as mesmas variaveis de ambiente do backend (`DATABASE_URL`, `REDIS_URL`,
+`DJANGO_SECRET_KEY`, credenciais do Resend). O `entrypoint.sh` sobe apenas o
+gunicorn: ele nao inicia worker nenhum.
+
+---
+
 ## Scripts e comandos uteis
 
 Frontend:
@@ -293,6 +352,12 @@ Observacao: no momento, o frontend nao possui scripts `test` ou `lint` no
 `package.json`; o check principal disponivel e `npm run build`.
 
 ## Deploy
+
+> **Antes de qualquer processo seletivo real:** confirme que existe um servico de
+> worker rodando (`celery -A core worker`) e rode
+> `python manage.py check_email_pipeline`. Sem worker, nenhum e-mail e enviado e
+> nada acusa o erro. Ver a secao "E-mail, Celery e Redis".
+
 
 O projeto possui arquivos `railway.toml` para backend e frontend.
 

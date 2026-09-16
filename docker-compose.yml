@@ -13,18 +13,54 @@ services:
       timeout: 5s
       retries: 5
 
+  # Broker das tasks de e-mail. Sem ele, qualquer ação que notifique o
+  # candidato falha ao enfileirar.
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   backend:
     build: ./backend
     volumes:
       - ./backend:/app
+      # Entregáveis dos candidatos. Sem o volume, os PDFs somem a cada
+      # `docker compose down`.
+      - media:/app/media
     ports:
       - "8000:8000"
     env_file:
       - .env
     environment:
       POSTGRES_HOST: postgres
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Consome a fila e envia os e-mails. Sem este serviço as tasks ficam
+  # enfileiradas para sempre: a requisição responde 200, a notificação aparece
+  # no banco e o e-mail nunca sai — sem erro nenhum.
+  worker:
+    build: ./backend
+    command: celery -A core worker --loglevel=info
+    volumes:
+      - ./backend:/app
+      - media:/app/media
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   frontend:
@@ -43,3 +79,4 @@ services:
 
 volumes:
   pgdata:
+  media:

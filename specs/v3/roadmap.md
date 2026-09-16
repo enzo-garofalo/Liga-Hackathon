@@ -60,10 +60,11 @@ etapa está.
 - `Deliverable` com upload, validação de tipo, quantidade e prazo
 - Remoção antes do prazo
 - Exibição dos arquivos na ficha do candidato
-- `tests/test_views_deliverables.py`
+- Download autenticado: arquivo de candidatura não fica em URL pública
+- `export_deliverables` para backup ao fim de cada etapa
+- `tests/test_views_deliverables.py`, `tests/test_export_command.py`
 
-**Produção:** `MEDIA_ROOT` num volume do Railway ([decisions.md](decisions.md) §5). Em
-desenvolvimento, storage local resolve. Não há mais bloqueio para esta fase.
+**Produção:** `MEDIA_ROOT` num volume do Railway ([decisions.md](decisions.md) §5).
 
 ---
 

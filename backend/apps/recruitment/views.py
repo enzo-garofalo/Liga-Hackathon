@@ -1,16 +1,20 @@
-from django.http import Http404
+import os
+
+from django.contrib.auth import get_user_model
+from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from django.contrib.auth import get_user_model
-
 from apps.recruitment.models import (
     Application,
     Communication,
+    Deliverable,
     Process,
     Stage,
     StageAssignment,
@@ -22,6 +26,7 @@ from apps.recruitment.serializers import (
     CommunicationDetailSerializer,
     CommunicationInputSerializer,
     CommunicationListSerializer,
+    DeliverableSerializer,
     EvaluationInputSerializer,
     MyApplicationDetailSerializer,
     MyApplicationListSerializer,
@@ -43,6 +48,12 @@ from apps.recruitment.services.assignments import (
     workload,
 )
 from apps.recruitment.services.communications import send_communication
+from apps.recruitment.services.deliverables import (
+    assert_owner,
+    can_download,
+    delete as delete_deliverable,
+    upload as upload_deliverable,
+)
 from apps.recruitment.services.evaluations import (
     evaluation_summary,
     save_evaluation,
@@ -513,4 +524,70 @@ class AdminStageAutoDistributeView(APIView):
         return Response(
             {'created': len(assignments), 'workload': workload(stage)},
             status=status.HTTP_201_CREATED,
+        )
+
+
+# ── Entregáveis ───────────────────────────────────────────────────
+
+
+class MyDeliverableView(APIView):
+    """Upload e remoção de entregáveis pelo candidato."""
+
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get_application(self, request, pk):
+        application = get_object_or_404(
+            Application.objects.select_related('process', 'current_stage'), pk=pk
+        )
+        assert_owner(application, _participant_or_404(request))
+        return application
+
+    def post(self, request, pk):
+        application = self.get_application(request, pk)
+        uploaded = request.FILES.get('file')
+        if uploaded is None:
+            raise ValidationError('Envie um arquivo no campo "file".')
+
+        stage = application.current_stage
+        if stage is None:
+            raise ValidationError('Sua candidatura ainda não está em uma etapa.')
+
+        deliverable = upload_deliverable(application, stage, uploaded)
+        return Response(
+            DeliverableSerializer(deliverable, context={'request': request}).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class MyDeliverableDetailView(APIView):
+    def delete(self, request, pk, deliverable_id):
+        application = get_object_or_404(Application, pk=pk)
+        assert_owner(application, _participant_or_404(request))
+        deliverable = get_object_or_404(
+            Deliverable.objects.select_related('stage'),
+            pk=deliverable_id,
+            application=application,
+        )
+        delete_deliverable(deliverable)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DeliverableDownloadView(APIView):
+    """Download autenticado.
+
+    Os arquivos não são servidos por URL pública: são material de candidatura,
+    o caminho seria adivinhável e o conteúdo é o trabalho do candidato.
+    """
+
+    def get(self, request, pk):
+        deliverable = get_object_or_404(
+            Deliverable.objects.select_related('application', 'stage'), pk=pk
+        )
+        if not can_download(deliverable, request.user):
+            raise PermissionDenied('Você não tem acesso a este arquivo.')
+
+        return FileResponse(
+            deliverable.file.open('rb'),
+            as_attachment=True,
+            filename=os.path.basename(deliverable.file.name),
         )

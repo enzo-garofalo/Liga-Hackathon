@@ -53,6 +53,8 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
 - Divergência acima do limiar do processo marca `needs_third_review`.
 - Aprovação final só é permitida para candidatos na última etapa.
 - Candidato nunca vê nota nem observação de avaliador.
+- Entregáveis não ficam em URL pública: download passa por endpoint autenticado, liberado
+  ao dono da candidatura e a organizadores.
 - Sem teto de aprovados no seletivo (o limite de 10 é regra só do hackathon).
 - Notificações são criadas no banco junto com o disparo de e-mail — nunca um sem o outro.
 - Todo organizador (`is_staff=True`) cria processo, move etapa e envia comunicado.
@@ -75,9 +77,10 @@ Existentes (v2):
 - `TEAM_DEADLINE=2026-05-30` — data de corte para formação de equipes
 - `VITE_WHATSAPP_LINK=https://chat.whatsapp.com/...` — link fixo do grupo
 
-Para a v3 (entregáveis, Fase 4):
-- `MEDIA_ROOT` deve apontar para um volume do Railway em produção. Ver
-  `specs/v3/decisions.md` §5.
+Para a v3 (entregáveis):
+- `MEDIA_ROOT` — em produção, caminho do volume do Railway montado no backend.
+  Ver `specs/v3/decisions.md` §5.
+- `MAX_UPLOAD_BYTES` — teto por arquivo enviado pelo candidato (padrão 10 MB).
 
 ## Fronteira entre hackathon e processo seletivo
 A v3 **não migra nem altera nenhuma tabela existente** — só cria tabelas novas no app

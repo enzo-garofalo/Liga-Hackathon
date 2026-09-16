@@ -333,7 +333,8 @@ class ApplicationTimelineStageSerializer(PublicStageSerializer):
         return [
             {
                 'id': str(deliverable.id),
-                'file': deliverable.file.url if deliverable.file else None,
+                'filename': deliverable.file.name.rsplit('/', 1)[-1],
+                'download_url': f'/api/v1/deliverables/{deliverable.id}/download/',
                 'uploaded_at': deliverable.uploaded_at,
             }
             for deliverable in application.deliverables.all()
@@ -373,11 +374,37 @@ class MyApplicationDetailSerializer(MyApplicationListSerializer):
 
 class DeliverableSerializer(serializers.ModelSerializer):
     stage_name = serializers.CharField(source='stage.name')
+    filename = serializers.SerializerMethodField()
+    size = serializers.SerializerMethodField()
+    download_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Deliverable
-        fields = ['id', 'stage', 'stage_name', 'file', 'uploaded_at']
+        fields = [
+            'id',
+            'stage',
+            'stage_name',
+            'filename',
+            'size',
+            'download_url',
+            'uploaded_at',
+        ]
         read_only_fields = fields
+
+    def get_filename(self, deliverable):
+        import os
+
+        return os.path.basename(deliverable.file.name)
+
+    def get_size(self, deliverable):
+        try:
+            return deliverable.file.size
+        except (OSError, ValueError):
+            return None
+
+    def get_download_url(self, deliverable):
+        """Endpoint autenticado — nunca a URL crua do arquivo."""
+        return f'/api/v1/deliverables/{deliverable.id}/download/'
 
 
 class AdminApplicationDetailSerializer(serializers.ModelSerializer):

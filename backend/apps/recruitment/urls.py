@@ -1,7 +1,10 @@
 from django.urls import path
 
 from .views import (
+    AdminApplicationDetailView,
     AdminApplicationListView,
+    AdminBulkActionView,
+    AdminEvaluationView,
     AdminProcessCloseView,
     AdminProcessDetailView,
     AdminProcessListCreateView,
@@ -71,5 +74,20 @@ urlpatterns = [
         'admin/processes/<uuid:pk>/applications/',
         AdminApplicationListView.as_view(),
         name='admin-applications',
+    ),
+    path(
+        'admin/applications/<uuid:pk>/',
+        AdminApplicationDetailView.as_view(),
+        name='admin-application-detail',
+    ),
+    path(
+        'admin/applications/<uuid:pk>/evaluations/',
+        AdminEvaluationView.as_view(),
+        name='admin-application-evaluations',
+    ),
+    path(
+        'admin/processes/<uuid:pk>/applications/bulk-action/',
+        AdminBulkActionView.as_view(),
+        name='admin-bulk-action',
     ),
 ]

@@ -3,7 +3,6 @@ import uuid
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Avg
 
 from apps.teams.models import Participant
 
@@ -174,36 +173,22 @@ class Application(models.Model):
         return self.status in ApplicationStatus.FINISHED
 
     def stage_average(self, stage):
-        """Média da etapa: média das médias de cada critério.
+        """Média desta candidatura numa etapa. Delega para services.scoring."""
+        from apps.recruitment.services.scoring import stage_average
 
-        Critério sem nenhuma nota é ignorado. Retorna None se a etapa não tem
-        nenhuma avaliação registrada.
-        """
-        averages = (
-            self.evaluations.filter(stage=stage)
-            .values('criterion')
-            .annotate(criterion_average=Avg('score'))
-            .values_list('criterion_average', flat=True)
-        )
-        averages = list(averages)
-        if not averages:
-            return None
-        return sum(averages) / len(averages)
+        stage_id = getattr(stage, 'pk', stage)
+        return stage_average(self.pk, stage_id)
 
     @property
     def final_score(self):
-        """Média das médias de etapa. None enquanto não houver avaliação."""
-        stage_ids = (
-            self.evaluations.values_list('stage', flat=True).distinct()
-        )
-        averages = [
-            average
-            for average in (self.stage_average(stage_id) for stage_id in stage_ids)
-            if average is not None
-        ]
-        if not averages:
-            return None
-        return sum(averages) / len(averages)
+        """Média das médias de etapa. None enquanto não houver avaliação.
+
+        Para listas use services.scoring.final_scores(), que resolve todas as
+        candidaturas numa query só.
+        """
+        from apps.recruitment.services.scoring import final_scores
+
+        return final_scores([self.pk]).get(self.pk)
 
 
 class Deliverable(models.Model):

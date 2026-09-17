@@ -10,6 +10,12 @@ export type NotificationType =
   | 'team_rejected'
   | 'team_removed'
   | 'team_disbanded'
+  // Processo seletivo (v3)
+  | 'application_confirmed'
+  | 'stage_advanced'
+  | 'application_approved'
+  | 'application_rejected'
+  | 'custom_communication'
 
 export interface Notification {
   id: string

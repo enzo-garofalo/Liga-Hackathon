@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { getInfo } from '../api/info'
+import { SHOW_HACKATHON } from '../featureFlags'
 
 function daysUntil(isoDate: string): number {
   const [y, m, d] = isoDate.split('-').map(Number)
@@ -16,9 +17,14 @@ function deadlineMessage(days: number, isoDate: string): string {
 }
 
 export function DeadlineBanner() {
-  const infoQuery = useQuery({ queryKey: ['info'], queryFn: getInfo })
+  // Prazo de formacao de equipe: pertence ao hackathon e sai junto com ele.
+  const infoQuery = useQuery({
+    queryKey: ['info'],
+    queryFn: getInfo,
+    enabled: SHOW_HACKATHON,
+  })
   const info = infoQuery.data
-  if (!info) return null
+  if (!SHOW_HACKATHON || !info) return null
   const days = daysUntil(info.team_deadline)
   if (days < 0 || days > 7) return null
 

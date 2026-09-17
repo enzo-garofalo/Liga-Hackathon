@@ -60,6 +60,10 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
 - Todo organizador (`is_staff=True`) cria processo, move etapa e envia comunicado.
   `role_title` é informativo. A única distinção de papel é `is_coordinator`: coordenador
   vê a identidade na correção anônima e administra as designações de avaliador.
+  **Superusuário conta como coordenador** (decisions.md §12).
+- Datas formatadas no backend para leitura humana (mensagens, e-mails) passam por
+  `timezone.localtime()`. O banco guarda em UTC; sem converter, um prazo às 23:59 aparece
+  como o dia seguinte (decisions.md §13).
 
 ## Regras de negócio — Hackathon (v2, em produção)
 - Participantes têm cadastro próprio (e-mail + senha) e fazem login via JWT.
@@ -81,6 +85,31 @@ Para a v3 (entregáveis):
 - `MEDIA_ROOT` — em produção, caminho do volume do Railway montado no backend.
   Ver `specs/v3/decisions.md` §5.
 - `MAX_UPLOAD_BYTES` — teto por arquivo enviado pelo candidato (padrão 10 MB).
+
+## Hackathon desativado na interface — não reintroduzir
+O módulo do hackathon está **desligado no frontend** por `SHOW_HACKATHON = false` em
+`frontend/src/featureFlags.ts` (decisions.md §11). A Liga usa a plataforma para o
+processo seletivo.
+
+- **Não remover** código do hackathon: páginas, componentes, hooks, rotas e backend ficam
+  inteiros para a próxima edição. Religar é trocar a chave para `true`.
+- **Não reexibir** equipes, convites, prazo de formação ou selo "Sem equipe" fora da chave.
+  Todo elemento de hackathon na interface fica dentro de `SHOW_HACKATHON`.
+- Com a chave desligada, **consultas do hackathon também não são disparadas** — usar o
+  parâmetro `enabled` (`useOpenTeams(SHOW_HACKATHON)`, `useMyInvites(SHOW_HACKATHON)`).
+  Esconder só o JSX deixa a tela dependendo de endpoints do hackathon.
+- A landing page (`/`) ainda apresenta o hackathon e será tratada por último.
+
+## Frontend: testes e checagem de tipos
+- `npm test` (Vitest + Testing Library) dentro de `frontend/`. Testes em `src/test/`,
+  API simulada com `vi.mock`, helpers em `src/test/render.tsx` e `src/test/http.ts`.
+- Para checar tipos sem gerar build, `npx tsc --noEmit -p tsconfig.json`.
+  `frontend/tsconfig.tsbuildinfo` é cache do `tsc -b` e está no `.gitignore`.
+- Reaproveitar `utils/errors.ts`: `getApiError` para mensagem, `isNotFound` para separar 404
+  de falha real, `retryUnlessClientError` como política de nova tentativa dos hooks da v3.
+- Falha de API nunca pode virar estado vazio: usar `QueryError`.
+- Ao escrever teste de "X não aparece", confirmar que sem a regra X apareceria — um teste
+  assim já passou despercebido (tests.md, "Verificação por sabotagem").
 
 ## E-mail depende de worker
 Todo e-mail e enfileirado no Celery. Sao necessarios tres processos: backend, redis e
@@ -107,6 +136,7 @@ Ao implementar:
    silenciosamente. O `recruitment` precisa do seu próprio
    `services/notifications.py` com o dispatch dos tipos dele.
 4. A suíte de testes do hackathon precisa continuar passando inteira a cada fase.
-5. Ao mexer em página compartilhada do frontend (`DashboardPage`, `AdminDashboardPage`,
-   `NotificationBell`), conferir que o fluxo do hackathon continua funcionando — são
-   telas em produção.
+5. Ao mexer em arquivo compartilhado do frontend (`DashboardPage`, `AdminDashboardPage`,
+   `AppLayout`, `ProfilePage`, `DeadlineBanner`, `NotificationBell`, `useTeams`,
+   `useInvites`), conferir o fluxo do hackathon com `SHOW_HACKATHON = true`. Lista
+   completa e riscos em `specs/v3/frontend.md`.

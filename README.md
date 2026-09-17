@@ -336,11 +336,21 @@ cd backend
 python -m pytest
 ```
 
+A suite frontend usa Vitest e Testing Library. Os testes ficam em
+`frontend/src/test/`.
+
+```powershell
+cd frontend
+npm test            # roda uma vez
+npm run test:watch  # modo continuo
+```
+
 Checks recomendados antes de merge:
 
 ```powershell
 git diff --check
 cd frontend
+npm test
 npm run build
 cd ..\backend
 python manage.py check
@@ -348,8 +358,10 @@ python manage.py makemigrations --check --dry-run
 python -m pytest
 ```
 
-Observacao: no momento, o frontend nao possui scripts `test` ou `lint` no
-`package.json`; o check principal disponivel e `npm run build`.
+Observacoes:
+
+- O frontend ainda nao possui script de `lint`.
+- Para so checar tipos, sem gerar build: `npx tsc --noEmit -p tsconfig.json`.
 
 ## Deploy
 

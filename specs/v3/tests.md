@@ -167,6 +167,7 @@ test_coordinator_sees_identity
 test_candidate_list_is_anonymous_for_evaluator
 test_identity_is_visible_when_anonymity_is_off
 test_application_gets_sequential_code_on_apply
+test_superuser_sees_identity
 ```
 
 ### tests/test_assignments.py
@@ -198,50 +199,152 @@ regressão silenciosa descrita em [email.md](email.md): ele varre os tipos de no
 do seletivo e falha se algum não estiver registrado no dispatch de e-mail. Sem ele, um
 tipo esquecido só apareceria quando um candidato não recebesse o resultado.
 
-## Frontend
-
-### hooks
-```typescript
-// useProcesses
-test_lists_only_published_processes
-test_marks_already_applied_process
-
-// useApplication
-test_returns_stage_timeline_with_current_stage
-test_upload_disabled_after_deadline
-
-// useBulkActions
-test_approve_disabled_when_selection_outside_last_stage
-test_move_stage_invalidates_applications_query
-
-// useEvaluations
-test_save_evaluation_posts_all_criteria
-test_average_recalculated_after_save
+### tests/test_timezone.py
+```python
+test_email_date_uses_local_day
+test_email_date_handles_missing_value
+test_deadline_message_uses_local_time
 ```
 
-### components
+Usa de propósito 26/08 02:59 UTC, que é 25/08 23:59 em Brasília — o caso em que exibir UTC
+mostraria o dia errado. Ver [decisions.md](decisions.md) §13.
+
+### tests/test_seed_command.py
+```python
+test_seed_creates_full_process
+test_seed_is_idempotent
+test_seed_clear_recreates_without_duplicating
+test_seed_does_not_send_email
+test_seed_case_stage_is_open_for_uploads
+```
+
+### tests/test_check_email_pipeline.py
+```python
+test_fails_when_no_worker_responds
+test_passes_when_worker_responds
+test_reports_unreachable_broker
+test_warns_about_eager_mode
+test_lists_registered_notification_types
+```
+
+## Frontend
+
+Vitest + Testing Library + jsdom. Rodar com `npm test` dentro de `frontend/`.
+
+Estrutura em `frontend/src/test/`:
+
+| Arquivo | Papel |
+|---------|-------|
+| `setup.ts` | matchers do jest-dom e limpeza entre testes |
+| `render.tsx` | `renderWithProviders` — QueryClient sem novas tentativas + MemoryRouter |
+| `http.ts` | `httpError(status, data)` — erro no formato que o axios produz |
+
+A API é simulada com `vi.mock` nos módulos de `src/api/`.
+
+### Implementados (Fase 7 — candidato)
+
 ```typescript
-// ProcessCard
-test_shows_ver_detalhes_for_available_process
-test_shows_ver_candidatura_for_applied_process
-test_shows_abrir_inscricoes_for_draft_process
+// errors.test.ts
+getApiError: lê o detail do DRF
+getApiError: lê a lista que o ValidationError do DRF devolve
+getApiError: cai na mensagem genérica sem resposta do servidor
+isNotFound: reconhece 404 / não confunde 500 com 404
+retryUnlessClientError: não repete 4xx / repete 5xx até duas vezes / repete falha de rede
 
-// StageTimeline
-test_marks_stages_as_done_current_and_upcoming
-test_shows_deliverable_requirements_on_current_stage
+// QueryError.test.tsx
+mostra título e mensagem
+chama onRetry ao clicar em tentar novamente
+sem onRetry não mostra botão
 
+// ProcessCard.test.tsx
+processo disponível mostra "Ver detalhes" e período de inscrição
+inscrições encerradas aparecem como tal
+candidatura mostra status, etapa atual e "Ver candidatura"
+cada status aparece com o rótulo certo
+
+// StageTimeline.test.tsx
+lista as etapas na ordem
+marca só a etapa atual
+renderiza o conteúdo extra apenas dentro da etapa atual
+mostra a descrição da etapa
+
+// DeliverableUpload.test.tsx
+mostra formatos aceitos e limite de arquivos
+escolher o arquivo não envia nada
+só envia ao clicar em "Enviar"
+o × troca o arquivo sem enviar
+mostra o erro devolvido pela API
+com o limite atingido, esconde a escolha de arquivo
+baixa pelo client autenticado, não por link direto
+remove um arquivo enviado
+
+// DashboardPage.test.tsx
+cumprimenta pelo primeiro nome
+mostra "Meus processos" com a candidatura
+"Processos disponíveis" não repete processo em que já se inscreveu
+pílulas refletem a candidatura ativa
+estado vazio quando não há candidatura nem processo aberto
+erro da API mostra aviso — e não o estado vazio
+"Tentar novamente" refaz as consultas
+hackathon desativado: nada de equipe na tela
+hackathon desativado: nenhuma consulta de equipe, convite ou prazo
+
+// ProcessDetailPage.test.tsx
+mostra descrição e etapas
+inscrever-se leva à página da candidatura
+mostra o motivo quando a inscrição é recusada
+já inscrito não vê o botão
+inscrições encerradas desabilitam o botão
+404 mostra "não encontrado"
+erro de servidor NÃO diz "não encontrado"
+404 não é repetido antes de mostrar a tela
+
+// ApplicationDetailPage.test.tsx
+mostra o status e a área de entrega na etapa atual
+etapa atual sem upload não mostra área de entrega
+candidatura finalizada não oferece entrega
+404 mostra "não encontrada"
+erro de servidor NÃO diz "não encontrada"
+```
+
+### Verificação por sabotagem
+
+Teste que nunca falha não protege nada. Cada regra abaixo foi quebrada de propósito no
+código para confirmar que algum teste acusa:
+
+| Sabotagem | Teste que pegou |
+|-----------|-----------------|
+| religar `SHOW_HACKATHON` | os dois testes "hackathon desativado" |
+| mostrar "nenhum processo aberto" mesmo com erro | "erro da API mostra aviso" |
+| pílulas afirmando "Sem inscrição" durante erro | "erro da API mostra aviso" |
+| enviar assim que o arquivo é escolhido | "escolher o arquivo não envia nada", "o × troca o arquivo" |
+| tratar qualquer erro como "não encontrado" | "erro de servidor NÃO diz não encontrado" |
+
+A segunda sabotagem **passou despercebida** na primeira versão do teste: o cenário
+simulava erro só em `/processes/`, mas a candidata ainda tinha uma candidatura, então o
+estado vazio nunca apareceria com ou sem a proteção. O cenário foi corrigido para uma
+candidata sem inscrição. Ao escrever teste de "X não aparece", conferir que sem a regra X
+apareceria.
+
+### Pendentes (Fase 8 — organizador)
+
+```typescript
 // CandidatesTable
-test_renders_average_score_column
-test_bulk_menu_enabled_only_with_selection
-test_approve_option_hidden_outside_last_stage
+renderiza a coluna de média
+menu de ações só com seleção
+opção "Aprovar" oculta fora da última etapa
 
 // CandidateProfileModal
-test_renders_criteria_from_stage_config
-test_save_evaluation_sends_scores_and_notes
+critérios vêm da configuração da etapa
+salvar avaliação envia notas e observações
+avaliador vê código, não nome, na correção anônima
 
 // NewCommunicationModal
-test_stage_selector_visible_only_for_stage_audience
-test_candidate_search_visible_only_for_specific_audience
+seletor de etapa só para destinatário "etapa"
+busca de candidatos só para destinatário "específicos"
+
+// ProcessCard (organizador)
+mostra "Abrir inscrições" para rascunho
 ```
 
 ## Regressão do hackathon

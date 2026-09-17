@@ -191,9 +191,103 @@ processo montado sem barema continua funcionando. Pesos configurados precisam so
 somar 90 produziria nota diferente da comunicada aos candidatos, e o erro passaria
 despercebido porque a média ponderada continua devolvendo um número plausível.
 
+> **Emendada pela decisão §12:** superusuário também conta como coordenador.
+
 **Isto emenda a decisão §4.** Continua não havendo RBAC por funcionalidade — qualquer
 `is_staff` cria processo, move etapa e envia comunicado. Mas passa a existir **uma**
 distinção de papel: `OrganizerProfile.is_coordinator`. O coordenador vê a identidade dos
 candidatos e administra as designações; o avaliador comum vê códigos e só pontua quem lhe
 foi designado. Sem essa distinção, correção anônima seria decorativa — bastaria abrir a
 ficha do candidato para ver quem é.
+
+---
+
+## 11. Hackathon desativado na interface, não removido
+
+**Decisão:** o módulo do hackathon sai da interface por uma chave,
+`SHOW_HACKATHON` em `frontend/src/featureFlags.ts`, desligada. Nada é apagado.
+
+**Motivo:** a Liga passou a usar a plataforma para o processo seletivo, e as telas de
+equipe (equipes abertas, convites, prazo de formação, selo "Sem equipe") confundiam o
+candidato. Mas o hackathon é recorrente e está em produção: apagar o código obrigaria a
+reescrever ou garimpar o histórico do git na próxima edição.
+
+Uma chave só, em um arquivo próprio, porque o hackathon aparece em quatro lugares
+(dashboard, menu lateral, banner de prazo, perfil) — uma constante por arquivo deixaria
+fácil religar três e esquecer o quarto.
+
+**Consequências:**
+- Religar é trocar `false` por `true`. Nenhum outro ajuste é necessário.
+- Com a chave desligada, as consultas do hackathon (equipes, convites, `/info/`) não são
+  disparadas. Esconder só o bloco manteria a tela do candidato dependendo desses
+  endpoints. Por isso `useOpenTeams` e `useMyInvites` ganharam um parâmetro `enabled`,
+  com padrão `true` para não alterar as páginas do hackathon.
+- O backend do hackathon não foi tocado e continua respondendo.
+- As rotas `/teams` e `/teams/:id` continuam acessíveis por URL — só a navegação saiu.
+- Há teste de frontend que falha se a chave for religada sem querer.
+
+**Pendente:** a landing page (`/`) ainda apresenta o hackathon e será tratada depois que o
+resto estiver funcionando.
+
+---
+
+## 12. Superusuário conta como coordenador
+
+**Decisão:** `is_coordinator()` devolve verdadeiro para `is_superuser`, além de para
+`OrganizerProfile.is_coordinator`.
+
+**Motivo:** encontrado usando o sistema de verdade, não por teste. O superusuário que
+instala a plataforma não tinha `OrganizerProfile` e caía na correção anônima — via
+`C-0001` no lugar de todos os nomes e não conseguia identificar ninguém. Não existe tela
+para marcar `is_coordinator`, então ele não teria como sair disso sem o Django Admin.
+
+**Isto emenda a decisão §10**, que dizia que só `is_coordinator` enxerga identidade.
+
+**Consequência:** o seed de demonstração marca o "Diretor de Operações" como
+coordenador e a "Diretora de Projetos" como avaliadora, espelhando o planejamento
+(1 coordenador + avaliadores).
+
+---
+
+## 13. Datas exibidas no fuso da Liga
+
+**Decisão:** toda data formatada no **backend** para leitura humana passa por
+`timezone.localtime()` (`TIME_ZONE = 'America/Sao_Paulo'`). O frontend não precisa: o
+navegador já converte.
+
+**Motivo:** encontrado testando o envio do case. O banco guarda em UTC e a mensagem de
+prazo encerrado mostrava **17:11** quando o prazo real era **14:11**. Nos e-mails era
+pior: eles mostram só dia e mês, então um prazo às **23:59 de 25/08** sairia como
+**"até 26/08"** — o candidato leria um dia inteiro a mais do que tem.
+
+**Consequência:** `emails._date()` e a mensagem de prazo em `services/deliverables.py`
+convertem antes de formatar. O teste usa de propósito um horário que cai no dia seguinte
+em UTC, para travar exatamente esse caso.
+
+---
+
+## 14. Testes de frontend com Vitest
+
+**Decisão:** Vitest + Testing Library + jsdom, com os testes em `frontend/src/test/` e
+configuração própria em `vitest.config.ts`.
+
+**Motivo:** o projeto não tinha nenhum teste de frontend nem infraestrutura para eles. O
+frontend já usa Vite, e o Vitest reaproveita o pipeline de transformação dele — não
+exige Babel, Jest nem configuração paralela de TypeScript.
+
+A configuração é separada do `vite.config.ts` porque o de desenvolvimento aponta o proxy
+para o serviço `backend` do Docker, o que não interessa aos testes.
+
+**Consequências:**
+- `npm test` roda a suíte; `npm run test:watch`, em modo contínuo.
+- A API é simulada com `vi.mock` nos módulos de `src/api/`. MSW seria mais fiel, mas é
+  mais uma dependência e mais configuração para o tamanho atual da suíte.
+- Os testes foram conferidos por sabotagem: cada regra importante foi quebrada de
+  propósito para confirmar que algum teste falha. Um deles passava mesmo com o bug — o
+  cenário não chegava a exercitar a regra — e foi corrigido.
+- Os arquivos de teste ficam dentro de `src/` e entram no `tsc` do build. Isso é
+  proposital: teste que não compila é detectado antes do deploy.
+- Versão **3.2.7**. A 2.1.x trazia um alerta crítico (leitura de arquivo pela interface
+  web do Vitest). Resta um alerta moderado em `@vitest/mocker`, corrigido só na 4.x, que
+  exige Vite 6 — atualizar o Vite mexe no build de produção e fica para decisão própria.
+  Nenhum dos dois afeta produção: são dependências de desenvolvimento.

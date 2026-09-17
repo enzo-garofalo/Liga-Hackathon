@@ -16,10 +16,10 @@ As rotas do hackathon (v2) continuam existindo. As rotas abaixo são adicionadas
 
 | Rota | Página | Descrição |
 |------|--------|-----------|
-| /dashboard | DashboardPage | Existente — ganha as seções "Meus processos" e "Processos disponíveis" |
+| /dashboard | DashboardPage | Existente — pílulas e seções do processo seletivo; bloco do hackathon desativado (ver abaixo) |
 | /processes/:id | ProcessDetailPage | Detalhes do processo + botão "Inscrever-se" |
 | /applications/:id | ApplicationDetailPage | Acompanhamento da candidatura: etapas, status, entregáveis |
-| /profile | ProfilePage | Existente, sem alteração |
+| /profile | ProfilePage | Existente — selo de equipe desativado junto com o hackathon |
 
 ### Organizador
 
@@ -38,8 +38,10 @@ recarregar a página ou compartilhar o link mantenha o contexto.
 
 ### ProcessCard
 Card de processo, usado nas duas dashboards.
-- Candidato: nome, status das inscrições, nº de etapas, data limite, botão "Ver Detalhes"
-  (processos disponíveis) ou "Ver Candidatura" (meus processos).
+- Candidato: nome, status das inscrições, nº de etapas, período, botão "Ver detalhes"
+  (processos disponíveis) ou "Ver candidatura" (meus processos).
+- Na candidatura, as datas de inscrição são **opcionais**: `/me/applications/` não as
+  devolve, então o card mostra "Inscrito em" e a etapa atual no lugar.
 - Organizador: nome, nº de inscritos, etapa atual, status; botão "Gerenciar Processo"
   (published/closed) ou "Abrir inscrições" (draft).
 
@@ -49,10 +51,27 @@ Cada etapa aparece como concluída, atual ou futura, com nome, descrição e dat
 Na etapa atual mostra o que precisa ser entregue e o prazo.
 
 ### DeliverableUpload
-Área de upload da etapa atual (só quando `allows_file_upload=True`).
-- Mostra tipos permitidos e quantidade máxima.
-- Lista os arquivos já enviados com opção de remover antes do prazo.
-- Bloqueia upload após `end_at` (a menos que a etapa aceite entrega atrasada).
+Área de entrega da etapa atual (só quando `allows_file_upload=True` e a candidatura está
+em andamento).
+
+- Mostra formatos aceitos e quantidade máxima.
+- **Envio em dois passos.** "Escolher arquivo" só seleciona; aparece o nome e o tamanho do
+  arquivo, um × para trocar, e só o botão **"Enviar"** manda. Como o case aceita um único
+  arquivo, envio imediato ao selecionar faria um clique errado ocupar a vaga.
+- Arquivos já enviados aparecem com a etiqueta "Enviado", botão de baixar e de remover.
+  Com o limite atingido, a escolha de arquivo some até o candidato remover um.
+- **Download autenticado.** O botão baixa pelo `client` com token
+  (`downloadDeliverable` + `saveBlob`). Um `<a href>` não envia o token e o backend
+  responde 401 — os arquivos não ficam em URL pública.
+- Regras de prazo, formato, tamanho e quantidade são do backend; o componente mostra a
+  mensagem que ele devolver, via `getApiError`.
+
+### QueryError
+Falha ao carregar dados. Título, mensagem da API e botão "Tentar novamente".
+
+Existe porque uma consulta que falha deixava a seção vazia, e o candidato não conseguia
+distinguir "não há processo aberto" de "o servidor está fora do ar". Usado no dashboard e
+nas páginas de detalhe.
 
 ### ProcessStats
 Os quatro tiles de "Gerenciar Processo": Inscritos, Em análise, Aprovados, Reprovados.
@@ -152,7 +171,7 @@ Cargo e permissão são exibidos como informação — não alteram o que o orga
 ```
 src/hooks/
 ├── useProcesses.ts          ← lista processos publicados (candidato)
-├── useProcess.ts            ← detalhe do processo + apply
+├── useProcess.ts            ← detalhe do processo + useApplyToProcess
 ├── useMyApplications.ts     ← "Meus processos"
 ├── useApplication.ts        ← detalhe da candidatura + etapas
 ├── useDeliverables.ts       ← upload e remoção de entregáveis
@@ -179,6 +198,20 @@ src/api/
 
 Reaproveitam `client.ts` (instância axios com interceptor de JWT) sem alteração.
 
+`applications.ts` inclui `downloadDeliverable`, que pede o arquivo como `Blob` pelo
+client autenticado. `utils/download.ts` (`saveBlob`) entrega o Blob ao navegador.
+
+### Tratamento de erro
+
+Reaproveita `utils/errors.ts`, que o projeto já tinha (`getApiError`), e acrescenta:
+
+- `isNotFound(error)` — separa 404 de falha real. As páginas de detalhe só dizem "não
+  encontrado" em 404; erro de servidor mostra `QueryError` com "Tentar novamente".
+- `retryUnlessClientError` — política de nova tentativa dos hooks da v3. Erro 4xx não se
+  resolve tentando de novo, então não repete; rede e 5xx têm até duas novas tentativas.
+  Aplicada só nos hooks da v3: mudar o `QueryClient` global alteraria as telas do
+  hackathon.
+
 ## Tipos
 
 ```
@@ -201,21 +234,65 @@ src/types/
   "nenhum comunicado enviado" precisam de mensagem própria, não tabela vazia.
 - **Upload fora do prazo** mostra o motivo (prazo encerrado, tipo não permitido, limite de
   arquivos atingido) em vez de falhar silenciosamente.
+- **Falha de API nunca vira estado vazio.** Com erro, o dashboard mostra `QueryError`, não
+  "nenhum processo aberto", e as pílulas mostram "-" em vez de "Sem inscrição".
+- **Horários vêm do navegador.** O frontend recebe datas em ISO com fuso e usa
+  `toLocaleDateString('pt-BR')`, que converte para o fuso local. Quem formata data no
+  backend (mensagens de erro, e-mails) precisa de `timezone.localtime()` — ver
+  [decisions.md](decisions.md) §13.
+
+## Hackathon desativado (`SHOW_HACKATHON`)
+
+A Liga usa a plataforma para o processo seletivo, então o módulo do hackathon está
+**desativado na interface** por uma chave em [`src/featureFlags.ts`](../../frontend/src/featureFlags.ts).
+
+**Nada foi removido.** Páginas, componentes, hooks, rotas e todo o backend do hackathon
+continuam no projeto e funcionando. Trocar `SHOW_HACKATHON` para `true` devolve, de uma vez:
+
+| Onde | O que volta |
+|------|-------------|
+| Dashboard | pílulas Status / Equipes abertas / Convites / Prazo, convites pendentes, `StatusBanner`, bloco "Você ainda não está em uma equipe", contagem do evento |
+| Menu lateral (`AppLayout`) | "Equipes abertas" e "Minha equipe" |
+| Topo (`DeadlineBanner`) | aviso de prazo de formação de equipe |
+| Perfil | selo "Equipe: X" / "Sem equipe" |
+
+Com a chave desligada, as consultas de equipes, convites e `/info/` **não são
+disparadas** — não basta esconder o bloco, senão a tela do candidato continuaria
+dependendo de endpoints do hackathon.
+
+As rotas `/teams` e `/teams/:id` seguem acessíveis por URL direta; só a navegação foi
+desativada.
+
+Decisão registrada em [decisions.md](decisions.md) §11.
 
 ## Arquivos do hackathon que a v3 encosta
 
-Nenhuma página, hook ou componente do hackathon é **removido**, mas alguns arquivos em
-produção são alterados (quatro, contando a tipagem). Cada um precisa ser conferido no
-fluxo do hackathon depois de mexido:
+Nenhuma página, hook ou componente do hackathon é **removido**. Estes arquivos em produção
+foram alterados, e cada um precisa ser conferido no fluxo do hackathon quando a chave for
+religada:
 
 | Arquivo | Alteração | Risco |
 |---------|-----------|-------|
-| `pages/DashboardPage.tsx` | Ganha as seções "Meus processos" e "Processos disponíveis" | Regressão no `StatusBanner` e no fluxo de equipe, que vivem nessa mesma página |
-| `pages/AdminDashboardPage.tsx` | Ganha a lista de processos seletivos e "+ Novo Processo" | Regressão na tabela de equipes submetidas e nas ações de aprovar/recusar |
+| `pages/DashboardPage.tsx` | Pílulas e seções do seletivo; bloco do hackathon atrás de `SHOW_HACKATHON` | Religar a chave e conferir `StatusBanner`, convites e criação de equipe |
+| `components/AppLayout.tsx` | Itens de equipe do menu atrás de `SHOW_HACKATHON` | Baixo |
+| `components/DeadlineBanner.tsx` | Atrás de `SHOW_HACKATHON`, sem consultar `/info/` quando desligado | Baixo |
+| `pages/ProfilePage.tsx` | Selo de equipe atrás de `SHOW_HACKATHON` | Baixo |
+| `hooks/useTeams.ts` | `useOpenTeams(enabled = true)` | Baixo — padrão `true`, páginas do hackathon não mudam |
+| `hooks/useInvites.ts` | `useMyInvites(enabled = true)` | Baixo — idem |
+| `components/NotificationBell.tsx` | Cores dos 5 tipos novos | Baixo |
 | `types/notification.ts` | Union `NotificationType` ganha os 5 tipos novos | Baixo — só tipagem |
-| `components/NotificationBell.tsx` | `notificationTone()` precisa cobrir os tipos novos | **Sem isso a bolinha renderiza sem cor**: a função retorna `undefined` para tipo desconhecido e o `className` fica vazio |
+| `utils/errors.ts` | Ganha `isNotFound` e `retryUnlessClientError`; `getApiError` intocado | Baixo |
+| `App.tsx` | Rotas `/processes/:id` e `/applications/:id` | Baixo |
+| `pages/AdminDashboardPage.tsx` | *(Fase 8)* lista de processos seletivos | Regressão na tabela de equipes submetidas |
 
-`TeamsPage`, `TeamDetailPage`, `StatusBanner`, `DeadlineBanner` e todos os hooks de equipe
-continuam exatamente como estão.
+> **Correção:** uma versão anterior deste documento afirmava que `notificationTone()`
+> retornava `undefined` para tipo desconhecido, deixando a bolinha sem cor. Estava errado:
+> a função tem fallback `bg-ink/30`, então um tipo novo apareceria cinza. As cores
+> próprias foram adicionadas de qualquer forma.
 
-Fora esses quatro arquivos, a v3 só adiciona páginas, componentes, hooks e tipos novos.
+`TeamsPage`, `TeamDetailPage`, `StatusBanner` e os demais componentes de equipe não foram
+alterados.
+
+## Testes
+
+Vitest + Testing Library, em `src/test/`. Ver [tests.md](tests.md).

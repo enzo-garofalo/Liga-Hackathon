@@ -20,6 +20,14 @@ from apps.recruitment.services.scoring import (
 
 
 def is_coordinator(user):
+    """Coordenador do processo, para efeito de correcao anonima e designacao.
+
+    Superusuario conta como coordenador: e quem administra a instalacao, e sem
+    isso ficaria sem enxergar a identidade de candidato nenhum — nao ha tela
+    para marcar `is_coordinator` ainda.
+    """
+    if getattr(user, 'is_superuser', False):
+        return True
     profile = getattr(user, 'organizer_profile', None)
     return bool(profile and profile.is_coordinator)
 

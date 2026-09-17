@@ -59,3 +59,19 @@ def test_seed_does_not_send_email():
     mail.outbox.clear()
     call_command('seed_recruitment_demo', stdout=StringIO())
     assert mail.outbox == []
+
+
+def test_seed_case_stage_is_open_for_uploads():
+    """A demo existe para testar o envio do case.
+
+    As datas eram calculadas a partir do início das inscrições e o Case vencia no
+    instante em que o seed rodava — o upload era recusado por prazo encerrado.
+    """
+    from django.utils import timezone
+
+    call_command('seed_recruitment_demo', stdout=StringIO())
+
+    case = Stage.objects.get(name='Resolução do Case')
+    now = timezone.now()
+    assert case.allows_file_upload
+    assert case.start_at <= now <= case.end_at

@@ -82,3 +82,29 @@ def test_application_gets_sequential_code_on_apply(candidate_client, process):
     candidate_client.post(f'/api/v1/processes/{process.id}/apply/')
     codes = list(Application.objects.values_list('code', flat=True))
     assert any(code.startswith('C-') for code in codes)
+
+
+def test_superuser_sees_identity(db, scenario):
+    """Quem administra a instalacao precisa enxergar os candidatos.
+
+    Sem isto o superusuario ficaria preso ao codigo anonimo, e nao ha tela para
+    marcar `is_coordinator` — foi o que aconteceu ao usar o sistema de verdade.
+    """
+    from rest_framework.test import APIClient
+    from rest_framework_simplejwt.tokens import RefreshToken
+
+    from apps.teams.tests.factories import UserFactory
+
+    root = UserFactory()
+    root.is_staff = True
+    root.is_superuser = True
+    root.save(update_fields=['is_staff', 'is_superuser'])
+
+    client = APIClient()
+    client.credentials(
+        HTTP_AUTHORIZATION=f'Bearer {RefreshToken.for_user(root).access_token}'
+    )
+
+    r = client.get(detail_url(scenario['application'].id))
+    assert r.status_code == 200
+    assert r.data['participant_name'] == 'Ana Lima'

@@ -3,6 +3,8 @@
 O layout vem de core/email_layout.py, o mesmo usado pelo hackathon.
 """
 
+from django.utils import timezone
+
 from core.email_layout import badge, base_html, em, footnote, info_rows, p, send
 
 _FOOTER = (
@@ -16,7 +18,14 @@ _RED = '#dc2626'
 
 
 def _date(value):
-    return value.strftime('%d/%m') if value else 'a definir'
+    """Data no fuso da Liga.
+
+    O banco guarda em UTC. Sem converter, um prazo às 23:59 de Brasília sai como o
+    dia seguinte no e-mail — o candidato leria um dia a mais do que tem.
+    """
+    if not value:
+        return 'a definir'
+    return timezone.localtime(value).strftime('%d/%m')
 
 
 def _stage_rows(process):

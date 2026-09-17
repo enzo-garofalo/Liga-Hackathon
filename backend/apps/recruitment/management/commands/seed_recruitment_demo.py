@@ -34,6 +34,7 @@ STAGES = [
     {
         'name': 'Inscrição',
         'description': 'Preenchimento do formulário de inscrição.',
+        'window': (-14, -7),
         'weight': 0,
         'criteria': [],
         'allows_file_upload': False,
@@ -41,6 +42,8 @@ STAGES = [
     {
         'name': 'Resolução do Case',
         'description': 'Entrega de um case prático em até 7 dias.',
+        # Aberta agora, para a demo permitir testar o envio do PDF.
+        'window': (-3, 4),
         'weight': 35,
         'criteria': [
             ('Compreensão do problema', 15),
@@ -58,6 +61,7 @@ STAGES = [
     {
         'name': 'Pitch',
         'description': 'Apresentação da solução em 5 minutos, com 3 de perguntas.',
+        'window': (7, 8),
         'weight': 30,
         'criteria': [
             ('Clareza da comunicação', 20),
@@ -72,6 +76,7 @@ STAGES = [
     {
         'name': 'Entrevista',
         'description': 'Entrevista individual estruturada com a comissão.',
+        'window': (12, 14),
         'weight': 35,
         'criteria': [
             ('Motivação', 20),
@@ -85,9 +90,11 @@ STAGES = [
     },
 ]
 
+# (email, nome, cargo, e_coordenador) — o planejamento preve 1 coordenador
+# e os demais como avaliadores.
 ORGANIZERS = [
-    ('bruno.reitano@liga.dev', 'Bruno Reitano', 'Diretor de Operações'),
-    ('marina.alves@liga.dev', 'Marina Alves', 'Diretora de Projetos'),
+    ('bruno.reitano@liga.dev', 'Bruno Reitano', 'Diretor de Operações', True),
+    ('marina.alves@liga.dev', 'Marina Alves', 'Diretora de Projetos', False),
 ]
 
 CANDIDATES = [
@@ -201,6 +208,10 @@ class Command(BaseCommand):
         return process
 
     def _create_stages(self, process):
+        # Janelas relativas a agora: a etapa do Case fica aberta, as anteriores
+        # encerradas e as seguintes no futuro. Calcular a partir do início das
+        # inscrições fazia o Case vencer no instante em que o seed rodava.
+        now = timezone.now()
         stages = {}
         for order, data in enumerate(STAGES, start=1):
             stage, _ = Stage.objects.get_or_create(
@@ -209,8 +220,8 @@ class Command(BaseCommand):
                 defaults={
                     'name': data['name'],
                     'description': data['description'],
-                    'start_at': process.registration_start + timedelta(days=order * 5),
-                    'end_at': process.registration_start + timedelta(days=order * 5 + 4),
+                    'start_at': now + timedelta(days=data['window'][0]),
+                    'end_at': now + timedelta(days=data['window'][1]),
                     'weight': data['weight'],
                     'allows_file_upload': data.get('allows_file_upload', False),
                     'max_files': data.get('max_files'),
@@ -237,14 +248,18 @@ class Command(BaseCommand):
 
     def _create_organizers(self):
         organizers = []
-        for email, full_name, role in ORGANIZERS:
+        for email, full_name, role, is_coordinator in ORGANIZERS:
             user = self._user(email, full_name)
             if not user.is_staff:
                 user.is_staff = True
                 user.save(update_fields=['is_staff'])
             OrganizerProfile.objects.get_or_create(
                 user=user,
-                defaults={'full_name': full_name, 'role_title': role},
+                defaults={
+                    'full_name': full_name,
+                    'role_title': role,
+                    'is_coordinator': is_coordinator,
+                },
             )
             organizers.append(user)
         return organizers

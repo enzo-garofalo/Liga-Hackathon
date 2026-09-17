@@ -44,7 +44,7 @@ def assert_upload_allowed(application, stage, uploaded_file):
     if stage.end_at and timezone.now() > stage.end_at and not stage.accepts_late_submission:
         raise ValidationError(
             f'O prazo de entrega da etapa {stage.name} encerrou em '
-            f'{stage.end_at.strftime("%d/%m/%Y às %H:%M")}.'
+            f'{timezone.localtime(stage.end_at).strftime("%d/%m/%Y às %H:%M")}.'
         )
 
     allowed = [ext.lower() for ext in (stage.allowed_file_types or [])]

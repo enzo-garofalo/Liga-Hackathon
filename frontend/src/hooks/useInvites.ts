@@ -1,10 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { acceptInvite, declineInvite, listMyInvites } from '../api/invites'
 
-export function useMyInvites() {
+/** `enabled` existe para o dashboard nao consultar convites com o hackathon desativado. */
+export function useMyInvites(enabled = true) {
   return useQuery({
     queryKey: ['my-invites'],
     queryFn: listMyInvites,
+    enabled,
   })
 }
 

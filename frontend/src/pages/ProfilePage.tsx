@@ -3,6 +3,7 @@ import type { ElementType } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { GitBranch, Link2, Lock, User, CheckCircle2 } from 'lucide-react'
 import { Button } from '../components/ui/Button'
+import { SHOW_HACKATHON } from '../featureFlags'
 import { useProfile, useUpdateProfile } from '../hooks/useProfile'
 import type { UpdateMePayload } from '../types/participant'
 import { getApiError } from '../utils/errors'
@@ -131,11 +132,13 @@ export function ProfilePage() {
   const displayName = watchedName || meQuery.data?.full_name || ''
   const bioLength = (watchedBio || '').length
 
-  const teamBadge = meQuery.data
-    ? meQuery.data.has_team && meQuery.data.team
-      ? { text: `Equipe: ${meQuery.data.team.name}`, cls: 'bg-green-50 text-green-600' }
-      : { text: 'Sem equipe', cls: 'bg-amber-50 text-amber-600' }
-    : null
+  // Selo de equipe: pertence ao hackathon e sai junto com ele.
+  const teamBadge =
+    SHOW_HACKATHON && meQuery.data
+      ? meQuery.data.has_team && meQuery.data.team
+        ? { text: `Equipe: ${meQuery.data.team.name}`, cls: 'bg-green-50 text-green-600' }
+        : { text: 'Sem equipe', cls: 'bg-amber-50 text-amber-600' }
+      : null
 
   const handleCancel = () => {
     if (meQuery.data) {

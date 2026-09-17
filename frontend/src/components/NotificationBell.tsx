@@ -32,10 +32,32 @@ function relativeTime(iso: string): string {
   return diffD === 1 ? '1 dia' : `${diffD} dias`
 }
 
+const TONE_BRAND = [
+  'team_invite',
+  'join_request',
+  'application_confirmed',
+  'custom_communication',
+]
+const TONE_GREEN = [
+  'invite_accepted',
+  'join_accepted',
+  'team_approved',
+  'stage_advanced',
+  'application_approved',
+]
+const TONE_RED = [
+  'invite_declined',
+  'join_declined',
+  'team_rejected',
+  'team_removed',
+  'team_disbanded',
+  'application_rejected',
+]
+
 function notificationTone(type: Notification['type']) {
-  if (['team_invite', 'join_request'].includes(type)) return 'bg-brand'
-  if (['invite_accepted', 'join_accepted', 'team_approved'].includes(type)) return 'bg-brand-green'
-  if (['invite_declined', 'join_declined', 'team_rejected', 'team_removed', 'team_disbanded'].includes(type)) return 'bg-red-500'
+  if (TONE_BRAND.includes(type)) return 'bg-brand'
+  if (TONE_GREEN.includes(type)) return 'bg-brand-green'
+  if (TONE_RED.includes(type)) return 'bg-red-500'
   return 'bg-ink/30'
 }
 

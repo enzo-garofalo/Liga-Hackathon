@@ -9,6 +9,7 @@ import {
 import { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import logo from '../assets/logo.svg'
+import { SHOW_HACKATHON } from '../featureFlags'
 import { useLogout } from '../hooks/useAuth'
 import { useProfile } from '../hooks/useProfile'
 import { NotificationBell } from './NotificationBell'
@@ -23,13 +24,28 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
   const profile = useProfile()
   const me = profile.data
 
+  // Itens do hackathon (equipes). Desativado junto com o bloco do dashboard —
+  // ver SHOW_HACKATHON em pages/DashboardPage.tsx. As rotas continuam existindo.
+  const hackathonNav = SHOW_HACKATHON
+    ? [
+        { to: '/teams', icon: Users, label: 'Equipes abertas', match: (path: string) => path === '/teams' },
+        ...(me?.team
+          ? [
+              {
+                to: `/teams/${me.team.id}`,
+                icon: Users,
+                label: 'Minha equipe',
+                match: (path: string) => path === `/teams/${me.team!.id}`,
+              },
+            ]
+          : []),
+      ]
+    : []
+
   const navItems = [
     { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', match: (path: string) => path === '/dashboard' },
     { to: '/profile', icon: User, label: 'Meu perfil', match: (path: string) => path === '/profile' },
-    { to: '/teams', icon: Users, label: 'Equipes abertas', match: (path: string) => path === '/teams' },
-    ...(me?.team
-      ? [{ to: `/teams/${me.team.id}`, icon: Users, label: 'Minha equipe', match: (path: string) => path === `/teams/${me.team!.id}` }]
-      : []),
+    ...hackathonNav,
   ]
 
   return (

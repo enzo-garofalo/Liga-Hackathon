@@ -3,9 +3,11 @@ import { AppLayout } from './components/AppLayout'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { AdminLoginPage } from './pages/AdminLoginPage'
+import { ApplicationDetailPage } from './pages/ApplicationDetailPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { LandingPage } from './pages/LandingPage'
 import { LoginPage } from './pages/LoginPage'
+import { ProcessDetailPage } from './pages/ProcessDetailPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { RegisterPage } from './pages/RegisterPage'
 import { TeamDetailPage } from './pages/TeamDetailPage'
@@ -25,6 +27,8 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/processes/:id" element={<ProcessDetailPage />} />
+          <Route path="/applications/:id" element={<ApplicationDetailPage />} />
           <Route path="/teams" element={<TeamsPage />} />
           <Route path="/teams/:id" element={<TeamDetailPage />} />
         </Route>

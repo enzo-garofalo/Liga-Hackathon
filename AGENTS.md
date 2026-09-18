@@ -49,7 +49,9 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
 - Vários organizadores avaliam o mesmo candidato; a nota do critério é a média entre eles.
 - Médias são calculadas em service, nunca persistidas em campo.
 - Correção é anônima por padrão: o avaliador vê o código da candidatura, não a pessoa.
-- Avaliador só pontua candidato que lhe foi designado (`StageAssignment`).
+- Qualquer organizador avalia qualquer candidato. `StageAssignment` distribui o trabalho
+  entre corretores, mas **não é permissão**: designação ausente não bloqueia nota
+  (decisions.md §19).
 - Divergência acima do limiar do processo marca `needs_third_review`.
 - Aprovação final só é permitida para candidatos na última etapa.
 - Candidato nunca vê nota nem observação de avaliador.
@@ -59,7 +61,7 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
 - Notificações são criadas no banco junto com o disparo de e-mail — nunca um sem o outro.
 - Todo organizador (`is_staff=True`) cria processo, move etapa e envia comunicado.
   `role_title` é informativo. A única distinção de papel é `is_coordinator`: coordenador
-  vê a identidade na correção anônima e administra as designações de avaliador.
+  vê a identidade na correção anônima e administra a distribuição de avaliadores.
   **Superusuário conta como coordenador** (decisions.md §12).
 - Datas formatadas no backend para leitura humana (mensagens, e-mails) passam por
   `timezone.localtime()`. O banco guarda em UTC; sem converter, um prazo às 23:59 aparece
@@ -108,6 +110,15 @@ processo seletivo.
 - Reaproveitar `utils/errors.ts`: `getApiError` para mensagem, `isNotFound` para separar 404
   de falha real, `retryUnlessClientError` como política de nova tentativa dos hooks da v3.
 - Falha de API nunca pode virar estado vazio: usar `QueryError`.
+- Aprovar e reprovar candidato passam por `ui/ConfirmDialog` antes de agir — disparam
+  e-mail e mudam o rumo de uma pessoa. Aprovar fora da última etapa **avança de etapa**;
+  na última, aprova no processo.
+- Nota de avaliação usa `ui/ScoreInput`: aceita vírgula e valor quebrado, e bloqueia fora
+  da escala do processo antes de chamar a API.
+- Modal novo usa `components/ui/Modal.tsx` (decisions.md §16).
+- Todo campo de formulário precisa de rótulo associado (`htmlFor`/`id`). `ui/Input` e
+  `ui/PasswordInput` já fazem isso sozinhos; `textarea` e `select` escritos à mão
+  precisam do par manualmente (decisions.md §15).
 - Ao escrever teste de "X não aparece", confirmar que sem a regra X apareceria — um teste
   assim já passou despercebido (tests.md, "Verificação por sabotagem").
 

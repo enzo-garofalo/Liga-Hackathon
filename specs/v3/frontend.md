@@ -26,11 +26,17 @@ As rotas do hackathon (v2) continuam existindo. As rotas abaixo são adicionadas
 | Rota | Página | Descrição |
 |------|--------|-----------|
 | /admin/login | AdminLoginPage | Existente, sem alteração |
-| /admin/dashboard | AdminDashboardPage | Existente — ganha a lista de processos seletivos e "+ Novo Processo" |
+| /admin/dashboard | AdminDashboardPage | Existente — lista de processos, "Novo processo" e "Meu perfil"; abas do hackathon atrás de `SHOW_HACKATHON` |
 | /admin/processes/:id | ManageProcessPage | Gerenciar processo: tiles de estatísticas + abas Candidatos / Etapas / Comunicações |
 
 `ManageProcessPage` controla a aba ativa por query string (`?tab=candidates`) para que
 recarregar a página ou compartilhar o link mantenha o contexto.
+
+### Modais
+
+Todos usam o invólucro `components/ui/Modal.tsx` (fundo, painel, título, fechar, Esc).
+Os modais do hackathon (`CreateTeamModal`, `InviteMembersModal`, `TeamPreviewModal`) não
+foram migrados: são telas em produção e o ganho não justificaria o risco.
 
 ---
 
@@ -42,8 +48,10 @@ Card de processo, usado nas duas dashboards.
   (processos disponíveis) ou "Ver candidatura" (meus processos).
 - Na candidatura, as datas de inscrição são **opcionais**: `/me/applications/` não as
   devolve, então o card mostra "Inscrito em" e a etapa atual no lugar.
-- Organizador: nome, nº de inscritos, etapa atual, status; botão "Gerenciar Processo"
-  (published/closed) ou "Abrir inscrições" (draft).
+- Organizador: nome, nº de inscritos, etapa atual, status; botão "Gerenciar processo"
+  em **todos** os status, inclusive rascunho. Publicar exige ao menos uma etapa e etapa só
+  se configura dentro do processo: um rascunho que só oferecesse "Abrir inscrições" no card
+  seria um beco sem saída.
 
 ### StageTimeline
 Linha do tempo das etapas na página da candidatura.
@@ -76,6 +84,15 @@ nas páginas de detalhe.
 ### ProcessStats
 Os quatro tiles de "Gerenciar Processo": Inscritos, Em análise, Aprovados, Reprovados.
 
+### StagesTab
+Cards das etapas na aba "Etapas": nome, descrição, datas, peso, critérios, tipos de
+arquivo aceitos e **quem está na etapa** — nome de até 8 candidatos e "+ N outros"
+quando passa disso.
+
+A lista de nomes vem do endpoint de candidatos (`page_size=200`), e não das etapas: assim
+ela herda a correção anônima, mostrando o código no lugar do nome para quem não é
+coordenador.
+
 ### CandidatesTable
 Tabela da aba Candidatos.
 - Colunas: seleção, nome, curso, etapa, nota (média final), status, última atualização, ações.
@@ -85,23 +102,52 @@ Tabela da aba Candidatos.
 - Clique no ícone de nota abre `EvaluationDetailModal`; "Ver" abre `CandidateProfileModal`.
 
 ### CandidateProfileModal
-Ficha do candidato: foto, nome, e-mail, curso, semestre, GitHub, LinkedIn, telefone,
-status e etapa atual, entregáveis, campos de nota por critério da etapa, observações e
-botão "Salvar Avaliação".
+Ficha do candidato: nome, e-mail, curso, semestre, GitHub, LinkedIn, telefone, status,
+etapa atual, entregáveis para baixar, campos de nota por critério, observações e os
+botões de decisão.
 
 Os critérios exibidos vêm da configuração da etapa — não são fixos.
+
+**Decisão sobre o candidato.** Além de "Salvar avaliação", a ficha traz "Aprovar" e
+"Reprovar", só enquanto a candidatura está em andamento. Ambos passam por
+`ConfirmDialog` antes de agir: as duas ações disparam e-mail e a reprovação encerra a
+candidatura.
+
+**Aprovar avança de etapa.** Fora da última etapa, aprovar move o candidato para a
+próxima — o botão anuncia o destino ("Aprovar para Entrevista") e a confirmação explica
+que ele recebe e-mail de convocação. Na última etapa, aprova no processo.
 
 ### EvaluationDetailModal
 Avaliação consolidada: por etapa, nota de cada avaliador em cada critério, observações e
 média automática final.
 
+Não mostra aviso de divergência. A API ainda devolve `needs_third_review`, mas o selo
+"Divergência — pede terceiro avaliador" saiu da tela a pedido da Liga: notas diferentes
+entre dois avaliadores são o esperado, e o alarme aparecia em avaliação normal.
+
+### ConfirmDialog
+Confirmação para ação que mexe na vida do candidato e dispara e-mail: aprovar, reprovar
+e as mesmas ações em massa. Pergunta direta ("Você tem certeza de aprovar o
+candidato?"), uma linha explicando a consequência, e rótulo de confirmação explícito
+("Sim, aprovar").
+
+### ScoreInput
+Campo de nota. Aceita inteiro e quebrado, com vírgula ou ponto — "4,5" e "4.5" são a
+mesma nota, e é vírgula que a pessoa digita. Recusa letra e sinal negativo na digitação,
+marca o campo quando a nota sai da escala do processo, e a ficha não envia avaliação com
+nota inválida. O 0 é sempre aceito: significa ausência de entrega.
+
 ### StageConfigModal
 Criação/edição de etapa: nome, descrição, datas, aceitar entrega após prazo, permitir envio
 de arquivos, nº máximo de arquivos, tipos permitidos e lista editável de critérios.
 
-### NewProcessModal
-Criação de processo: nome, descrição, banner opcional, período de inscrições e a opção
-"Processo visível para candidatos?" (Sim / Não — rascunho).
+### ProcessFormModal
+Criação **e** edição de processo: nome, descrição, banner opcional e período de inscrições.
+A opção "Processo visível para candidatos?" (Sim / Não — rascunho) só aparece na criação —
+depois disso a transição de status é feita por "Abrir inscrições" / "Encerrar processo".
+As datas usam `datetime-local`: o formulário mostra o horário local e envia em UTC
+(um prazo 23:59 em Brasília chega ao backend como 02:59 UTC do dia seguinte).
+Aberto pelo "+ Novo processo" do dashboard e pelo "Editar processo" da tela do processo.
 
 ### OpenApplicationsModal
 Confirmação de publicação de um rascunho, listando o que vai acontecer (processo fica
@@ -136,11 +182,21 @@ Cargo e permissão são exibidos como informação — não alteram o que o orga
 3. Se a etapa pede entrega: DeliverableUpload dentro do prazo
 
 ### Criação e publicação de processo (organizador)
-1. /admin/dashboard → "+ Novo Processo" → NewProcessModal
-2. Criado como rascunho → card mostra "Abrir inscrições"
-3. /admin/processes/:id → aba Etapas → "+ Nova Etapa" → StageConfigModal (repete por etapa)
-4. Voltar ao dashboard → "Abrir inscrições" → OpenApplicationsModal → confirma
+1. /admin/dashboard → "+ Novo processo" → ProcessFormModal
+2. Criado como rascunho → o card leva a "Gerenciar processo"
+3. /admin/processes/:id → aviso de que falta etapa → aba Etapas → "+ Nova Etapa" →
+   StageConfigModal (repete por etapa)
+4. Na mesma tela → "Abrir inscrições" → OpenApplicationsModal → confirma
 5. Processo passa a aparecer para os candidatos
+
+Publicar, editar e encerrar moram na tela do processo, não no dashboard: é lá que estão as
+etapas de que a publicação depende. O dashboard só cria e lista.
+
+### Edição de processo (organizador)
+1. /admin/processes/:id → "Editar processo" (some quando o processo está `closed`)
+2. ProcessFormModal pré-preenchido → altera nome, descrição, banner ou as datas de
+   início/fim das inscrições
+3. PATCH /admin/processes/:id/ → o cabeçalho e os cards refletem as datas novas
 
 ### Avaliação de candidato
 1. /admin/processes/:id?tab=candidates
@@ -175,24 +231,25 @@ src/hooks/
 ├── useMyApplications.ts     ← "Meus processos"
 ├── useApplication.ts        ← detalhe da candidatura + etapas
 ├── useDeliverables.ts       ← upload e remoção de entregáveis
-├── useAdminProcesses.ts     ← lista, cria, publica, encerra processos
+├── useAdminProcesses.ts     ← lista, cria, publica, encerra e exclui processos
 ├── useAdminProcess.ts       ← detalhe + estatísticas
 ├── useStages.ts             ← CRUD de etapas e critérios
 ├── useApplications.ts       ← tabela de candidatos (busca, filtros, ordenação)
-├── useEvaluations.ts        ← salvar e consultar avaliações
 ├── useBulkActions.ts        ← mover, aprovar, reprovar, descartar em massa
 ├── useCommunications.ts     ← histórico e envio de comunicados
-└── useOrganizerProfile.ts   ← GET/PATCH /admin/me/
+├── useOrganizerProfile.ts   ← GET/PATCH /admin/me/
+└── useEvaluations.ts        ← ficha do candidato, resumo e gravação de nota
 ```
 
 ## Camada de API
 
 ```
 src/api/
-├── processes.ts
-├── applications.ts
+├── processes.ts          ← candidato
+├── applications.ts       ← candidato + entregáveis
+├── adminProcesses.ts     ← processos e perfil do organizador
+├── adminApplications.ts  ← tabela, ficha, avaliações, ações em massa
 ├── stages.ts
-├── evaluations.ts
 └── communications.ts
 ```
 
@@ -216,19 +273,29 @@ Reaproveita `utils/errors.ts`, que o projeto já tinha (`getApiError`), e acresc
 
 ```
 src/types/
-├── process.ts        ← Process, ProcessStatus, ProcessStats
-├── stage.ts          ← Stage, EvaluationCriterion
-├── application.ts    ← Application, ApplicationStatus, Deliverable
-├── evaluation.ts     ← Evaluation, StageEvaluationSummary
-└── communication.ts  ← Communication, Audience
+├── process.ts           ← ProcessSummary, ProcessDetail, ProcessStatus
+├── adminProcess.ts      ← AdminProcess, AdminProcessDetail, ProcessStats
+├── stage.ts             ← Stage, EvaluationCriterion, StagePayload
+├── application.ts       ← ApplicationSummary, ApplicationDetail, Deliverable
+├── adminApplication.ts  ← ApplicationRow, Paginated, BulkAction, OrganizerProfile
+├── evaluation.ts        ← StageEvaluationSummary, EvaluationPayload
+└── communication.ts     ← Communication, CommunicationAudience
 ```
 
 ## Regras de interface
 
 - **Candidato nunca vê nota nem observação.** A API não devolve esses campos para ele —
   a interface não deve tentar exibi-los.
-- **Aprovar só na última etapa.** O botão fica desabilitado, com explicação no title,
-  quando a seleção inclui candidato fora da última etapa.
+- **Aprovar só na última etapa.** A opção fica desabilitada e rotulada "(só na última
+  etapa)" quando a seleção inclui candidato fora dela. O backend recusa de qualquer forma;
+  a interface evita a tentativa.
+- **Toda decisão sobre candidato passa por confirmação.** Aprovar e reprovar disparam
+  e-mail e mudam o rumo de uma pessoa; a interface pergunta antes, na ficha e nas ações
+  em massa. Mover etapa e descartar não perguntam: o primeiro é reversível e o segundo
+  não notifica ninguém.
+- **"Enviar comunicado" nas ações em massa** abre o modal já dirigido aos selecionados,
+  com `audience: specific`. Por isso a tabela devolve o id do participante além do id da
+  candidatura — o comunicado é endereçado por pessoa.
 - **Processo encerrado é somente leitura.** Abas continuam navegáveis, ações ficam ocultas.
 - **Estados vazios:** "nenhum processo disponível", "nenhum candidato neste filtro" e
   "nenhum comunicado enviado" precisam de mensagem própria, não tabela vazia.
@@ -236,6 +303,8 @@ src/types/
   arquivos atingido) em vez de falhar silenciosamente.
 - **Falha de API nunca vira estado vazio.** Com erro, o dashboard mostra `QueryError`, não
   "nenhum processo aberto", e as pílulas mostram "-" em vez de "Sem inscrição".
+- **Nota é validada antes de sair da tela.** `ScoreInput` aceita vírgula e valor quebrado
+  e bloqueia envio fora da escala do processo, em vez de esperar o 400 do backend.
 - **Horários vêm do navegador.** O frontend recebe datas em ISO com fuso e usa
   `toLocaleDateString('pt-BR')`, que converte para o fuso local. Quem formata data no
   backend (mensagens de erro, e-mails) precisa de `timezone.localtime()` — ver
@@ -283,7 +352,9 @@ religada:
 | `types/notification.ts` | Union `NotificationType` ganha os 5 tipos novos | Baixo — só tipagem |
 | `utils/errors.ts` | Ganha `isNotFound` e `retryUnlessClientError`; `getApiError` intocado | Baixo |
 | `App.tsx` | Rotas `/processes/:id` e `/applications/:id` | Baixo |
-| `pages/AdminDashboardPage.tsx` | *(Fase 8)* lista de processos seletivos | Regressão na tabela de equipes submetidas |
+| `pages/AdminDashboardPage.tsx` | Lista de processos, "Novo processo", "Meu perfil"; abas de equipe e participantes atrás de `SHOW_HACKATHON` | Religar a chave e conferir aprovação/recusa de equipes |
+| `hooks/useAdminDashboard.ts` | `useAdminTeams(status, enabled)` e `useAdminParticipants(enabled)` | Baixo — padrão `true` |
+| `components/ui/Input.tsx`, `ui/PasswordInput.tsx` | Rótulo associado ao campo (`htmlFor`/`id`) e `aria-describedby` no erro | Baixo — corrige acessibilidade em todos os formulários |
 
 > **Correção:** uma versão anterior deste documento afirmava que `notificationTone()`
 > retornava `undefined` para tipo desconhecido, deixando a bolinha sem cor. Estava errado:

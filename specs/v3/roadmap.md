@@ -112,6 +112,10 @@ com e-mail em cada transição.
 
 **Objetivo:** tirar a operação do Django Admin.
 
+> Entregue. O endpoint `/admin/me/` estava no spec mas nunca tinha sido implementado —
+> foi feito aqui, junto com o campo `participant` na tabela de candidatos, necessário
+> para o comunicado dirigido.
+
 - Lista de processos no dashboard admin + `NewProcessModal` + `OpenApplicationsModal`
 - `ManageProcessPage` com tiles e as três abas
 - `CandidatesTable` com filtros, seleção e ações em massa
@@ -125,6 +129,7 @@ com e-mail em cada transição.
 ## Fase 9 — Produção
 
 - Storage de arquivos configurado
+- Processo seletivo criado sozinho no deploy (`ensure_selection_process`, decisions.md §18)
 - Revisão de permissões em todos os endpoints `/admin/`
 - Suíte completa passando (hackathon + seletivo)
 - Deploy no Railway
@@ -146,5 +151,5 @@ com e-mail em cada transição.
 Nenhuma pendência bloqueia as fases restantes.
 
 - Storage: resolvido — volume do Railway ([decisions.md](decisions.md) §5).
-- Quem pode avaliar: resolvido — avaliador designado ([decisions.md](decisions.md) §10).
+- Quem pode avaliar: resolvido — qualquer organizador ([decisions.md](decisions.md) §19).
 - Formato de `allowed_file_types`: resolvido — `ArrayField` do Postgres.

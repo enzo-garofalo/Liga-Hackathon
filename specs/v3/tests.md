@@ -172,8 +172,7 @@ test_superuser_sees_identity
 
 ### tests/test_assignments.py
 ```python
-test_evaluator_cannot_grade_without_assignment
-test_evaluator_can_grade_when_assigned
+test_evaluator_grades_without_assignment
 test_coordinator_grades_without_assignment
 test_auto_distribute_gives_two_evaluators_per_candidate
 test_auto_distribute_balances_workload
@@ -199,6 +198,23 @@ regressão silenciosa descrita em [email.md](email.md): ele varre os tipos de no
 do seletivo e falha se algum não estiver registrado no dispatch de e-mail. Sem ele, um
 tipo esquecido só apareceria quando um candidato não recebesse o resultado.
 
+### tests/test_views_organizer_profile.py
+```python
+test_returns_profile_of_authenticated_organizer
+test_creates_profile_on_first_visit
+test_updates_editable_fields
+test_cannot_promote_itself_to_coordinator
+test_candidate_cannot_access
+```
+
+### tests/test_notifications.py (conteúdo do aviso automático)
+```python
+test_advancing_stage_tells_the_candidate_they_advanced
+test_rejecting_tells_the_candidate_they_were_not_approved
+test_approving_tells_the_candidate_they_were_approved
+test_auto_communication_records_what_the_candidate_was_told
+```
+
 ### tests/test_timezone.py
 ```python
 test_email_date_uses_local_day
@@ -216,6 +232,18 @@ test_seed_is_idempotent
 test_seed_clear_recreates_without_duplicating
 test_seed_does_not_send_email
 test_seed_case_stage_is_open_for_uploads
+```
+
+### tests/test_ensure_selection_process.py
+```python
+test_creates_the_process_with_every_stage_and_criterion
+test_process_is_born_as_draft
+test_running_again_changes_nothing
+test_does_not_overwrite_what_the_organizer_changed
+test_stages_run_in_sequence_without_gaps
+test_weights_add_up_to_one_hundred
+test_file_upload_only_on_the_case_stage
+test_custom_name_creates_a_separate_process
 ```
 
 ### tests/test_check_email_pipeline.py
@@ -319,6 +347,19 @@ código para confirmar que algum teste acusa:
 | pílulas afirmando "Sem inscrição" durante erro | "erro da API mostra aviso" |
 | enviar assim que o arquivo é escolhido | "escolher o arquivo não envia nada", "o × troca o arquivo" |
 | tratar qualquer erro como "não encontrado" | "erro de servidor NÃO diz não encontrado" |
+| aprovar liberado em qualquer etapa | "aprovar fica desabilitado fora da última etapa" |
+| religar `SHOW_HACKATHON` no painel do organizador | "hackathon desativado: sem abas de equipe" |
+| comunicado dirigido perdendo os destinatários | "Enviar comunicado endereça os selecionados" |
+| agir sem pedir confirmação | "ação em massa de reprovar também confirma" |
+| aprovar sempre finalizando, sem avançar de etapa | "aprovar fora da última etapa avança para a próxima" |
+| aceitar nota fora da escala | "recusa fora da escala", "avisa quando a nota sai da escala" |
+| aviso de reprovação dizendo só "Resultado do processo" | backend: `test_rejecting_tells_the_candidate_they_were_not_approved` |
+| histórico registrando "comunicação automática" no lugar do texto | backend: `test_auto_communication_records_what_the_candidate_was_told` |
+| deploy sobrescrevendo o processo existente | backend: `test_running_again_changes_nothing`, `test_does_not_overwrite_what_the_organizer_changed` |
+| processo padrão nascendo publicado | backend: `test_process_is_born_as_draft` |
+| etapas sem os nomes | "mostra o nome de quem está em cada etapa" |
+| rascunho sem link para a tela do processo | "todo processo leva à tela de gerenciamento, inclusive rascunho" |
+| tela do processo sem editar/publicar | "rascunho pode publicar por aqui", "edita nome e datas do processo", "publicar pela tela do processo confirma antes" |
 
 A segunda sabotagem **passou despercebida** na primeira versão do teste: o cenário
 simulava erro só em `/processes/`, mas a candidata ainda tinha uma candidatura, então o
@@ -326,26 +367,89 @@ estado vazio nunca apareceria com ou sem a proteção. O cenário foi corrigido 
 candidata sem inscrição. Ao escrever teste de "X não aparece", conferir que sem a regra X
 apareceria.
 
-### Pendentes (Fase 8 — organizador)
+### Implementados (Fase 8 — organizador)
 
 ```typescript
-// CandidatesTable
-renderiza a coluna de média
-menu de ações só com seleção
-opção "Aprovar" oculta fora da última etapa
+// AdminDashboardPage.test.tsx
+lista os processos com inscritos e etapas
+todo processo leva à tela de gerenciamento, inclusive rascunho
+o dashboard não publica: isso acontece dentro do processo
+cria processo como rascunho por padrão
+estado vazio quando não há processo
+erro de API mostra aviso em vez de estado vazio
+hackathon desativado: sem abas de equipe e sem consultá-las
 
-// CandidateProfileModal
-critérios vêm da configuração da etapa
-salvar avaliação envia notas e observações
-avaliador vê código, não nome, na correção anônima
+// ManageProcessPage.test.tsx
+mostra nome, estatísticas e as três abas
+rascunho pode publicar por aqui — senão fica sem saída
+rascunho sem etapa avisa o que falta
+edita nome e datas do processo
+publicar pela tela do processo confirma antes
+processo encerrado não oferece edição
+trocar de aba troca o conteúdo
 
-// NewCommunicationModal
-seletor de etapa só para destinatário "etapa"
-busca de candidatos só para destinatário "específicos"
+// CandidatesTab.test.tsx
+mostra a nota final de quem foi avaliado
+o menu de ações só aparece com alguém selecionado
+aprovar fica desabilitado fora da última etapa
+aprovar libera para quem está na última etapa
+mover etapa exige escolher o destino antes de aplicar
+aplica a ação em massa nos selecionados
+mostra o motivo quando o backend recusa a ação
+"Enviar comunicado" endereça os selecionados por participante
+erro de API mostra aviso em vez de tabela vazia
 
-// ProcessCard (organizador)
-mostra "Abrir inscrições" para rascunho
+// CandidateProfileModal.test.tsx
+os critérios vêm da configuração da etapa
+envia as notas e a observação
+pré-carrega as notas que o avaliador já deu
+não envia sem nenhuma nota preenchida
+na correção anônima, mostra código e esconde identidade
+mostra o motivo quando o backend recusa a nota
+etapa sem critérios não oferece avaliação
+
+// StagesTab.test.tsx
+mostra a etapa com participantes, peso e critérios
+avisa quando não há etapa, porque publicar exige uma
+cria etapa com critérios e pesos
+avisa quando os pesos não somam 100
+tipos de arquivo só aparecem com upload ligado
+mostra o motivo quando o backend recusa a exclusão
+
+// CommunicationsTab.test.tsx
+lista o histórico com tipo e destinatários
+o seletor de etapa só aparece para o destinatário "etapa"
+envia o comunicado com o destinatário escolhido
+não envia sem assunto e mensagem
+mostra o motivo quando o backend recusa o envio
+erro de API mostra aviso em vez de histórico vazio
+
+// Decisions.test.tsx
+a ficha oferece aprovar e reprovar
+aprovar pede confirmação antes de agir
+cancelar a confirmação não muda nada
+aprovar fora da última etapa avança para a próxima
+aprovar na última etapa aprova no processo
+reprovar pela ficha encerra a candidatura
+ação em massa de reprovar também confirma
+candidatura finalizada não oferece decisão
+
+// ScoreInput.test.tsx
+parseScore aceita vírgula como separador decimal
+isValidScore aceita inteiros e quebrados dentro da escala
+isValidScore recusa fora da escala
+isValidScore aceita 0: ausência de entrega
+campo vazio não é inválido — é só não preenchido
+não deixa digitar letra nem sinal negativo
+avisa quando a nota sai da escala
+
+// StagesTab.test.tsx (quem está em cada etapa)
+mostra o nome de quem está em cada etapa, não só o total
+pede a lista inteira, não só a primeira página
+etapa vazia não lista ninguém
 ```
+
+Fixtures compartilhadas em `src/test/fixtures.ts`.
 
 ## Regressão do hackathon
 

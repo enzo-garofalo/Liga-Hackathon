@@ -221,8 +221,11 @@ Bloqueado se o processo já tem candidaturas em andamento — 400.
 ## Candidatos
 
 ### GET /api/v1/admin/processes/{id}/applications/
-Tabela da aba "Candidatos". Cada linha: nome, curso, etapa atual, média final, status,
-última atualização.
+Tabela da aba "Candidatos". Cada linha: id da candidatura, id do participante, nome,
+curso, etapa atual, média final, status e última atualização.
+
+O id do participante existe porque o comunicado dirigido é endereçado por participante, e
+a seleção da tabela é de candidaturas.
 
 Filtros (todos combináveis):
 - `?search=` — nome ou e-mail do candidato
@@ -286,8 +289,8 @@ nota do mesmo avaliador em vez de duplicar.
 
 Validações: `score` dentro de `score_min`..`score_max` do processo (padrão 1 a 5), com 0
 sempre aceito para ausência de entrega; critérios pertencem à etapa informada; processo
-não está `closed`; e **o avaliador precisa estar designado** para esta candidatura nesta
-etapa — senão 403. O coordenador (`is_coordinator`) não depende de designação.
+não está `closed`. **Não exige designação**: qualquer organizador avalia qualquer
+candidato (decisions.md §19). O endpoint continua restrito a `is_staff`.
 
 ### POST /api/v1/admin/processes/{id}/applications/bulk-action/
 Ações em massa da tabela de candidatos.
@@ -343,17 +346,23 @@ Detalhe do comunicado enviado (modal): tipo, data, assunto, mensagem, destinatá
 ## Perfil do organizador
 
 ### GET /api/v1/admin/me/
-Perfil do organizador autenticado: nome, e-mail, `role_title`, telefone, github, linkedin.
+Perfil do organizador autenticado: nome, e-mail, cargo, telefone, github, linkedin e
+`is_coordinator`.
+
+O perfil é criado na primeira visita: nem todo `is_staff` tem um — o superusuário criado
+pelo `entrypoint.sh`, por exemplo, nunca passou por aqui.
 
 ### PATCH /api/v1/admin/me/
-Atualiza os campos editáveis do perfil.
+Atualiza os campos editáveis do perfil. `is_coordinator` é somente leitura — concede
+acesso à identidade dos candidatos, então não pode ser autoatribuído.
 `role_title` é informativo — não concede nem restringe permissão (ver
 [decisions.md](decisions.md) §4).
 
 ## Designação de avaliadores
 
 O planejamento prevê dois corretores independentes por case, distribuídos entre
-candidatos diferentes. Sem designação, avaliador não consegue pontuar (403).
+candidatos diferentes. A designação **organiza quem corrige o quê — não dá nem tira
+permissão**: avaliador sem designação pontua normalmente (decisions.md §19).
 
 ### GET /api/v1/admin/stages/{id}/assignments/
 Distribuição atual da etapa: a carga de cada avaliador e a lista de designações

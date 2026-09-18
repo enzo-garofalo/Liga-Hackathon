@@ -7,7 +7,7 @@ from rest_framework import generics, status
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, MultiPartParser
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -35,6 +35,7 @@ from apps.recruitment.serializers import (
     ProcessDetailSerializer,
     ProcessSerializer,
     PublicProcessDetailSerializer,
+    OpenProcessSerializer,
     PublicProcessListSerializer,
     StageSerializer,
 )
@@ -254,6 +255,24 @@ def _participant_or_404(request):
     if participant is None:
         raise Http404('Usuário autenticado não possui perfil de participante.')
     return participant
+
+
+class OpenProcessView(APIView):
+    """Periodo de inscricoes do processo publicado, para a landing.
+
+    Aberto de proposito: quem le a home ainda nao tem conta. Devolve `null`
+    quando nao ha processo publicado, em vez de 404, para a landing so omitir a
+    linha das datas em vez de tratar erro.
+    """
+
+    permission_classes = [AllowAny]
+    authentication_classes: list = []
+
+    def get(self, request):
+        process = published_processes().order_by("registration_start").first()
+        if process is None:
+            return Response(None)
+        return Response(OpenProcessSerializer(process).data)
 
 
 class ProcessListView(generics.ListAPIView):

@@ -198,6 +198,16 @@ regressão silenciosa descrita em [email.md](email.md): ele varre os tipos de no
 do seletivo e falha se algum não estiver registrado no dispatch de e-mail. Sem ele, um
 tipo esquecido só apareceria quando um candidato não recebesse o resultado.
 
+### tests/test_views_open_process.py
+```python
+test_anonymous_sees_the_registration_window
+test_returns_null_without_a_published_process
+test_closed_process_is_not_announced
+test_exposes_only_name_and_dates
+test_registration_open_reflects_the_window
+test_picks_the_process_that_starts_first
+```
+
 ### tests/test_views_organizer_profile.py
 ```python
 test_returns_profile_of_authenticated_organizer
@@ -357,6 +367,10 @@ código para confirmar que algum teste acusa:
 | histórico registrando "comunicação automática" no lugar do texto | backend: `test_auto_communication_records_what_the_candidate_was_told` |
 | deploy sobrescrevendo o processo existente | backend: `test_running_again_changes_nothing`, `test_does_not_overwrite_what_the_organizer_changed` |
 | processo padrão nascendo publicado | backend: `test_process_is_born_as_draft` |
+| landing voltando a falar de hackathon/equipes | "apresenta o processo seletivo, não o hackathon" |
+| prazo escrito no código em vez de vir da API | "sem processo publicado, não inventa data" |
+| landing prometendo mentoria de novo | "só promete o que a Liga faz de verdade" |
+| landing sem o acesso de organizador | "oferece entrar como candidato e como organizador" |
 | etapas sem os nomes | "mostra o nome de quem está em cada etapa" |
 | rascunho sem link para a tela do processo | "todo processo leva à tela de gerenciamento, inclusive rascunho" |
 | tela do processo sem editar/publicar | "rascunho pode publicar por aqui", "edita nome e datas do processo", "publicar pela tela do processo confirma antes" |
@@ -387,6 +401,17 @@ edita nome e datas do processo
 publicar pela tela do processo confirma antes
 processo encerrado não oferece edição
 trocar de aba troca o conteúdo
+
+// LandingPage.test.tsx
+apresenta o processo seletivo, não o hackathon
+não menciona a empresa parceira da edição anterior
+oferece entrar como candidato e como organizador
+explica as três etapas com o peso de cada uma
+mostra os critérios de avaliação antes da inscrição
+responde as dúvidas que afastam candidato de outra área
+a primeira pergunta do FAQ já vem aberta
+LandingPageHackathon: continua inteira para a próxima edição
+LandingPageHackathon: também não cita mais a empresa parceira
 
 // CandidatesTab.test.tsx
 mostra a nota final de quem foi avaliado

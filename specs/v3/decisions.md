@@ -395,3 +395,51 @@ divergência acima do limiar continua marcando `needs_third_review`, então o si
 
 Se um dia a distribuição precisar valer de verdade, o caminho é construir a tela de
 designação e reintroduzir a trava, não o contrário.
+
+---
+
+## 20. A landing vira do processo seletivo; a do hackathon fica atrás da chave
+
+**Decisão:** `/` passa a apresentar o processo seletivo e a Liga. A landing do hackathon
+foi preservada inteira em `pages/LandingPageHackathon.tsx`, e a rota escolhe entre as duas
+por `SHOW_HACKATHON`. A empresa parceira daquela edição saiu de todo o projeto — landing,
+telas de login e cadastro, CSS e o arquivo do logo.
+
+A página ganhou uma seção de acesso com os **dois caminhos separados**: "Sou candidato"
+(criar conta ou entrar) e "Sou organizador" (login da comissão). Antes havia só um "Entrar"
+genérico apontando para a área do candidato, e o login de organizador não era alcançável
+pela home — só por quem já soubesse a URL `/admin/login`.
+
+**Motivo:** a Liga usa a plataforma para o seletivo, e a home ainda vendia um evento de
+junho com equipes de quatro pessoas. Preservar a versão antiga em vez de reescrever por
+cima segue a §11: religar o hackathon continua sendo trocar uma chave, sem ter que
+reconstruir a home. O conteúdo novo vem do planejamento do processo seletivo (etapas,
+pesos, escala 1–5, política de IA, correção anônima) e do manual de onboarding da Liga
+(missão, valores, o que a pessoa ganha ao entrar).
+
+**Consequência:** os pesos das etapas aparecem em dois lugares — em `blueprint.py`, que
+cria o processo, e no texto da landing. São públicos por decisão da Liga ("nenhuma regra
+usada para avaliar alguém aparece pela primeira vez no resultado"), mas mudar o barema
+exige lembrar da landing. Um teste confere que os três pesos exibidos somam 100.
+
+---
+
+## 21. O prazo na landing vem da API, não do código
+
+**Decisão:** `GET /api/v1/open-process/` é aberto (`AllowAny`, sem autenticação) e devolve
+nome e janela de inscrições do processo publicado, ou `null` quando não há nenhum. A
+landing lê dali para mostrar o período no hero e no FAQ.
+
+O serializer é próprio (`OpenProcessSerializer`) com quatro campos escolhidos a dedo, em
+vez de reaproveitar o do organizador: este endpoint é público, e o outro carrega escala de
+nota, limiar de divergência e contadores que são assunto interno.
+
+**Motivo:** escrever as datas no código criaria uma segunda fonte da verdade. O organizador
+já define o período em "Editar processo" (§17); com data chumbada, mudar o prazo exigiria
+editar arquivo e subir de novo, e esquecer um dos dois deixaria o site dizendo uma coisa e
+o sistema outra — com candidato no meio.
+
+**Consequência:** enquanto o processo está em `draft`, a landing não mostra data nenhuma.
+É proposital: as datas de rascunho são provisórias (`ensure_selection_process` cria o
+período a partir do dia do deploy, §18), e anunciá-las seria mentir. O prazo aparece
+quando alguém clicar em "Abrir inscrições".

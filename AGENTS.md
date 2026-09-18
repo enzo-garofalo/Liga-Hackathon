@@ -100,7 +100,10 @@ processo seletivo.
 - Com a chave desligada, **consultas do hackathon também não são disparadas** — usar o
   parâmetro `enabled` (`useOpenTeams(SHOW_HACKATHON)`, `useMyInvites(SHOW_HACKATHON)`).
   Esconder só o JSX deixa a tela dependendo de endpoints do hackathon.
-- A landing page (`/`) ainda apresenta o hackathon e será tratada por último.
+- A landing page (`/`) é a do **processo seletivo**. A do hackathon foi preservada inteira em
+  `pages/LandingPageHackathon.tsx` e volta sozinha quando a chave for `true` — a rota `/`
+  escolhe entre as duas. A empresa parceira daquela edição saiu de todo o projeto a pedido
+  da Liga (fase 9).
 
 ## Frontend: testes e checagem de tipos
 - `npm test` (Vitest + Testing Library) dentro de `frontend/`. Testes em `src/test/`,

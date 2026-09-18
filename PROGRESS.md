@@ -1,18 +1,17 @@
 # PROGRESS — v3 Processo Seletivo
 
-Estado do trabalho na branch `feature/v3-processo-seletivo`, atualizado em 17/09/2026.
+Estado do trabalho na branch `feature/v3-processo-seletivo`, atualizado em 18/09/2026.
 Este arquivo é o ponto de partida de quem retomar a v3: o que está pronto, o que foi
 decidido e por quê, e o que falta.
 
-**Nada foi commitado ainda.** O último commit é `a87b67e`. Todo o trabalho da fase 8 e das
-correções seguintes está no working tree.
+As fases 8 e 9 já estão commitadas e no GitHub, na branch. A `main` segue intocada, com o
+hackathon em produção.
 
 ---
 
 ## Onde estamos
 
-Fases 1 a 8 do [roadmap](specs/v3/roadmap.md) entregues. Falta a **fase 9 (produção)** e a
-landing page.
+Fases 1 a 9 do [roadmap](specs/v3/roadmap.md) entregues. Falta a **fase 10 (produção)**.
 
 | Fase | O que é | Situação |
 |---|---|---|
@@ -23,10 +22,11 @@ landing page.
 | 5 | Avaliações, baremas e fluxo entre etapas | pronta, commitada |
 | 6 | Comunicações | pronta, commitada |
 | 7 | Frontend do candidato | pronta, commitada |
-| 8 | Frontend do organizador | **pronta, não commitada** |
-| 9 | Produção (deploy, storage, revisão de permissões) | não começou |
+| 8 | Frontend do organizador | pronta, commitada |
+| 9 | Landing page do processo seletivo | pronta, commitada |
+| 10 | Produção (deploy, storage, revisão de permissões) | não começou |
 
-Suítes: **252 testes de backend** e **114 de frontend (16 arquivos)**, todos passando.
+Suítes: **260 testes de backend** e **132 de frontend (17 arquivos)**, todos passando.
 `tsc --noEmit` limpo e `npm run build` ok. A suíte do hackathon continua inteira.
 
 ---
@@ -76,7 +76,7 @@ Compartilhado: `ui/Modal`, `ui/ConfirmDialog`, `ui/ScoreInput`, `utils/errors.ts
 
 ## Decisões tomadas
 
-As 18 decisões estão em [specs/v3/decisions.md](specs/v3/decisions.md) com o motivo de
+As 21 decisões estão em [specs/v3/decisions.md](specs/v3/decisions.md) com o motivo de
 cada uma. As que mais afetam quem for mexer no código:
 
 - **§2 — domínios paralelos.** Hackathon e seletivo não têm FK entre si. A v3 não migra nem
@@ -96,17 +96,24 @@ cada uma. As que mais afetam quem for mexer no código:
 - **§17 — publicar e editar moram na tela do processo.** O dashboard só cria e lista.
 - **§18 — o processo nasce junto com o ambiente.** `ensure_selection_process` roda no
   `entrypoint.sh`, é idempotente, não altera processo existente e cria em `draft`.
+- **§19 — designação distribui trabalho, não dá permissão.** Qualquer organizador avalia
+  qualquer candidato; `StageAssignment` só organiza quem corrige o quê.
+- **§20 — a landing é do seletivo.** A do hackathon ficou em `LandingPageHackathon.tsx`,
+  atrás da chave. A empresa parceira daquela edição saiu do projeto inteiro.
+- **§21 — o prazo na landing vem da API.** `GET /open-process/` é aberto e devolve a janela
+  de inscrições do processo publicado, ou `null`. Data escrita no código criaria uma segunda
+  fonte da verdade.
 
 ### Decisões de processo com o Pedro
 
 - **Nenhum commit sem pedido explícito.**
 - Push só na branch `feature/v3-processo-seletivo`, nunca na `main`.
 - Os alertas do `npm audit` ficam como estão: não quebram nada.
-- A landing page é a última coisa a ser feita, porque é só frontend.
+- Travessão (`—`) não entra em texto que o candidato lê.
 
 ---
 
-## Últimas correções (ainda não commitadas)
+## Correções que vieram de usar a plataforma
 
 **1. Rascunho ficava sem saída.** O card do rascunho só oferecia "Abrir inscrições", e
 publicar exige ao menos uma etapa — mas etapa só se configura dentro do processo, e não
@@ -130,9 +137,7 @@ comunica, de propósito.
 
 ## Próximos passos
 
-1. **Commitar a fase 8** (quando o Pedro pedir). É um volume grande de arquivos novos: vale
-   quebrar em commits por assunto — organizador, correções de fluxo, comunicados.
-2. **Fase 9 — produção:**
+1. **Fase 10 — produção:**
    - `MEDIA_ROOT` apontando para o volume do Railway ([decisions.md](specs/v3/decisions.md) §5)
    - `MAX_UPLOAD_BYTES` configurado
    - o processo já sobe criado pelo `entrypoint.sh`; falta só conferir as datas e publicar
@@ -140,8 +145,8 @@ comunica, de propósito.
    - **worker do Celery rodando** — sem ele o e-mail nunca sai e ninguém percebe. Rodar
      `manage.py check_email_pipeline` antes de abrir inscrições.
    - teste do fluxo completo com dados reais antes de abrir para os candidatos
-3. **Landing page (`/`)** — ainda vende o hackathon. Deixada por último de propósito.
-4. **Conferir o hackathon com `SHOW_HACKATHON = true`** antes de considerar a v3 fechada,
+2. **Front de login e telas de conta** — próximo assunto combinado com o Pedro.
+3. **Conferir o hackathon com `SHOW_HACKATHON = true`** antes de considerar a v3 fechada,
    para garantir que os arquivos compartilhados não quebraram o fluxo antigo.
 
 ---

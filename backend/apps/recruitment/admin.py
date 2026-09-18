@@ -94,7 +94,12 @@ class CommunicationAdmin(admin.ModelAdmin):
 
 @admin.register(OrganizerProfile)
 class OrganizerProfileAdmin(admin.ModelAdmin):
-    list_display = ['full_name', 'user', 'role_title']
+    # `is_coordinator` na lista porque é a única distinção de papel que concede
+    # algo: ver a identidade na correção anônima. `role_title` é informativo.
+    # Sem isto, saber quem é coordenador exige abrir perfil por perfil.
+    list_display = ['full_name', 'user', 'role_title', 'is_coordinator']
+    list_filter = ['is_coordinator']
+    list_editable = ['is_coordinator']
     search_fields = ['full_name', 'user__email', 'role_title']
     readonly_fields = ['id', 'created_at', 'updated_at']
 

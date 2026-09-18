@@ -443,3 +443,30 @@ o sistema outra — com candidato no meio.
 É proposital: as datas de rascunho são provisórias (`ensure_selection_process` cria o
 período a partir do dia do deploy, §18), e anunciá-las seria mentir. O prazo aparece
 quando alguém clicar em "Abrir inscrições".
+
+---
+
+## 22. Permissão e a chave do hackathon viram teste, não conferência manual
+
+**Decisão:** a revisão de permissões e a checagem do fluxo antigo com
+`SHOW_HACKATHON = true` deixaram de ser tarefas de checklist e viraram suíte.
+
+`tests/test_permissions.py` percorre o URLconf e exige que **toda** rota `/admin/`
+recuse candidato (403) e anônimo (401). Endpoint novo entra no teste sozinho, sem
+ninguém lembrar de acrescentá-lo. Um teste extra confere que a varredura achou as
+rotas: varredura vazia passaria em tudo sem testar nada.
+
+`src/test/HackathonFlag.test.tsx` simula a chave ligada com `vi.mock` e renderiza o
+dashboard, o perfil e a rota `/`, conferindo que o bloco de equipes, o selo e a
+landing antiga voltam.
+
+**Motivo:** o `CLAUDE.md` manda conferir o hackathon a cada mexida em arquivo
+compartilhado, e mexemos em vários. Conferência manual só acontece enquanto alguém
+lembra; a suíte roda os dois estados a cada commit.
+
+**O que a revisão encontrou:** as permissões estavam corretas — todas as views
+`Admin*` com `IsAdminUser`, padrão do DRF em `IsAuthenticated`, dono verificado no
+download e na exclusão de entregável. O buraco era de cobertura, não de código: o
+login de organizador recusa quem não é `is_staff`, mas nada testava isso. Se a
+validação caísse, um candidato entraria pela tela da comissão e cairia num painel
+que recusa tudo. Agora tem teste, com contraprova de que organizador continua entrando.

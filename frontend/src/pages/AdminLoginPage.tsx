@@ -23,14 +23,12 @@ function AdminLoginShowcase() {
         <div />
 
         <div className="max-w-xl pb-28">
-          <p className="font-display text-4xl font-light leading-[0.98] tracking-[-0.055em] text-white/54 xl:text-5xl">
-            Gestão
-          </p>
-          <h2 className="mt-1 font-display text-4xl font-extrabold leading-[0.98] tracking-[-0.065em] text-white xl:text-5xl">
-            do hackathon
+          <h2 className="font-display text-4xl leading-[1.02] tracking-[-0.06em] text-white xl:text-5xl">
+            <span className="font-light text-white/54">Gestão</span>{' '}
+            <span className="font-extrabold">do processo</span>
           </h2>
           <p className="mt-5 max-w-sm text-base leading-7 text-white/46">
-            Área exclusiva para acompanhar equipes, aprovações e decisões da organização.
+            Área da comissão avaliadora: etapas, correções, decisões e comunicados.
           </p>
           <div className="mt-7 flex items-center gap-3 text-white/58">
             <span className="inline-flex h-7 items-center rounded-full border border-white/14 bg-white/[0.06] px-3 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-white/62">Organização</span>

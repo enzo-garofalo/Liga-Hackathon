@@ -14,6 +14,11 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
 
+from apps.recruitment.blueprint import (
+    PROCESS_DESCRIPTION,
+    PROCESS_NAME,
+    STAGES,
+)
 from apps.recruitment.models import (
     Application,
     ApplicationStatus,
@@ -28,67 +33,15 @@ from apps.teams.models import Participant
 
 User = get_user_model()
 
-PROCESS_NAME = 'Processo Seletivo Liga de TI 2026.2'
-
-STAGES = [
-    {
-        'name': 'Inscrição',
-        'description': 'Preenchimento do formulário de inscrição.',
-        'window': (-14, -7),
-        'weight': 0,
-        'criteria': [],
-        'allows_file_upload': False,
-    },
-    {
-        'name': 'Resolução do Case',
-        'description': 'Entrega de um case prático em até 7 dias.',
-        # Aberta agora, para a demo permitir testar o envio do PDF.
-        'window': (-3, 4),
-        'weight': 35,
-        'criteria': [
-            ('Compreensão do problema', 15),
-            ('Pensamento crítico', 20),
-            ('Qualidade da solução', 15),
-            ('Viabilidade', 15),
-            ('Justificativa das decisões', 15),
-            ('Estrutura e clareza', 10),
-            ('Criatividade e iniciativa', 10),
-        ],
-        'allows_file_upload': True,
-        'max_files': 1,
-        'allowed_file_types': ['pdf'],
-    },
-    {
-        'name': 'Pitch',
-        'description': 'Apresentação da solução em 5 minutos, com 3 de perguntas.',
-        'window': (7, 8),
-        'weight': 30,
-        'criteria': [
-            ('Clareza da comunicação', 20),
-            ('Capacidade de síntese', 15),
-            ('Argumentação', 20),
-            ('Domínio da solução', 20),
-            ('Resposta às perguntas', 15),
-            ('Organização da apresentação', 10),
-        ],
-        'allows_file_upload': False,
-    },
-    {
-        'name': 'Entrevista',
-        'description': 'Entrevista individual estruturada com a comissão.',
-        'window': (12, 14),
-        'weight': 35,
-        'criteria': [
-            ('Motivação', 20),
-            ('Comprometimento', 25),
-            ('Trabalho em equipe', 20),
-            ('Iniciativa', 15),
-            ('Capacidade de aprendizado', 10),
-            ('Alinhamento com o propósito da Liga', 10),
-        ],
-        'allows_file_upload': False,
-    },
-]
+# Janelas relativas a agora, só para a demo: a etapa do Case fica aberta para
+# dar o que testar no upload. Nome, peso, critérios e regras de arquivo vêm do
+# blueprint — duplicar o barema aqui o faria envelhecer em um lugar só.
+WINDOWS = {
+    'Inscrição': (-14, -7),
+    'Resolução do Case': (-3, 4),
+    'Pitch': (7, 8),
+    'Entrevista': (12, 14),
+}
 
 # (email, nome, cargo, e_coordenador) — o planejamento preve 1 coordenador
 # e os demais como avaliadores.
@@ -190,14 +143,7 @@ class Command(BaseCommand):
         process, _ = Process.objects.get_or_create(
             name=PROCESS_NAME,
             defaults={
-                'description': (
-                    'Venha fazer parte da Liga de TI e desenvolva projetos reais, '
-                    'participe de eventos, conheça empresas parceiras e faça parte '
-                    'da comunidade.\n\n'
-                    'Buscamos pessoas comprometidas, curiosas e com vontade de '
-                    'aprender. O mais importante é seu comprometimento ao longo '
-                    'do processo.'
-                ),
+                'description': PROCESS_DESCRIPTION,
                 'status': ProcessStatus.PUBLISHED,
                 'registration_start': now - timedelta(days=14),
                 'registration_end': now + timedelta(days=7),
@@ -214,14 +160,15 @@ class Command(BaseCommand):
         now = timezone.now()
         stages = {}
         for order, data in enumerate(STAGES, start=1):
+            opens, closes = WINDOWS[data['name']]
             stage, _ = Stage.objects.get_or_create(
                 process=process,
                 order=order,
                 defaults={
                     'name': data['name'],
                     'description': data['description'],
-                    'start_at': now + timedelta(days=data['window'][0]),
-                    'end_at': now + timedelta(days=data['window'][1]),
+                    'start_at': now + timedelta(days=opens),
+                    'end_at': now + timedelta(days=closes),
                     'weight': data['weight'],
                     'allows_file_upload': data.get('allows_file_upload', False),
                     'max_files': data.get('max_files'),

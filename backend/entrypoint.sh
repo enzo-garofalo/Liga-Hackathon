@@ -59,6 +59,12 @@ else:
     print(f'Superuser {username} ja existe.')
 "
 
+# ── Processo seletivo padrão ──────────────────────────────────────
+# Idempotente e não mexe em processo existente: rodar a cada deploy é seguro.
+# Nasce como rascunho — abrir inscrições é decisão do organizador.
+echo "==> Ensuring the selection process exists..."
+python manage.py ensure_selection_process
+
 # ── Start server ──────────────────────────────────────────────────
 echo "==> Starting gunicorn on port ${PORT:-8000}..."
 exec gunicorn config.wsgi:application \

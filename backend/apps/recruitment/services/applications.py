@@ -146,7 +146,7 @@ def reject(application):
     notify(
         application.participant,
         NotificationType.APPLICATION_REJECTED,
-        f'Resultado do {application.process.name}.',
+        f'Sua candidatura no {application.process.name} não seguiu adiante.',
         link_to=f'/applications/{application.id}',
         subject_id=application.id,
     )
@@ -162,14 +162,27 @@ def discard(application):
     return application
 
 
-# Assunto do registro no histórico de comunicações. Descarte não aparece:
-# é ação administrativa e não dispara e-mail.
-def _auto_subject(action, target_stage):
+# Assunto e texto do registro no histórico de comunicações. O texto repete o que o
+# candidato recebeu por e-mail: um histórico que só diz "comunicação automática" não
+# deixa o organizador conferir o que foi dito. Descarte não aparece: é ação
+# administrativa e não dispara e-mail.
+def _auto_message(action, target_stage):
     if action == MOVE_STAGE:
-        return f'Convocação para {target_stage.name}'
+        return (
+            f'Convocação para {target_stage.name}',
+            f'Você avançou para a etapa {target_stage.name}. '
+            'Confira o que é pedido e o prazo pela plataforma.',
+        )
     if action == APPROVE:
-        return 'Aprovados no processo seletivo'
-    return 'Resultado: não aprovados'
+        return (
+            'Aprovados no processo seletivo',
+            'Você foi aprovado no processo seletivo da Liga de TI.',
+        )
+    return (
+        'Resultado: não aprovados',
+        'Sua candidatura não seguiu adiante nesta edição. '
+        'Obrigado por participar do processo seletivo.',
+    )
 
 
 @transaction.atomic
@@ -193,10 +206,11 @@ def run_bulk_action(process, applications, action, target_stage=None):
         updated = [handler(app) for app in applications]
 
     if action != DISCARD:
+        subject, message = _auto_message(action, target_stage)
         record_auto_communication(
             process,
-            _auto_subject(action, target_stage),
-            'Comunicação automática disparada pela ação do organizador.',
+            subject,
+            message,
             [app.participant for app in updated],
         )
 

@@ -3,9 +3,11 @@ from rest_framework import serializers
 
 from apps.recruitment.models import (
     Application,
+    ApplicationStatus,
     Communication,
     Deliverable,
     EvaluationCriterion,
+    OrganizerProfile,
     Process,
     ProcessStatus,
     Stage,
@@ -193,6 +195,7 @@ class ApplicationListSerializer(serializers.ModelSerializer):
         model = Application
         fields = [
             'id',
+            'participant',
             'participant_name',
             'participant_email',
             'course',
@@ -325,6 +328,11 @@ class ApplicationTimelineStageSerializer(PublicStageSerializer):
         if stage.order < current.order:
             return 'done'
         if stage.order == current.order:
+            # Candidatura encerrada não tem etapa em andamento. Sem isto, quem
+            # foi aprovado na última etapa continuava vendo "Etapa atual:
+            # Entrevista", girando, como se ainda houvesse o que esperar.
+            if application.status != ApplicationStatus.IN_PROGRESS:
+                return 'done'
             return 'current'
         return 'upcoming'
 
@@ -610,3 +618,32 @@ def validate_weights(items, label):
         raise serializers.ValidationError(
             f'Os pesos {label} devem somar 100%. Soma atual: {total}%.'
         )
+
+
+# ── Perfil do organizador ─────────────────────────────────────────
+
+
+class OrganizerProfileSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source='user.email', read_only=True)
+    is_coordinator = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrganizerProfile
+        fields = [
+            'id',
+            'email',
+            'full_name',
+            'role_title',
+            'is_coordinator',
+            'phone',
+            'github',
+            'linkedin',
+            'updated_at',
+        ]
+        read_only_fields = ['id', 'email', 'is_coordinator', 'updated_at']
+
+    def get_is_coordinator(self, profile):
+        """Superusuário também é coordenador — ver decisions.md §12."""
+        from apps.recruitment.services.evaluations import is_coordinator
+
+        return is_coordinator(profile.user)

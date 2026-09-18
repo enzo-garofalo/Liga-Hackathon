@@ -3,12 +3,11 @@
 from decimal import Decimal
 
 from django.db import transaction
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import ValidationError
 
 from apps.recruitment.models import (
     Evaluation,
     EvaluationCriterion,
-    StageAssignment,
     ProcessStatus,
 )
 from apps.recruitment.services.scoring import (
@@ -32,29 +31,14 @@ def is_coordinator(user):
     return bool(profile and profile.is_coordinator)
 
 
-def assert_can_evaluate(application, stage, evaluator):
-    """Avaliador só corrige quem lhe foi designado.
-
-    Sem isso, a distribuição entre corretores vira sugestão: qualquer
-    organizador poderia avaliar qualquer candidato e não haveria como garantir
-    dois pareceres independentes. O coordenador escapa da regra porque é quem
-    administra a distribuição e faz a revisão de divergência.
-    """
-    if is_coordinator(evaluator):
-        return
-
-    assigned = StageAssignment.objects.filter(
-        stage=stage, application=application, evaluator=evaluator
-    ).exists()
-    if not assigned:
-        raise PermissionDenied(
-            'Você não foi designado para avaliar este candidato nesta etapa.'
-        )
-
-
 @transaction.atomic
 def save_evaluation(application, stage, evaluator, scores, notes=''):
     """Grava as notas de um avaliador para uma etapa.
+
+    Qualquer organizador avalia qualquer candidato. `StageAssignment` continua
+    existindo para distribuir o trabalho, mas não é trava: não havia tela para
+    designar, e a trava deixava todo avaliador que não fosse coordenador sem
+    conseguir salvar nota nenhuma.
 
     Upsert por (candidatura, critério, avaliador): reenviar sobrescreve a nota
     do mesmo avaliador em vez de duplicar, que é o comportamento esperado de
@@ -63,8 +47,6 @@ def save_evaluation(application, stage, evaluator, scores, notes=''):
     A observação é gravada em todas as linhas da etapa para aquele avaliador —
     na interface ela é uma só por etapa, não por critério.
     """
-    assert_can_evaluate(application, stage, evaluator)
-
     if application.process.status == ProcessStatus.CLOSED:
         raise ValidationError('Processo encerrado não aceita novas avaliações.')
     if stage.process_id != application.process_id:

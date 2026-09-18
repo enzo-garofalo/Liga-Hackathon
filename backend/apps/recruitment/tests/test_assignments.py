@@ -37,31 +37,16 @@ def stage_with_candidates(process):
     return stage, applications
 
 
-def test_evaluator_cannot_grade_without_assignment(
+def test_evaluator_grades_without_assignment(
     evaluator_client, process, stage_with_candidates
 ):
+    """Designação distribui trabalho, não é permissão.
+
+    A trava anterior deixava todo avaliador que não fosse coordenador sem
+    conseguir salvar nota nenhuma, porque nunca houve tela para designar.
+    """
     stage, applications = stage_with_candidates
     criterion = stage.criteria.first()
-
-    r = evaluator_client.post(
-        evaluations_url(applications[0].id),
-        {
-            'stage': str(stage.id),
-            'scores': [{'criterion': str(criterion.id), 'score': 4}],
-        },
-        format='json',
-    )
-    assert r.status_code == 403
-
-
-def test_evaluator_can_grade_when_assigned(
-    evaluator_client, evaluator_user, process, stage_with_candidates
-):
-    stage, applications = stage_with_candidates
-    criterion = stage.criteria.first()
-    StageAssignment.objects.create(
-        stage=stage, application=applications[0], evaluator=evaluator_user
-    )
 
     r = evaluator_client.post(
         evaluations_url(applications[0].id),
@@ -77,7 +62,7 @@ def test_evaluator_can_grade_when_assigned(
 def test_coordinator_grades_without_assignment(
     admin_client, process, stage_with_candidates
 ):
-    """O coordenador revisa divergências, então não depende de designação."""
+    """O coordenador também avalia direto, como qualquer organizador."""
     stage, applications = stage_with_candidates
     criterion = stage.criteria.first()
 

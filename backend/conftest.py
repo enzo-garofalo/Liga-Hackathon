@@ -56,3 +56,14 @@ def team_deadline_in_future(settings):
     do próprio teste, então continuam válidos.
     """
     settings.TEAM_DEADLINE = timezone.localdate() + timedelta(days=30)
+
+
+@pytest.fixture(autouse=True)
+def media_root_isolado(settings, tmp_path):
+    """Cada teste escreve arquivo no seu próprio diretório temporário.
+
+    Sem isto, todo teste que envia entregável deixa PDF em `backend/media/`, que
+    é o MEDIA_ROOT de desenvolvimento. O lixo se acumula a cada rodada e fica
+    perto de virar commit acidental de material de candidatura.
+    """
+    settings.MEDIA_ROOT = str(tmp_path / 'media')

@@ -220,3 +220,7 @@ node_modules/
 
 # Frontend — cache incremental do TypeScript, gerado pelo `tsc -b` do build
 *.tsbuildinfo
+
+# Entregaveis dos candidatos. Material de candidatura, nunca vai para o repositorio.
+# Em producao isto mora no volume do Railway (MEDIA_ROOT).
+backend/media/

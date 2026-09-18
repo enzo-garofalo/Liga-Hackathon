@@ -169,11 +169,6 @@ body {
     animation: logo-drift-soft 7s ease-in-out infinite;
   }
 
-  .floating-logo-wehandle {
-    animation-name: logo-drift-alt;
-    animation-duration: 8.5s;
-  }
-
   .topographic-hero {
     background:
       radial-gradient(circle at 72% 26%, rgba(128, 68, 210, 0.52), transparent 28rem),
@@ -276,12 +271,6 @@ body {
 
   .hero-logo-plaque-liga {
     transform: rotate(-5deg);
-  }
-
-  .hero-logo-plaque-wehandle {
-    animation-name: logo-float-alt;
-    animation-duration: 9s;
-    transform: rotate(6deg);
   }
 
   @keyframes floating-panel-drift {
@@ -438,10 +427,6 @@ body {
     animation: floating-panel-drift 8s ease-in-out infinite;
   }
 
-  .floating-panel-wehandle {
-    animation: floating-panel-drift-alt 9.5s ease-in-out infinite;
-  }
-
   .floating-mini-card {
     box-shadow: 0 30px 90px rgba(0, 0, 0, 0.22);
     animation: mini-card-drift 8.5s ease-in-out infinite;
@@ -467,10 +452,6 @@ body {
       animation-name: mobile-panel-drift;
     }
 
-    .floating-panel-wehandle {
-      animation-name: mobile-panel-drift-alt;
-    }
-
     .floating-countdown {
       transform: perspective(1000px) rotateY(0deg) rotateX(2deg);
     }
@@ -490,7 +471,6 @@ body {
 
   @media (prefers-reduced-motion: reduce) {
     .floating-panel-liga,
-    .floating-panel-wehandle,
     .floating-mini-card,
     .hero-flat-node,
     .hero-progress,

@@ -6,7 +6,9 @@ import { AdminLoginPage } from './pages/AdminLoginPage'
 import { ApplicationDetailPage } from './pages/ApplicationDetailPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { ManageProcessPage } from './pages/ManageProcessPage'
+import { SHOW_HACKATHON } from './featureFlags'
 import { LandingPage } from './pages/LandingPage'
+import { LandingPageHackathon } from './pages/LandingPageHackathon'
 import { LoginPage } from './pages/LoginPage'
 import { ProcessDetailPage } from './pages/ProcessDetailPage'
 import { ProfilePage } from './pages/ProfilePage'
@@ -18,7 +20,8 @@ function App() {
   return (
     <Routes>
       {/* Public */}
-      <Route path="/" element={<LandingPage />} />
+      {/* Com o hackathon ligado, a home volta a ser a daquela edicao (decisions.md §11). */}
+      <Route path="/" element={SHOW_HACKATHON ? <LandingPageHackathon /> : <LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/admin/login" element={<AdminLoginPage />} />

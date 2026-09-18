@@ -71,3 +71,39 @@ def test_me_patch_updates_profile(auth):
     p.refresh_from_db()
     assert p.full_name == 'New Name'
     assert p.semester == 5
+
+
+ADMIN_TOKEN_URL = '/api/v1/auth/admin/token/'
+
+
+def test_admin_login_rejects_who_is_not_staff(api_client):
+    """O login de organizador é aberto; quem barra não-staff é o serializer.
+
+    Sem esta trava, um candidato entraria pela tela da comissão. Os endpoints
+    `/admin/` continuariam recusando por `IsAdminUser`, mas a pessoa cairia num
+    painel que erra em tudo — e o acesso deve parar no login.
+    """
+    api_client.post(REGISTER_URL, VALID_REGISTER, format='json')
+
+    r = api_client.post(
+        ADMIN_TOKEN_URL,
+        {'email': 'ana@x.com', 'password': 'strongpass123'},
+        format='json',
+    )
+    assert r.status_code == 401
+    assert 'access' not in r.data
+
+
+def test_admin_login_accepts_staff(api_client, django_user_model):
+    """Contraprova: a trava não pode barrar quem é da organização."""
+    django_user_model.objects.create_user(
+        username='org@x.com', email='org@x.com', password='strongpass123', is_staff=True
+    )
+
+    r = api_client.post(
+        ADMIN_TOKEN_URL,
+        {'email': 'org@x.com', 'password': 'strongpass123'},
+        format='json',
+    )
+    assert r.status_code == 200
+    assert 'access' in r.data

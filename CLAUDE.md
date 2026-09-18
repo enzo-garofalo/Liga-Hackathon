@@ -129,8 +129,8 @@ processo seletivo.
 - Nota de avaliação usa `ui/ScoreInput`: aceita vírgula e valor quebrado, e bloqueia fora
   da escala do processo antes de chamar a API.
 - Modal novo usa `components/ui/Modal.tsx` (decisions.md §16).
-- Todo campo de formulário precisa de rótulo associado (`htmlFor`/`id`). `ui/Input` e
-  `ui/PasswordInput` já fazem isso sozinhos; `textarea` e `select` escritos à mão
+- Todo campo de formulário precisa de rótulo associado (`htmlFor`/`id`). `ui/Input`,
+  `ui/PasswordInput` e `ui/Select` já fazem isso sozinhos; `textarea` e `select` escritos à mão
   precisam do par manualmente (decisions.md §15).
 - Ao escrever teste de "X não aparece", confirmar que sem a regra X apareceria — um teste
   assim já passou despercebido (tests.md, "Verificação por sabotagem").

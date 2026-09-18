@@ -369,6 +369,8 @@ código para confirmar que algum teste acusa:
 | processo padrão nascendo publicado | backend: `test_process_is_born_as_draft` |
 | landing voltando a falar de hackathon/equipes | "apresenta o processo seletivo, não o hackathon" |
 | prazo escrito no código em vez de vir da API | "sem processo publicado, não inventa data" |
+| `ui/Select` sem htmlFor no rótulo | "o formulário de cadastro continua pedindo o perfil do candidato" |
+| telas de conta voltando a falar de equipe | "não falam mais do hackathon" |
 | landing prometendo mentoria de novo | "só promete o que a Liga faz de verdade" |
 | landing sem o acesso de organizador | "oferece entrar como candidato e como organizador" |
 | etapas sem os nomes | "mostra o nome de quem está em cada etapa" |
@@ -401,6 +403,13 @@ edita nome e datas do processo
 publicar pela tela do processo confirma antes
 processo encerrado não oferece edição
 trocar de aba troca o conteúdo
+
+// AuthPages.test.tsx
+criação de conta / entrar como candidato / entrar como organizador: não falam mais do hackathon
+as três telas falam da Liga e do processo seletivo
+o formulário de cadastro continua pedindo o perfil do candidato
+a bio tem rótulo associado ao campo
+a tela do organizador é separada da do candidato
 
 // LandingPage.test.tsx
 apresenta o processo seletivo, não o hackathon

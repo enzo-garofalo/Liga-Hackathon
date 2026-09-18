@@ -225,6 +225,27 @@ class ApplicationListSerializer(serializers.ModelSerializer):
 # ── Área do candidato ─────────────────────────────────────────────
 
 
+class OpenProcessSerializer(serializers.ModelSerializer):
+    """O que a landing pode mostrar a quem nem tem conta.
+
+    Campos escolhidos a dedo em vez de reaproveitar `ProcessSerializer`: este
+    endpoint e aberto, e o outro carrega escala de nota, limiar de divergencia e
+    contadores que sao assunto de organizador.
+    """
+
+    registration_open = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Process
+        fields = ["name", "registration_start", "registration_end", "registration_open"]
+        read_only_fields = fields
+
+    def get_registration_open(self, process):
+        from apps.recruitment.services.applications import registration_is_open
+
+        return registration_is_open(process)
+
+
 class PublicStageSerializer(serializers.ModelSerializer):
     """Etapa como o candidato vê: sem critérios de avaliação, que são internos."""
 

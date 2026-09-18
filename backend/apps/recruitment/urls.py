@@ -24,11 +24,14 @@ from .views import (
     MyDeliverableView,
     ProcessApplyView,
     ProcessDetailView,
+    OpenProcessView,
     ProcessListView,
 )
 
 urlpatterns = [
     # ── Candidato ────────────────────────────────────────────────
+    # Aberto: a landing mostra o periodo de inscricoes a quem nem tem conta.
+    path('open-process/', OpenProcessView.as_view(), name='open-process'),
     path('processes/', ProcessListView.as_view(), name='processes'),
     path('processes/<uuid:pk>/', ProcessDetailView.as_view(), name='process-detail'),
     path(

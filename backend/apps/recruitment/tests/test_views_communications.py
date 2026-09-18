@@ -164,6 +164,23 @@ def test_auto_communication_is_recorded_on_bulk_action(admin_client, process, sc
     assert auto.count() == 1
     assert auto.first().subject == 'Convocação para Entrevista'
     assert auto.first().recipients.count() == 1
+    # O histórico precisa repetir o que foi dito, não "comunicação automática".
+    assert 'avançou para a etapa Entrevista' in auto.first().message
+
+
+def test_auto_communication_records_what_the_candidate_was_told(
+    admin_client, process, scenario
+):
+    bulk_url = f'/api/v1/admin/processes/{process.id}/applications/bulk-action/'
+    admin_client.post(
+        bulk_url,
+        {'applications': [str(scenario['ana'].id)], 'action': 'reject'},
+        format='json',
+    )
+
+    auto = Communication.objects.get(type=CommunicationType.AUTO)
+    assert auto.subject == 'Resultado: não aprovados'
+    assert 'não seguiu adiante' in auto.message
 
 
 def test_discard_does_not_record_communication(admin_client, process, scenario):

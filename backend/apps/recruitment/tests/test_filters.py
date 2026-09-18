@@ -126,3 +126,13 @@ def test_application_without_evaluation_has_null_score(admin_client, process, po
 
 def test_candidate_cannot_list_applications(candidate_client, process):
     assert candidate_client.get(url(process.id)).status_code == 403
+
+
+def test_row_exposes_participant_id_for_targeted_communication(
+    admin_client, process, populated
+):
+    """A tabela precisa do id do participante: o comunicado a candidatos
+    específicos é endereçado por participante, não por candidatura."""
+    r = admin_client.get(url(process.id, '?search=ana'))
+    row = r.data['results'][0]
+    assert str(row['participant']) == str(populated['ana'].participant_id)

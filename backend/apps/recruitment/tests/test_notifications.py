@@ -1,6 +1,7 @@
 import pytest
 from django.core import mail
 
+from apps.recruitment.services.applications import approve, move_to_stage, reject
 from apps.recruitment.services.notifications import (
     RECRUITMENT_NOTIFICATION_TYPES,
     _TASK_DISPATCH,
@@ -64,3 +65,47 @@ def test_notify_rejects_unregistered_type(process):
             subject_id=application.id,
         )
     assert Notification.objects.count() == 0
+
+
+def test_advancing_stage_tells_the_candidate_they_advanced(process):
+    """O aviso automático precisa dizer o que aconteceu, não só que houve novidade."""
+    first = StageFactory(process=process, order=1, name='Inscrição')
+    entrevista = StageFactory(process=process, order=2, name='Entrevista')
+    application = ApplicationFactory(process=process, current_stage=first)
+    mail.outbox.clear()
+
+    move_to_stage(application, entrevista)
+
+    notification = Notification.objects.get(type=NotificationType.STAGE_ADVANCED)
+    assert 'avançou' in notification.message
+    assert 'Entrevista' in notification.message
+    assert len(mail.outbox) == 1
+    assert 'avançou para Entrevista' in mail.outbox[0].subject
+    assert 'avançou para a etapa Entrevista' in mail.outbox[0].body
+
+
+def test_rejecting_tells_the_candidate_they_were_not_approved(process):
+    stage = StageFactory(process=process, order=1)
+    application = ApplicationFactory(process=process, current_stage=stage)
+    mail.outbox.clear()
+
+    reject(application)
+
+    notification = Notification.objects.get(type=NotificationType.APPLICATION_REJECTED)
+    # "Resultado do processo X" não diz nada a quem lê a notificação no sino.
+    assert 'não seguiu adiante' in notification.message
+    assert len(mail.outbox) == 1
+    assert 'não seguiu para a próxima etapa' in mail.outbox[0].body
+
+
+def test_approving_tells_the_candidate_they_were_approved(process):
+    stage = StageFactory(process=process, order=1)
+    application = ApplicationFactory(process=process, current_stage=stage)
+    mail.outbox.clear()
+
+    approve(application)
+
+    notification = Notification.objects.get(type=NotificationType.APPLICATION_APPROVED)
+    assert 'aprovado' in notification.message
+    assert len(mail.outbox) == 1
+    assert 'aprovado' in mail.outbox[0].subject

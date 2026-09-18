@@ -15,6 +15,7 @@ from apps.recruitment.models import (
     Application,
     Communication,
     Deliverable,
+    OrganizerProfile,
     Process,
     Stage,
     StageAssignment,
@@ -30,6 +31,7 @@ from apps.recruitment.serializers import (
     EvaluationInputSerializer,
     MyApplicationDetailSerializer,
     MyApplicationListSerializer,
+    OrganizerProfileSerializer,
     ProcessDetailSerializer,
     ProcessSerializer,
     PublicProcessDetailSerializer,
@@ -591,3 +593,22 @@ class DeliverableDownloadView(APIView):
             as_attachment=True,
             filename=os.path.basename(deliverable.file.name),
         )
+
+
+class AdminOrganizerProfileView(generics.RetrieveUpdateAPIView):
+    """Perfil do organizador autenticado.
+
+    Cria o perfil na primeira visita: nem todo `is_staff` tem um — o
+    superusuário criado pelo entrypoint, por exemplo, nunca passou por aqui.
+    """
+
+    serializer_class = OrganizerProfileSerializer
+    permission_classes = [IsAdminUser]
+    http_method_names = ['get', 'patch', 'head', 'options']
+
+    def get_object(self):
+        profile, _ = OrganizerProfile.objects.get_or_create(
+            user=self.request.user,
+            defaults={'full_name': self.request.user.get_username()},
+        )
+        return profile

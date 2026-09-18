@@ -7,6 +7,7 @@ from .views import (
     AdminCommunicationDetailView,
     AdminCommunicationListCreateView,
     AdminEvaluationView,
+    AdminOrganizerProfileView,
     AdminProcessCloseView,
     AdminProcessDetailView,
     AdminProcessListCreateView,
@@ -131,5 +132,10 @@ urlpatterns = [
         'admin/stages/<uuid:pk>/assignments/auto/',
         AdminStageAutoDistributeView.as_view(),
         name='admin-stage-auto-distribute',
+    ),
+    path(
+        'admin/me/',
+        AdminOrganizerProfileView.as_view(),
+        name='admin-organizer-profile',
     ),
 ]

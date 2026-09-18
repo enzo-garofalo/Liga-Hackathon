@@ -198,6 +198,24 @@ regressão silenciosa descrita em [email.md](email.md): ele varre os tipos de no
 do seletivo e falha se algum não estiver registrado no dispatch de e-mail. Sem ele, um
 tipo esquecido só apareceria quando um candidato não recebesse o resultado.
 
+### tests/test_permissions.py
+```python
+test_the_sweep_actually_found_the_admin_routes
+test_candidate_cannot_reach_any_admin_endpoint      # varre o URLconf
+test_anonymous_cannot_reach_any_admin_endpoint      # varre o URLconf
+test_candidate_cannot_open_someone_elses_application
+test_candidate_cannot_download_someone_elses_file
+test_candidate_cannot_delete_someone_elses_file
+test_candidate_cannot_upload_into_someone_elses_application
+test_organizer_can_download_any_file
+```
+
+### apps/teams/tests/test_views_auth.py (acrescentados)
+```python
+test_admin_login_rejects_who_is_not_staff
+test_admin_login_accepts_staff
+```
+
 ### tests/test_views_open_process.py
 ```python
 test_anonymous_sees_the_registration_window
@@ -369,6 +387,9 @@ código para confirmar que algum teste acusa:
 | processo padrão nascendo publicado | backend: `test_process_is_born_as_draft` |
 | landing voltando a falar de hackathon/equipes | "apresenta o processo seletivo, não o hackathon" |
 | prazo escrito no código em vez de vir da API | "sem processo publicado, não inventa data" |
+| endpoint `/admin/` sem `IsAdminUser` | backend: `test_candidate_cannot_reach_any_admin_endpoint` |
+| download liberado para qualquer logado | backend: `test_candidate_cannot_download_someone_elses_file` |
+| chave ligada sem trazer o hackathon de volta | "o dashboard do candidato volta a mostrar o bloco de equipes" |
 | `ui/Select` sem htmlFor no rótulo | "o formulário de cadastro continua pedindo o perfil do candidato" |
 | telas de conta voltando a falar de equipe | "não falam mais do hackathon" |
 | landing prometendo mentoria de novo | "só promete o que a Liga faz de verdade" |
@@ -403,6 +424,12 @@ edita nome e datas do processo
 publicar pela tela do processo confirma antes
 processo encerrado não oferece edição
 trocar de aba troca o conteúdo
+
+// HackathonFlag.test.tsx
+o dashboard do candidato volta a mostrar o bloco de equipes
+o dashboard volta a consultar os endpoints do hackathon
+o perfil volta a mostrar o selo de equipe
+a rota / passa a servir a landing do hackathon
 
 // AuthPages.test.tsx
 criação de conta / entrar como candidato / entrar como organizador: não falam mais do hackathon

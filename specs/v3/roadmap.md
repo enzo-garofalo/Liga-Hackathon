@@ -143,7 +143,7 @@ com e-mail em cada transição.
 
 - Storage de arquivos configurado
 - Processo seletivo criado sozinho no deploy (`ensure_selection_process`, decisions.md §18)
-- Revisão de permissões em todos os endpoints `/admin/`
+- ~~Revisão de permissões em todos os endpoints `/admin/`~~ — feita, virou suíte (decisions.md §22)
 - Suíte completa passando (hackathon + seletivo)
 - Deploy no Railway
 - Teste do fluxo completo com dados reais antes de abrir para os candidatos

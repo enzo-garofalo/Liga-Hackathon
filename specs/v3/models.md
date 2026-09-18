@@ -171,9 +171,8 @@ resolvido, seguindo a regra existente de "nunca um sem o outro".
 Constraint: `unique_together(stage, application, evaluator)`.
 
 O planejamento prevê dois corretores independentes por case, distribuídos entre
-candidatos diferentes. Sem designação, a correção vira "quem pegar primeiro" e não há
-como garantir dois pareceres. Avaliador só pontua quem lhe foi designado; o coordenador
-escapa da regra porque é quem distribui e revisa divergências.
+candidatos diferentes. A designação registra essa distribuição, mas **não é permissão**:
+qualquer organizador avalia qualquer candidato (decisions.md §19).
 
 ## Reconciliação com o hackathon existente
 `Team`/`TeamMembership` continuam existindo do jeito que estão — não fazem parte do
@@ -186,5 +185,5 @@ risco para os dados de produção do hackathon.
 ## Pendências antes de gerar migrations
 Os enums de `Process.status` e `Application.status` estão definidos em [overview.md](overview.md) — ciclo de vida.
 
-Resolvido: o planejamento do processo seletivo define correção por dois avaliadores
-designados, então existe `StageAssignment` e avaliador não designado recebe 403.
+Resolvido: `StageAssignment` existe para distribuir a correção entre dois avaliadores,
+sem ser trava de permissão (decisions.md §19).

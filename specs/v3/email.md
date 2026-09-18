@@ -107,6 +107,26 @@ dentro do layout padrão de e-mail da Liga.
 - Desenvolvimento: `EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend`.
 - Produção: Resend via SMTP, configuração já existente.
 
+## Comunicado automático x comunicado manual
+
+O organizador nunca precisa escrever o aviso de avanço de etapa, aprovação ou reprovação:
+mover, aprovar e reprovar já disparam sozinhos a `Notification` e o e-mail, e a aba
+"Comunicações" ganha uma linha `type=auto` com os destinatários. O `NewCommunicationModal`
+serve só para recado extra — mudança de local, lembrete de prazo, instruções de entrega.
+
+O texto registrado no histórico repete o que o candidato recebeu. Um registro que só
+dissesse "comunicação automática" deixaria o organizador sem saber o que foi comunicado
+quando alguém perguntasse depois.
+
+Cada aviso diz **o que aconteceu**, não que houve novidade:
+
+| Ação | Notificação no sino | Assunto no histórico |
+|---|---|---|
+| Mover de etapa | "Você avançou para a etapa {etapa}." | Convocação para {etapa} |
+| Aprovar | "Você foi aprovado no {processo}!" | Aprovados no processo seletivo |
+| Reprovar | "Sua candidatura no {processo} não seguiu adiante." | Resultado: não aprovados |
+| Descartar | nenhuma — ação administrativa | não aparece |
+
 ## Envio em massa
 
 Ações em massa (mover etapa, aprovar, reprovar) e comunicados podem atingir mais de 100

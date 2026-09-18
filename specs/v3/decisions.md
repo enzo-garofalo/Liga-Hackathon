@@ -196,9 +196,11 @@ despercebido porque a média ponderada continua devolvendo um número plausível
 **Isto emenda a decisão §4.** Continua não havendo RBAC por funcionalidade — qualquer
 `is_staff` cria processo, move etapa e envia comunicado. Mas passa a existir **uma**
 distinção de papel: `OrganizerProfile.is_coordinator`. O coordenador vê a identidade dos
-candidatos e administra as designações; o avaliador comum vê códigos e só pontua quem lhe
-foi designado. Sem essa distinção, correção anônima seria decorativa — bastaria abrir a
-ficha do candidato para ver quem é.
+candidatos e administra a distribuição; o avaliador comum vê códigos. Sem essa distinção,
+correção anônima seria decorativa — bastaria abrir a ficha do candidato para ver quem é.
+
+> **Emendado pela §19:** a parte de "só pontua quem lhe foi designado" caiu. A designação
+> continua existindo para distribuir a correção, mas não é permissão.
 
 ---
 
@@ -291,3 +293,105 @@ para o serviço `backend` do Docker, o que não interessa aos testes.
   web do Vitest). Resta um alerta moderado em `@vitest/mocker`, corrigido só na 4.x, que
   exige Vite 6 — atualizar o Vite mexe no build de produção e fica para decisão própria.
   Nenhum dos dois afeta produção: são dependências de desenvolvimento.
+
+---
+
+## 15. Rótulo associado ao campo nos inputs compartilhados
+
+**Decisão:** `ui/Input.tsx` e `ui/PasswordInput.tsx` passam a gerar um `id` (via `useId`)
+e ligar o `<label>` a ele com `htmlFor`, além de apontar o erro por `aria-describedby`.
+
+**Motivo:** encontrado ao escrever teste da Fase 8 — a Testing Library não achava o campo
+pelo rótulo. O motivo era real, não uma limitação do teste: sem a associação, o leitor de
+tela não anuncia o rótulo ao focar o campo, e clicar no rótulo não foca o campo.
+
+**Consequência:** corrige todos os formulários do projeto de uma vez, inclusive os do
+hackathon, sem mudar aparência nem comportamento visível. Os `textarea` escritos na v3
+seguem a mesma regra.
+
+---
+
+## 16. Um invólucro de modal para a v3, sem migrar os do hackathon
+
+**Decisão:** `ui/Modal.tsx` concentra fundo, painel, título, botão de fechar e tecla Esc.
+Os seis modais do organizador usam esse invólucro. `CreateTeamModal`,
+`InviteMembersModal` e `TeamPreviewModal` continuam com o markup próprio.
+
+**Motivo:** o mesmo bloco estava repetido em três arquivos, e a v3 acrescentaria mais
+seis. Migrar os antigos daria consistência total, mas são telas do hackathon em produção,
+e o ganho é estético — não justifica o risco. Ficam como estão até alguém precisar mexer
+neles por outro motivo.
+
+---
+
+## 17. Publicar e editar o processo moram na tela do processo
+
+**Decisão:** o card do dashboard do organizador leva a "Gerenciar processo" em qualquer
+status, inclusive rascunho. "Editar processo", "Abrir inscrições" e "Encerrar processo"
+ficam no cabeçalho de `/admin/processes/:id`. O dashboard só cria e lista. Um rascunho sem
+etapa mostra um aviso apontando para a aba "Etapas". `ProcessFormModal` atende criação e
+edição; a pergunta "visível para candidatos?" só aparece na criação.
+
+**Motivo:** a versão anterior oferecia "Abrir inscrições" no card do rascunho e nenhum link
+para a tela do processo. Como publicar exige ao menos uma etapa e etapa só se configura
+dentro do processo, um rascunho recém-criado ficava sem saída: o único botão disponível
+era justamente o que o backend recusava. Faltava também qualquer tela para
+`PATCH /admin/processes/{id}/`, então as datas de início e fim das inscrições eram
+definidas na criação e nunca mais podiam ser corrigidas.
+
+**Consequência:** as datas do formulário são `datetime-local` — horário local na tela,
+UTC no payload. Um fim de inscrição às 23:59 em Brasília chega ao backend como 02:59 UTC
+do dia seguinte, coerente com a §13.
+
+---
+
+## 18. O processo seletivo nasce junto com o ambiente
+
+**Decisão:** `manage.py ensure_selection_process` cria o processo da Liga com as quatro
+etapas e o barema inteiro, e roda no `entrypoint.sh` logo depois das migrations, ao lado
+do "garantir superusuário". O desenho (nomes, pesos, critérios, regras de arquivo) mora em
+`apps/recruitment/blueprint.py`, lido também pelo `seed_recruitment_demo`.
+
+O comando **não altera processo que já existe** — se achar um com o mesmo nome, não faz
+nada. E o processo **nasce como rascunho**.
+
+**Motivo:** o processo só existia no banco local, montado à mão. Um ambiente novo subia
+com a tela do organizador vazia, e remontar 4 etapas e 19 critérios à mão é justamente
+onde o barema sai errado — e barema errado só aparece na hora de fechar nota.
+
+Os dois cuidados têm o mesmo pano de fundo: o comando roda a cada deploy.
+
+- **Não sobrescrever** porque o organizador ajusta datas e pesos pela interface. Um deploy
+  que resetasse isso desfaria o trabalho dele sem avisar.
+- **Nascer rascunho** porque publicar abre inscrições para gente de verdade e passa a
+  mostrar o processo na área do candidato. Isso é decisão de organizador, por "Abrir
+  inscrições" (§17), não efeito colateral de um `git push`.
+
+**Consequência:** as datas criadas são um ponto de partida (etapas em sequência a partir
+de agora). Conferir em "Editar processo" antes de abrir as inscrições.
+
+---
+
+## 19. Designação distribui trabalho, não concede permissão
+
+**Decisão:** qualquer organizador (`is_staff`) salva nota de qualquer candidato.
+`StageAssignment`, o modelo e os endpoints de distribuição continuam de pé, mas deixaram
+de ser pré-requisito para avaliar. **Isto emenda a §10.**
+
+**Motivo:** a trava foi escrita junto com o modelo, e nunca houve tela para designar
+ninguém — os endpoints existem só na API. Na prática, todo organizador que não fosse
+coordenador preenchia as notas na ficha do candidato, clicava em salvar e recebia
+403 "Você não foi designado para avaliar este candidato nesta etapa", sem nenhum caminho
+na interface para resolver. A regra protegia a independência dos dois pareceres, mas
+custava a correção inteira: só o coordenador conseguia avaliar.
+
+Havia duas saídas — construir a tela de designação ou tirar a trava. A Liga escolheu tirar
+a trava, que é o caminho que funciona hoje, com a comissão inteira corrigindo.
+
+**O que se perde:** não há mais garantia, imposta pelo sistema, de que dois avaliadores
+independentes corrigiram cada candidato, nem de que ninguém corrigiu quem não devia. A
+divergência acima do limiar continua marcando `needs_third_review`, então o sinal de
+"precisa de um terceiro olhar" permanece — o que sumiu é a barreira, não o indicador.
+
+Se um dia a distribuição precisar valer de verdade, o caminho é construir a tela de
+designação e reintroduzir a trava, não o contrário.

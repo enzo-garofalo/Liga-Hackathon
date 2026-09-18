@@ -196,6 +196,30 @@ O comando checa broker, workers respondendo, backend de e-mail e tipos de
 notificacao registrados. **Rode antes de abrir as inscricoes e antes de cada
 envio em massa.**
 
+### Processo seletivo padrao
+
+Ambiente novo ja sobe com o processo seletivo da Liga criado: o `entrypoint.sh`
+roda `ensure_selection_process` depois das migrations, e ele cria as quatro
+etapas (Inscricao, Resolucao do Case, Pitch, Entrevista) com o barema completo,
+a partir de `backend/apps/recruitment/blueprint.py`.
+
+```bash
+docker compose exec backend python manage.py ensure_selection_process
+```
+
+Duas garantias importantes, porque o comando roda a cada deploy:
+
+- **Nao altera processo que ja existe.** Se achar um com o mesmo nome, nao faz
+  nada. As datas e os pesos que o organizador ajustou pela interface ficam de pe.
+- **Nasce como rascunho.** Abrir as inscricoes e decisao do organizador, pelo
+  botao "Abrir inscricoes" dentro do processo, nao efeito colateral de um deploy.
+
+As datas criadas sao um ponto de partida, com as etapas em sequencia a partir de
+agora. Confira em "Editar processo" antes de abrir as inscricoes.
+
+Para mudar o barema, edite o blueprint — nunca duplique as etapas no seed de
+demonstracao, que le do mesmo arquivo.
+
 ### Desenvolvimento sem Redis
 
 Se voce nao quiser subir o Redis localmente, ligue o modo eager: as tarefas

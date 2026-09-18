@@ -11,7 +11,9 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://backend:8000',
+        // Padrão é o nome do serviço no compose. Rodando o Vite fora do
+        // container, `backend` não resolve: aponte com VITE_API_PROXY.
+        target: process.env.VITE_API_PROXY ?? 'http://backend:8000',
         changeOrigin: true,
       },
     },

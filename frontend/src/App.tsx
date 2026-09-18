@@ -5,6 +5,7 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { AdminLoginPage } from './pages/AdminLoginPage'
 import { ApplicationDetailPage } from './pages/ApplicationDetailPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { ManageProcessPage } from './pages/ManageProcessPage'
 import { LandingPage } from './pages/LandingPage'
 import { LoginPage } from './pages/LoginPage'
 import { ProcessDetailPage } from './pages/ProcessDetailPage'
@@ -40,6 +41,14 @@ function App() {
         element={
           <ProtectedRoute requireAdmin>
             <AdminDashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/processes/:id"
+        element={
+          <ProtectedRoute requireAdmin>
+            <ManageProcessPage />
           </ProtectedRoute>
         }
       />

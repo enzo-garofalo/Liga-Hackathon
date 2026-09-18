@@ -66,6 +66,25 @@ describe('ProcessCard', () => {
     )
   })
 
+  it('candidatura encerrada não anuncia etapa atual', () => {
+    // "Aprovado" e "Etapa atual: Entrevista" lado a lado fazem o candidato
+    // achar que a entrevista ainda vai acontecer.
+    renderWithProviders(
+      <ProcessCard
+        name="PS Liga 2026.2"
+        stageCount={4}
+        applicationStatus="approved"
+        currentStageName="Entrevista"
+        to="/applications/9"
+        actionLabel="Ver candidatura"
+      />,
+    )
+
+    expect(screen.getByText('Aprovado')).toBeInTheDocument()
+    expect(screen.queryByText(/Etapa atual/)).not.toBeInTheDocument()
+    expect(screen.queryByText('Entrevista')).not.toBeInTheDocument()
+  })
+
   it.each([
     ['approved', 'Aprovado'],
     ['rejected', 'Não aprovado'],

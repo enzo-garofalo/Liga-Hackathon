@@ -2,7 +2,6 @@ import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import logo from '../assets/logo.svg'
-import wehandleMark from '../assets/wehandle-mark.svg'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { PasswordInput } from '../components/ui/PasswordInput'
@@ -121,8 +120,7 @@ function RegisterShowcase() {
             Hackathon Liga de TI - 20 de junho de 2026.
           </p>
           <div className="mt-7 flex items-center gap-3 text-white/58">
-            <img src={wehandleMark} alt="WeHandle" className="h-7 w-7 object-contain" />
-            <span className="text-sm font-semibold">Liga + WeHandle</span>
+            <span className="inline-flex h-7 items-center rounded-full border border-white/14 bg-white/[0.06] px-3 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-white/62">Processo Seletivo</span>
           </div>
         </div>
       </div>

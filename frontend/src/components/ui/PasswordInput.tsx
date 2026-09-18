@@ -1,4 +1,4 @@
-import { forwardRef, InputHTMLAttributes, useState } from 'react'
+import { forwardRef, InputHTMLAttributes, useId, useState } from 'react'
 
 interface PasswordInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label: string
@@ -8,10 +8,13 @@ interface PasswordInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>,
 export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ label, error, className = '', required, ...props }, ref) => {
     const [visible, setVisible] = useState(false)
+    // Associa rótulo e campo — mesma correção feita no Input.
+    const generatedId = useId()
+    const inputId = props.id ?? generatedId
 
     return (
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium font-ui text-ink/80">
+        <label htmlFor={inputId} className="text-sm font-medium font-ui text-ink/80">
           {label}
           {required && <span className="ml-1 text-red-500">*</span>}
         </label>

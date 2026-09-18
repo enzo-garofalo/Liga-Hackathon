@@ -1,8 +1,14 @@
 import { useMemo, useState } from 'react'
-import { ExternalLink, Eye, Search, X } from 'lucide-react'
+import { ExternalLink, Eye, Plus, Search, UserRound, X } from 'lucide-react'
 import { Header } from '../components/Header'
+import { ProcessFormModal } from '../components/ProcessFormModal'
+import { OrganizerProfileModal } from '../components/OrganizerProfileModal'
+import { ProcessCard } from '../components/ProcessCard'
+import { QueryError } from '../components/QueryError'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
+import { SHOW_HACKATHON } from '../featureFlags'
+import { useAdminProcesses } from '../hooks/useAdminProcesses'
 import {
   useAdminParticipants,
   useAdminTeams,
@@ -553,37 +559,110 @@ function ParticipantsTab({
   )
 }
 
+function ProcessesSection() {
+  const processesQuery = useAdminProcesses()
+  const processes = processesQuery.data ?? []
+
+  if (processesQuery.isLoading) {
+    return <div className="dark-card h-40 animate-pulse rounded-[21px]" />
+  }
+
+  if (processesQuery.isError) {
+    return (
+      <QueryError
+        title="Não foi possível carregar os processos seletivos"
+        error={processesQuery.error}
+        onRetry={() => processesQuery.refetch()}
+        retrying={processesQuery.isFetching}
+      />
+    )
+  }
+
+  if (processes.length === 0) {
+    return (
+      <div className="dark-card rounded-[21px] p-8 text-center">
+        <p className="font-display text-base font-semibold text-ink">
+          Nenhum processo seletivo ainda
+        </p>
+        <p className="mx-auto mt-1 max-w-md text-sm text-ink/68">
+          Crie um processo, configure as etapas e abra as inscrições quando estiver pronto.
+        </p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {processes.map((process) => (
+        <ProcessCard
+          key={process.id}
+          name={process.name}
+          registrationStart={process.registration_start}
+          registrationEnd={process.registration_end}
+          stageCount={process.stage_count}
+          applicationCount={process.application_count}
+          processStatus={process.status}
+          to={`/admin/processes/${process.id}`}
+          actionLabel="Gerenciar processo"
+        />
+      ))}
+    </div>
+  )
+}
+
 export function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<'teams' | 'participants'>('teams')
+  const [newProcessOpen, setNewProcessOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
   const [statusFilter, setStatusFilter] = useState<TeamStatus>('submitted')
   const [selectedParticipant, setSelectedParticipant] = useState<AdminParticipant | null>(null)
 
-  const approvedQuery = useAdminTeams('approved')
-  const participantsQuery = useAdminParticipants()
+  // Hackathon: consultas desligadas junto com a interface dele.
+  const approvedQuery = useAdminTeams('approved', SHOW_HACKATHON)
+  const participantsQuery = useAdminParticipants(SHOW_HACKATHON)
 
   const approvedCount = approvedQuery.data?.length ?? 0
   const totalParticipants = participantsQuery.data?.length ?? 0
-  const teamsCount = useAdminTeams(statusFilter).data?.length ?? 0
+  const teamsCount = useAdminTeams(statusFilter, SHOW_HACKATHON).data?.length ?? 0
 
   return (
     <div className="min-h-screen app-shell text-ink">
       <Header admin />
 
       <main className="mx-auto max-w-5xl px-4 py-10">
-        {/* Header */}
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        {/* Cabeçalho */}
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="kicker mb-2">Administração</p>
             <h1 className="font-display text-4xl">
               <span className="font-light">Painel do </span>
-              <span className="font-semibold text-[#101114]">administrador</span>
+              <span className="font-semibold text-[#101114]">organizador</span>
             </h1>
-            <p className="mt-2 text-sm text-[#9497a9]">
-              {approvedCount}/6 equipes aprovadas · {totalParticipants} participantes cadastrados
-            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button variant="outlined" onClick={() => setProfileOpen(true)}>
+              <UserRound className="h-4 w-4" />
+              Meu perfil
+            </Button>
+            <Button onClick={() => setNewProcessOpen(true)}>
+              <Plus className="h-4 w-4" />
+              Novo processo
+            </Button>
           </div>
         </div>
 
+        {/* Processos seletivos */}
+        <section className="mb-10">
+          <h2 className="mb-4 font-display text-2xl font-semibold text-ink">Processos</h2>
+          <ProcessesSection />
+        </section>
+
+        {/* ── Hackathon — desativado, ver SHOW_HACKATHON ─────────── */}
+        {SHOW_HACKATHON && (
+          <>
+            <p className="mb-4 text-sm text-[#9497a9]">
+              {approvedCount}/6 equipes aprovadas · {totalParticipants} participantes cadastrados
+            </p>
         {/* Tabs */}
         <div className="mb-6 flex gap-8 border-b border-[#dedee5]">
           <button
@@ -636,8 +715,12 @@ export function AdminDashboardPage() {
         ) : (
           <ParticipantsTab onSelectParticipant={setSelectedParticipant} />
         )}
+          </>
+        )}
       </main>
 
+      {newProcessOpen && <ProcessFormModal onClose={() => setNewProcessOpen(false)} />}
+      {profileOpen && <OrganizerProfileModal onClose={() => setProfileOpen(false)} />}
       {selectedParticipant && (
         <ParticipantModal
           participant={selectedParticipant}

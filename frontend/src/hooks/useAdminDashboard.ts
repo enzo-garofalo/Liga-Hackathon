@@ -12,11 +12,12 @@ import type { TeamStatus } from '../types/team'
 const adminEnabled = () =>
   getSessionKind() === 'admin' && !!getAccessToken()
 
-export function useAdminTeams(status?: TeamStatus) {
+/** O parametro `enabled` desliga a consulta junto com a interface do hackathon. */
+export function useAdminTeams(status?: TeamStatus, enabled = true) {
   return useQuery({
     queryKey: ['admin-teams', status ?? 'submitted'],
     queryFn: () => listTeams(status),
-    enabled: adminEnabled(),
+    enabled: enabled && adminEnabled(),
   })
 }
 
@@ -40,10 +41,10 @@ export function useRejectTeam() {
   })
 }
 
-export function useAdminParticipants() {
+export function useAdminParticipants(enabled = true) {
   return useQuery<AdminParticipant[]>({
     queryKey: ['admin-participants'],
     queryFn: listParticipants,
-    enabled: adminEnabled(),
+    enabled: enabled && adminEnabled(),
   })
 }

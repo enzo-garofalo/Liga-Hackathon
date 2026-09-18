@@ -1,6 +1,7 @@
-import { ArrowRight, CalendarDays, Layers } from 'lucide-react'
+import { ArrowRight, CalendarDays, Layers, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { ApplicationStatus } from '../types/application'
+import type { ProcessStatus } from '../types/process'
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('pt-BR', {
@@ -23,6 +24,21 @@ const statusClass: Record<ApplicationStatus, string> = {
   discarded: 'border-ink/12 bg-ink/[0.06] text-ink/60',
 }
 
+const processStatusLabel: Record<ProcessStatus, string> = {
+  draft: 'Rascunho',
+  published: 'Publicado',
+  closed: 'Encerrado',
+}
+
+const processStatusClass: Record<ProcessStatus, string> = {
+  draft: 'border-amber-400/30 bg-amber-500/10 text-amber-700',
+  published: 'border-brand-green/25 bg-brand-green/12 text-brand-green',
+  closed: 'border-ink/12 bg-ink/[0.06] text-ink/60',
+}
+
+const actionClass =
+  'mt-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-ink/20 px-5 py-2.5 font-ui text-sm font-medium text-ink transition-colors hover:border-brand hover:bg-brand/5 hover:text-brand'
+
 interface ProcessCardProps {
   name: string
   /** Ausentes na candidatura: o endpoint de "Meus processos" não os devolve. */
@@ -32,9 +48,14 @@ interface ProcessCardProps {
   stageCount: number
   /** Presente só quando o candidato já está inscrito. */
   applicationStatus?: ApplicationStatus
+  /** Visão do organizador: status do processo e nº de inscritos. */
+  processStatus?: ProcessStatus
+  applicationCount?: number
   currentStageName?: string | null
   registrationOpen?: boolean
-  to: string
+  /** Navega (candidato) ou executa (organizador, quando abre um modal). */
+  to?: string
+  onAction?: () => void
   actionLabel: string
 }
 
@@ -45,9 +66,12 @@ export function ProcessCard({
   submittedAt,
   stageCount,
   applicationStatus,
+  processStatus,
+  applicationCount,
   currentStageName,
   registrationOpen,
   to,
+  onAction,
   actionLabel,
 }: ProcessCardProps) {
   return (
@@ -62,6 +86,12 @@ export function ProcessCard({
           >
             {statusLabel[applicationStatus]}
           </span>
+        ) : processStatus ? (
+          <span
+            className={`flex-shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${processStatusClass[processStatus]}`}
+          >
+            {processStatusLabel[processStatus]}
+          </span>
         ) : (
           <span
             className={`flex-shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${
@@ -75,7 +105,9 @@ export function ProcessCard({
         )}
       </div>
 
-      {currentStageName && (
+      {/* Só enquanto a candidatura corre: dizer "Etapa atual: Entrevista" ao lado
+          do selo "Aprovado" faz o candidato achar que ainda falta alguma coisa. */}
+      {currentStageName && applicationStatus === 'in_progress' && (
         <p className="mb-4 text-xs text-ink/68">
           Etapa atual: <span className="font-medium text-ink/82">{currentStageName}</span>
         </p>
@@ -98,15 +130,25 @@ export function ProcessCard({
           <Layers className="h-3.5 w-3.5 text-brand" />
           {stageCount} etapa{stageCount === 1 ? '' : 's'}
         </span>
+        {applicationCount !== undefined && (
+          <span className="inline-flex items-center gap-1.5">
+            <Users className="h-3.5 w-3.5 text-brand" />
+            {applicationCount} inscrito{applicationCount === 1 ? '' : 's'}
+          </span>
+        )}
       </div>
 
-      <Link
-        to={to}
-        className="mt-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-ink/20 px-5 py-2.5 font-ui text-sm font-medium text-ink transition-colors hover:border-brand hover:bg-brand/5 hover:text-brand"
-      >
-        {actionLabel}
-        <ArrowRight className="h-4 w-4" />
-      </Link>
+      {onAction ? (
+        <button type="button" onClick={onAction} className={actionClass}>
+          {actionLabel}
+          <ArrowRight className="h-4 w-4" />
+        </button>
+      ) : (
+        <Link to={to as string} className={actionClass}>
+          {actionLabel}
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      )}
     </div>
   )
 }

@@ -8,7 +8,7 @@ As rotas do hackathon (v2) continuam existindo. As rotas abaixo são adicionadas
 
 | Rota | Página | Descrição |
 |------|--------|-----------|
-| / | LandingPage | Existente — ganha CTA para o processo seletivo aberto, quando houver |
+| / | LandingPage | Reescrita na fase 9: apresenta a Liga e o processo seletivo, com os dois acessos (candidato e organizador). A do hackathon vive em `LandingPageHackathon` atrás de `SHOW_HACKATHON` (decisions.md §20) |
 | /login | LoginPage | Existente, sem alteração |
 | /register | RegisterPage | Existente, sem alteração |
 

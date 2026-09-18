@@ -22,6 +22,13 @@ Todo endpoint sob `/admin/` exige `is_staff=True`.
 
 # Área do candidato
 
+## GET /api/v1/open-process/
+**Aberto, sem autenticação.** Alimenta a landing com o período de inscrições do processo
+publicado. Devolve `{ name, registration_start, registration_end, registration_open }`,
+ou `null` quando não há processo publicado — a landing então omite as datas em vez de
+tratar erro. Serializer próprio: não expõe escala de nota, limiar de divergência nem
+contadores (decisions.md §21).
+
 ## GET /api/v1/processes/
 Lista processos com `status=published`. Usado em "Processos disponíveis".
 

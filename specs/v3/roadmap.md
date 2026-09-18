@@ -126,7 +126,20 @@ com e-mail em cada transição.
 
 ---
 
-## Fase 9 — Produção
+## Fase 9 — Landing page
+
+**Objetivo:** a home deixa de vender o hackathon e passa a apresentar a Liga e o processo seletivo.
+
+> Entregue. A landing do hackathon ficou preservada em `LandingPageHackathon.tsx`, atrás de
+> `SHOW_HACKATHON` (decisions.md §20).
+
+- Hero, seções da Liga, as três etapas com pesos e critérios, FAQ do seletivo
+- Seção de acesso com os dois caminhos: candidato e organizador
+- Remoção da empresa parceira da edição do hackathon em todo o projeto
+
+---
+
+## Fase 10 — Produção
 
 - Storage de arquivos configurado
 - Processo seletivo criado sozinho no deploy (`ensure_selection_process`, decisions.md §18)

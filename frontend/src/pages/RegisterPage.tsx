@@ -110,14 +110,12 @@ function RegisterShowcase() {
         <div />
 
         <div className="max-w-xl pb-28">
-          <p className="font-display text-4xl font-light leading-[0.98] tracking-[-0.055em] text-white/54 xl:text-5xl">
-            Transforme
-          </p>
-          <h2 className="mt-1 font-display text-4xl font-extrabold leading-[0.98] tracking-[-0.065em] text-white xl:text-5xl">
-            ideias em código
+          <h2 className="font-display text-4xl leading-[1.02] tracking-[-0.06em] text-white xl:text-5xl">
+            <span className="font-light text-white/54">Faça</span>{' '}
+            <span className="font-extrabold">parte da Liga</span>
           </h2>
           <p className="mt-5 max-w-sm text-base leading-7 text-white/46">
-            Hackathon Liga de TI - 20 de junho de 2026.
+            Processo seletivo da Liga de TI e Empreendedorismo, PUC-Campinas.
           </p>
           <div className="mt-7 flex items-center gap-3 text-white/58">
             <span className="inline-flex h-7 items-center rounded-full border border-white/14 bg-white/[0.06] px-3 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-white/62">Processo Seletivo</span>
@@ -206,7 +204,7 @@ export function RegisterPage() {
                 Criar sua conta
               </h1>
               <p className="mt-4 max-w-xl text-sm leading-7 text-black/50">
-                Preencha seu perfil para montar equipe, receber convites e acompanhar a submissão do hackathon.
+                Preencha seu perfil para se candidatar e acompanhar cada etapa do processo por aqui.
               </p>
 
               <form onSubmit={onSubmit} noValidate className="mt-7 space-y-5">
@@ -304,11 +302,12 @@ export function RegisterPage() {
                     error={errors.github?.message}
                   />
                   <div className="flex flex-col gap-1 md:col-span-2">
-                    <label className="font-ui text-sm font-medium text-ink/80">
+                    <label htmlFor="register-bio" className="font-ui text-sm font-medium text-ink/80">
                       Bio (resumo de habilidades e experiências)
                       <span className="ml-1 text-red-500">*</span>
                     </label>
                     <textarea
+                      id="register-bio"
                       rows={4}
                       {...register('bio', { required: 'Conte um pouco sobre você.' })}
                       className={[

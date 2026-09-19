@@ -31,7 +31,7 @@ function AdminLoginShowcase() {
             Área da comissão avaliadora: etapas, correções, decisões e comunicados.
           </p>
           <div className="mt-7 flex items-center gap-3 text-white/60">
-            <span className="inline-flex h-7 items-center rounded-full border border-white/14 bg-white/[0.06] px-3 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-white/60">Organização</span>
+            <span className="inline-flex h-7 items-center rounded-full border border-white/15 bg-white/[0.06] px-3 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-white/60">Organização</span>
           </div>
         </div>
       </div>
@@ -71,7 +71,7 @@ export function AdminLoginPage() {
               </Link>
             </div>
 
-            <div className="register-form-card bg-white/94 p-5 shadow-[0_24px_70px_rgba(20,16,30,0.08)] md:p-8">
+            <div className="register-form-card bg-white/95 p-5 shadow-[0_24px_70px_rgba(20,16,30,0.08)] md:p-8">
               <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-brand/60">Admin</p>
               <h1 className="mt-3 font-display text-4xl font-extrabold leading-[0.98] tracking-[-0.06em] text-black md:text-5xl">
                 Acesso administrativo

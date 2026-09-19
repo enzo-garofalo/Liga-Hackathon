@@ -31,7 +31,7 @@ function LoginShowcase() {
             Acompanhe sua candidatura, as etapas e os prazos do processo seletivo da Liga de TI.
           </p>
           <div className="mt-7 flex items-center gap-3 text-white/60">
-            <span className="inline-flex h-7 items-center rounded-full border border-white/14 bg-white/[0.06] px-3 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-white/60">Processo Seletivo</span>
+            <span className="inline-flex h-7 items-center rounded-full border border-white/15 bg-white/[0.06] px-3 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-white/60">Processo Seletivo</span>
           </div>
         </div>
       </div>
@@ -77,7 +77,7 @@ export function LoginPage() {
               </p>
             </div>
 
-            <div className="register-form-card bg-white/94 p-5 shadow-[0_24px_70px_rgba(20,16,30,0.08)] md:p-8">
+            <div className="register-form-card bg-white/95 p-5 shadow-[0_24px_70px_rgba(20,16,30,0.08)] md:p-8">
               <p className="text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-brand/60">Acesso participante</p>
               <h1 className="mt-3 font-display text-4xl font-extrabold leading-[0.98] tracking-[-0.06em] text-black md:text-5xl">
                 Bem-vindo de volta

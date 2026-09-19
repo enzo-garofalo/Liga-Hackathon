@@ -5,9 +5,9 @@ import { Modal } from './Modal'
 type Tone = 'default' | 'danger' | 'success'
 
 const toneClass: Record<Tone, string> = {
-  default: 'bg-brand/12 text-brand',
+  default: 'bg-brand/10 text-brand',
   danger: 'bg-red-500/10 text-red-600',
-  success: 'bg-brand-green/12 text-brand-green',
+  success: 'bg-brand-green/10 text-brand-green',
 }
 
 interface ConfirmDialogProps {

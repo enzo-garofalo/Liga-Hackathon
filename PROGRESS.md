@@ -165,10 +165,10 @@ comunica, de propósito.
 - **Datas no frontend.** 23:59 em Brasília chega ao backend como 02:59 UTC do dia seguinte.
   Isso está certo; não "corrigir".
 - **Opacidade de 5 em 5 no Tailwind.** `text-ink/68` não existe: a escala padrão vai de 5 em
-  5, a classe some do CSS e a letra herda o branco do `body`. Em painel claro isso vira texto
-  invisível — foi o que aconteceu com a data no pop-up de notificação. Usar múltiplo de 5
-  (`text-ink/70`) ou colchetes (`text-ink/[0.68]`).
-  **Ainda existem 53 ocorrências de texto assim** espalhadas pelo app (e 201 classes no total
-  contando fundos e bordas). O Pedro preferiu não varrer de uma vez, porque consertar fundo e
-  borda liga estilo que nunca renderizou e muda a aparência de tela que ninguém pediu para
-  mexer. Para achar: `grep -roh "text-ink/[0-9]*" frontend/src --include=*.tsx | awk -F/ '{if ($2%5!=0) print}'`.
+  5, a classe some do CSS e o elemento herda a cor do ancestral. Em painel claro isso vira
+  texto invisível — foi o que aconteceu com a data no pop-up de notificação. Usar múltiplo de
+  5 (`text-ink/70`) ou colchetes (`text-ink/[0.68]`).
+  As 199 ocorrências que existiam foram arredondadas de uma vez, e
+  `src/test/tailwindOpacity.test.ts` impede que voltem: ele varre o `src` e aponta arquivo e
+  linha. **Não é só questão de cor**: fundo e borda fora da escala também não renderizavam, e
+  por isso o item ativo do menu não tinha realce e os selos verdes não tinham preenchimento.

@@ -152,7 +152,7 @@ function RegistrationWindow() {
   if (!data) return null
 
   return (
-    <div className="mt-6 inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border border-white/14 bg-white/[0.06] px-4 py-2 backdrop-blur-xl">
+    <div className="mt-6 inline-flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border border-white/15 bg-white/[0.06] px-4 py-2 backdrop-blur-xl">
       <CalendarDays className="h-4 w-4 shrink-0 text-brand-soft" />
       <span className="text-xs font-semibold text-white/80 md:text-sm">
         Inscrições de {formatDate(data.registration_start)} a {formatDate(data.registration_end)}
@@ -196,7 +196,7 @@ function Hero() {
             <a href="#etapas" className="transition hover:text-white">Etapas</a>
             <a href="#faq" className="transition hover:text-white">FAQ</a>
           </div>
-          <a href="#acesso" className="rounded-full border border-white/14 bg-white/[0.055] px-4 py-2 font-semibold text-white transition hover:bg-white/12 hover:text-white md:border-0 md:bg-white md:text-black md:hover:bg-black md:hover:text-white">
+          <a href="#acesso" className="rounded-full border border-white/15 bg-white/[0.055] px-4 py-2 font-semibold text-white transition hover:bg-white/10 hover:text-white md:border-0 md:bg-white md:text-black md:hover:bg-black md:hover:text-white">
             Entrar
           </a>
         </nav>
@@ -227,7 +227,7 @@ function Hero() {
                 <a href="#processo">
                   <Button
                     variant="outlined"
-                    className="h-12 rounded-full border-white/18 bg-white/[0.06] px-7 text-sm font-semibold text-white hover:bg-white/12 hover:text-white"
+                    className="h-12 rounded-full border-white/20 bg-white/[0.06] px-7 text-sm font-semibold text-white hover:bg-white/10 hover:text-white"
                   >
                     Como funciona
                   </Button>
@@ -430,7 +430,7 @@ function HowItWorks() {
           {steps.map(({ n, icon: Icon, title, desc }) => (
             <article
               key={n}
-              className="group min-h-[13.5rem] rounded-[1.1rem] border border-black/8 bg-white p-5 shadow-[0_18px_45px_rgba(20,16,30,0.04)] transition duration-300 md:min-h-[16rem] md:rounded-[1.2rem] md:hover:z-10 md:hover:scale-[1.045] md:hover:shadow-[0_26px_70px_rgba(20,16,30,0.12)]"
+              className="group min-h-[13.5rem] rounded-[1.1rem] border border-black/10 bg-white p-5 shadow-[0_18px_45px_rgba(20,16,30,0.04)] transition duration-300 md:min-h-[16rem] md:rounded-[1.2rem] md:hover:z-10 md:hover:scale-[1.045] md:hover:shadow-[0_26px_70px_rgba(20,16,30,0.12)]"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs text-black/35">{n}</span>
@@ -464,7 +464,7 @@ function Stages() {
           {STAGES.map(({ n, icon: Icon, name, duration, summary, observes }) => (
             <article
               key={n}
-              className="group relative flex min-h-[20rem] flex-col overflow-hidden rounded-[1.1rem] border border-black/10 bg-white p-5 shadow-[0_18px_45px_rgba(20,16,30,0.04)] transition duration-300 hover:-translate-y-1 hover:border-black/16 md:rounded-[1.2rem] md:p-6"
+              className="group relative flex min-h-[20rem] flex-col overflow-hidden rounded-[1.1rem] border border-black/10 bg-white p-5 shadow-[0_18px_45px_rgba(20,16,30,0.04)] transition duration-300 hover:-translate-y-1 hover:border-black/15 md:rounded-[1.2rem] md:p-6"
             >
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-brand/10 text-brand transition duration-300 group-hover:bg-brand group-hover:text-white">
                 <Icon className="h-4 w-4" />
@@ -477,11 +477,11 @@ function Stages() {
                 <p className="mt-3 text-sm leading-6 text-black/50">{summary}</p>
               </div>
 
-              <div className="mt-5 border-t border-black/8 pt-4">
+              <div className="mt-5 border-t border-black/10 pt-4">
                 <p className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-black/40">Competências</p>
                 <ul className="mt-2.5 flex flex-wrap gap-1.5">
                   {observes.map((item) => (
-                    <li key={item} className="rounded-full border border-black/8 bg-[#f7f7f7] px-2.5 py-1 text-[0.7rem] font-medium text-black/60">
+                    <li key={item} className="rounded-full border border-black/10 bg-[#f7f7f7] px-2.5 py-1 text-[0.7rem] font-medium text-black/60">
                       {item}
                     </li>
                   ))}
@@ -586,11 +586,11 @@ function FAQ() {
             Perguntas frequentes
           </h2>
         </div>
-        <div className="overflow-hidden rounded-[1.35rem] border border-black/8 bg-white shadow-[0_18px_50px_rgba(20,16,30,0.05)] md:rounded-[1.8rem]">
+        <div className="overflow-hidden rounded-[1.35rem] border border-black/10 bg-white shadow-[0_18px_50px_rgba(20,16,30,0.05)] md:rounded-[1.8rem]">
           {items.map(({ q, a }, index) => {
             const isOpen = open === index
             return (
-              <div key={q} className={index > 0 ? 'border-t border-black/8' : ''}>
+              <div key={q} className={index > 0 ? 'border-t border-black/10' : ''}>
                 <button className="flex w-full items-center gap-3 px-4 py-4 text-left md:gap-5 md:px-8 md:py-5" onClick={() => setOpen(isOpen ? null : index)}>
                   <span className="text-xs text-brand/30">{String(index + 1).padStart(2, '0')}</span>
                   <span className="flex-1 text-sm font-semibold tracking-[-0.02em] text-black md:text-base">{q}</span>
@@ -631,7 +631,7 @@ function FinalCTA() {
             </Link>
             {WHATSAPP_LINK !== '#' && (
               <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">
-                <Button variant="outlined" className="h-12 w-full rounded-full border-white/18 bg-white/[0.06] px-7 text-white hover:bg-white/10 hover:text-white sm:w-auto">
+                <Button variant="outlined" className="h-12 w-full rounded-full border-white/20 bg-white/[0.06] px-7 text-white hover:bg-white/10 hover:text-white sm:w-auto">
                   Grupo WhatsApp
                 </Button>
               </a>

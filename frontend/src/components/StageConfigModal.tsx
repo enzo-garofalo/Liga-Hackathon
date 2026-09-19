@@ -161,7 +161,7 @@ export function StageConfigModal({ stage, onClose, onSave, saving, error }: Prop
           onChange={(event) => setWeight(event.target.value)}
         />
 
-        <div className="rounded-xl border border-ink/12 p-4">
+        <div className="rounded-xl border border-ink/10 p-4">
           <label className="flex items-center gap-2 font-ui text-sm font-medium text-ink/80">
             <input
               type="checkbox"
@@ -199,7 +199,7 @@ export function StageConfigModal({ stage, onClose, onSave, saving, error }: Prop
                         }
                         className={`rounded-full border px-3 py-1 font-ui text-xs font-medium transition-colors ${
                           active
-                            ? 'border-brand bg-brand/12 text-brand'
+                            ? 'border-brand bg-brand/10 text-brand'
                             : 'border-ink/15 text-ink/60 hover:border-brand/40'
                         }`}
                       >

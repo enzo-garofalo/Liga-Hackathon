@@ -122,10 +122,10 @@ function HeroDashboard() {
         <img src={logo} alt="Liga de TI" className="h-[4.25rem] w-[4.75rem] object-contain md:h-[7.5rem] md:w-[8.5rem]" />
       </div>
 
-      <div className="floating-countdown absolute bottom-2 left-[9%] right-[9%] z-20 rounded-[1.2rem] border border-white/14 bg-[#0b0714]/80 p-2.5 shadow-[0_34px_100px_rgba(0,0,0,0.34)] backdrop-blur-2xl md:bottom-8 md:left-[12%] md:right-[12%] md:rounded-[1.45rem] md:p-4">
+      <div className="floating-countdown absolute bottom-2 left-[9%] right-[9%] z-20 rounded-[1.2rem] border border-white/15 bg-[#0b0714]/80 p-2.5 shadow-[0_34px_100px_rgba(0,0,0,0.34)] backdrop-blur-2xl md:bottom-8 md:left-[12%] md:right-[12%] md:rounded-[1.45rem] md:p-4">
         <div className="mb-2 flex items-center justify-between md:mb-3">
           <span className="font-mono text-[0.55rem] uppercase tracking-[0.18em] text-white/50 md:text-[0.62rem] md:tracking-[0.2em]">20 junho 2026</span>
-          <span className="rounded-full border border-white/10 bg-white/8 px-2.5 py-1 font-mono text-[0.5rem] uppercase tracking-[0.14em] text-brand-soft md:px-3 md:text-[0.58rem] md:tracking-[0.16em]">contagem</span>
+          <span className="rounded-full border border-white/10 bg-white/10 px-2.5 py-1 font-mono text-[0.5rem] uppercase tracking-[0.14em] text-brand-soft md:px-3 md:text-[0.58rem] md:tracking-[0.16em]">contagem</span>
         </div>
         <div className="grid grid-cols-4 overflow-hidden rounded-[1.1rem] border border-white/10 bg-white/[0.04] text-center">
           {countdown.map(({ value, label }, index) => (
@@ -157,7 +157,7 @@ function Hero() {
             <a href="#faq" className="transition hover:text-white">Regras</a>
             <a href="#faq" className="transition hover:text-white">FAQ</a>
           </div>
-          <Link to="/login" className="rounded-full border border-white/14 bg-white/[0.055] px-4 py-2 font-semibold text-white transition hover:bg-white/12 hover:text-white md:border-0 md:bg-white md:text-black md:hover:bg-black md:hover:text-white">
+          <Link to="/login" className="rounded-full border border-white/15 bg-white/[0.055] px-4 py-2 font-semibold text-white transition hover:bg-white/10 hover:text-white md:border-0 md:bg-white md:text-black md:hover:bg-black md:hover:text-white">
             Entrar
           </Link>
         </nav>
@@ -369,7 +369,7 @@ function HowItWorks() {
         </div>
         <div className="grid gap-3 rounded-[1.8rem] bg-[#eeeeee] p-3 md:grid-cols-4">
           {steps.map(({ n, icon: Icon, title, desc }) => (
-            <article key={n} className="group min-h-[13.5rem] rounded-[1.1rem] border border-black/8 bg-white p-5 shadow-[0_18px_45px_rgba(20,16,30,0.04)] transition duration-300 md:min-h-[16rem] md:rounded-[1.2rem] md:hover:z-10 md:hover:scale-[1.045] md:hover:shadow-[0_26px_70px_rgba(20,16,30,0.12)]">
+            <article key={n} className="group min-h-[13.5rem] rounded-[1.1rem] border border-black/10 bg-white p-5 shadow-[0_18px_45px_rgba(20,16,30,0.04)] transition duration-300 md:min-h-[16rem] md:rounded-[1.2rem] md:hover:z-10 md:hover:scale-[1.045] md:hover:shadow-[0_26px_70px_rgba(20,16,30,0.12)]">
               <div className="flex items-center justify-between">
                 <span className="text-xs text-black/35">{n}</span>
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-brand transition duration-300 group-hover:bg-brand group-hover:text-white">
@@ -417,7 +417,7 @@ function Schedule() {
                 'group relative min-h-[10.5rem] overflow-hidden rounded-[1.1rem] border p-5 shadow-[0_18px_45px_rgba(20,16,30,0.04)] transition duration-300 md:min-h-[13rem] md:rounded-[1.2rem] md:p-5',
                 highlight
                   ? 'border-black bg-black text-white'
-                  : 'border-black/10 bg-white hover:-translate-y-1 hover:border-black/16',
+                  : 'border-black/10 bg-white hover:-translate-y-1 hover:border-black/15',
               ].join(' ')}
             >
               {highlight && <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-brand/10 blur-2xl transition duration-300" />}
@@ -455,11 +455,11 @@ function FAQ() {
             Regras e FAQ
           </h2>
         </div>
-        <div className="overflow-hidden rounded-[1.35rem] border border-black/8 bg-[#f8f8f8] shadow-[0_18px_50px_rgba(20,16,30,0.05)] md:rounded-[1.8rem]">
+        <div className="overflow-hidden rounded-[1.35rem] border border-black/10 bg-[#f8f8f8] shadow-[0_18px_50px_rgba(20,16,30,0.05)] md:rounded-[1.8rem]">
           {FAQS.map(({ q, a }, index) => {
             const isOpen = open === index
             return (
-              <div key={q} className={index > 0 ? 'border-t border-black/8' : ''}>
+              <div key={q} className={index > 0 ? 'border-t border-black/10' : ''}>
                 <button className="flex w-full items-center gap-3 px-4 py-4 text-left md:gap-5 md:px-8 md:py-5" onClick={() => setOpen(isOpen ? null : index)}>
                   <span className="text-xs text-brand/30">{String(index + 1).padStart(2, '0')}</span>
                   <span className="flex-1 text-sm font-semibold tracking-[-0.02em] text-black md:text-base">{q}</span>
@@ -500,7 +500,7 @@ function FinalCTA() {
           </Link>
           {WHATSAPP_LINK !== '#' && (
             <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">
-              <Button variant="outlined" className="h-12 w-full rounded-full border-white/18 bg-white/[0.06] px-7 text-white hover:bg-white/10 hover:text-white sm:w-auto">
+              <Button variant="outlined" className="h-12 w-full rounded-full border-white/20 bg-white/[0.06] px-7 text-white hover:bg-white/10 hover:text-white sm:w-auto">
                 Grupo WhatsApp
               </Button>
             </a>

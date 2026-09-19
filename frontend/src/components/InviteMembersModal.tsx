@@ -148,7 +148,7 @@ export function InviteMembersModal({ teamId, maxInvitees, meId, onClose }: Props
                       if (searchInput.trim()) setShowDropdown(true)
                     }}
                     placeholder="Buscar participante por nome..."
-                    className="h-12 w-full rounded-2xl border border-ink/16 bg-white pl-11 pr-10 text-sm font-medium text-ink placeholder:text-ink/55 shadow-sm transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
+                    className="h-12 w-full rounded-2xl border border-ink/15 bg-white pl-11 pr-10 text-sm font-medium text-ink placeholder:text-ink/55 shadow-sm transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
                   />
                   {isSearching && (
                     <Loader2 className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-ink/60" />

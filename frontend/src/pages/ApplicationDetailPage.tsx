@@ -1,5 +1,6 @@
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Info } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
+import { DeliverableList } from '../components/DeliverableList'
 import { DeliverableUpload } from '../components/DeliverableUpload'
 import { QueryError } from '../components/QueryError'
 import { StageTimeline } from '../components/StageTimeline'
@@ -110,6 +111,17 @@ export function ApplicationDetailPage() {
           <p className="mt-3 max-w-lg text-sm font-medium leading-relaxed text-white/78">
             {status.detail}
           </p>
+
+          {/* A página do processo só era alcançável antes de se inscrever, ou
+              por link de comunicado. Depois da inscrição o candidato perdia de
+              vista a descrição e o calendário do processo. */}
+          <Link
+            to={`/processes/${application.process_id}`}
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/[0.06] px-5 py-2.5 font-ui text-sm font-medium text-white transition-colors hover:bg-white/10 sm:w-auto"
+          >
+            <Info className="h-4 w-4" />
+            Sobre o processo
+          </Link>
         </div>
       </div>
 
@@ -120,11 +132,26 @@ export function ApplicationDetailPage() {
 
         <StageTimeline
           stages={application.stages}
-          renderCurrentExtra={(stage) =>
-            stage.allows_file_upload && application.status === 'in_progress' ? (
-              <DeliverableUpload applicationId={application.id} stage={stage} />
-            ) : null
-          }
+          renderStageExtra={(stage) => {
+            const podeEnviar =
+              stage.state === 'current' &&
+              stage.allows_file_upload &&
+              application.status === 'in_progress'
+
+            if (podeEnviar) {
+              return <DeliverableUpload applicationId={application.id} stage={stage} />
+            }
+
+            // Etapa já corrigida, ou candidatura encerrada: a entrega continua
+            // à mão para reler, mas não dá mais para trocar o arquivo.
+            if (stage.deliverables.length === 0) return null
+            return (
+              <div className="mt-4 rounded-[21px] border border-ink/10 bg-ink/[0.02] p-5">
+                <p className="kicker">O que você entregou</p>
+                <DeliverableList deliverables={stage.deliverables} />
+              </div>
+            )
+          }}
         />
       </section>
 

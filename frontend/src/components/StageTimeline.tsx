@@ -35,11 +35,17 @@ function StageIcon({ state }: { state: TimelineStage['state'] }) {
 
 interface StageTimelineProps {
   stages: TimelineStage[]
-  /** Renderizado dentro da etapa atual — área de entrega, por exemplo. */
-  renderCurrentExtra?: (stage: TimelineStage) => React.ReactNode
+  /**
+   * Renderizado dentro de cada etapa: área de entrega na etapa atual, e o que
+   * o candidato já entregou nas que ficaram para trás.
+   *
+   * Antes isto só rodava na etapa atual, e o PDF do case sumia da tela assim
+   * que a pessoa avançava.
+   */
+  renderStageExtra?: (stage: TimelineStage) => React.ReactNode
 }
 
-export function StageTimeline({ stages, renderCurrentExtra }: StageTimelineProps) {
+export function StageTimeline({ stages, renderStageExtra }: StageTimelineProps) {
   // Etapa cujas instruções estão abertas. O backend manda '' para quem ainda
   // não chegou na etapa, então o botão simplesmente não existe nesses casos.
   const [lendo, setLendo] = useState<TimelineStage | null>(null)
@@ -107,7 +113,7 @@ export function StageTimeline({ stages, renderCurrentExtra }: StageTimelineProps
                 </button>
               )}
 
-              {stage.state === 'current' && renderCurrentExtra?.(stage)}
+              {renderStageExtra?.(stage)}
             </div>
           </li>
         )

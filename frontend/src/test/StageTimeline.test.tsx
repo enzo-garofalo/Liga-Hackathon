@@ -46,11 +46,23 @@ describe('StageTimeline', () => {
     expect(within(current).getByText('Etapa atual')).toBeInTheDocument()
   })
 
-  it('renderiza o conteúdo extra apenas dentro da etapa atual', () => {
+  it('oferece o conteúdo extra em todas as etapas, não só na atual', () => {
+    // O que o candidato entregou precisa continuar na tela depois que a etapa
+    // passa; quem decide onde mostrar é quem chama.
+    render(<StageTimeline stages={stages} renderStageExtra={(s) => <p>extra de {s.name}</p>} />)
+
+    expect(screen.getAllByText(/extra de/)).toHaveLength(3)
+    expect(screen.getByText('extra de Inscrição')).toBeInTheDocument()
+    expect(screen.getByText('extra de Pitch')).toBeInTheDocument()
+  })
+
+  it('respeita o chamador que só quer o extra na etapa atual', () => {
     render(
       <StageTimeline
         stages={stages}
-        renderCurrentExtra={(s) => <p>área de entrega de {s.name}</p>}
+        renderStageExtra={(s) =>
+          s.state === 'current' ? <p>área de entrega de {s.name}</p> : null
+        }
       />,
     )
     expect(screen.getAllByText(/área de entrega/)).toHaveLength(1)

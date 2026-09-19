@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getMyApplication } from '../api/applications'
@@ -58,10 +59,39 @@ const application: ApplicationDetail = {
   ],
 }
 
+/** A mesma candidatura, já na etapa seguinte, com o case entregue para trás. */
+const caseEntregue = {
+  ...application,
+  current_stage: 's3',
+  current_stage_name: 'Pitch',
+  stages: [
+    stage({ id: 's1', name: 'Inscrição', order: 1, state: 'done' }),
+    stage({
+      id: 's2',
+      name: 'Resolução do Case',
+      order: 2,
+      state: 'done' as const,
+      allows_file_upload: true,
+      max_files: 1,
+      allowed_file_types: ['pdf'],
+      deliverables: [
+        {
+          id: 'entrega-1',
+          filename: 'meu-case.pdf',
+          download_url: '/api/v1/deliverables/entrega-1/download/',
+          uploaded_at: '2026-09-10T12:00:00Z',
+        },
+      ],
+    }),
+    stage({ id: 's3', name: 'Pitch', order: 3, state: 'current' as const }),
+  ],
+}
+
 function renderPage() {
   return renderWithProviders(
     <Routes>
       <Route path="/applications/:id" element={<ApplicationDetailPage />} />
+      <Route path="/processes/:id" element={<p>Página do processo proc-1</p>} />
     </Routes>,
     { route: '/applications/app-1' },
   )
@@ -97,6 +127,71 @@ describe('ApplicationDetailPage', () => {
 
     expect(await screen.findByText('Não aprovado')).toBeInTheDocument()
     expect(screen.queryByText('Sua entrega')).not.toBeInTheDocument()
+  })
+
+  it('leva à página do processo pelo botão "Sobre o processo"', async () => {
+    // Depois de se inscrever, essa página era a única tela do candidato: a
+    // descrição e o calendário do processo ficavam sem caminho de volta.
+    renderPage()
+    await userEvent.click(await screen.findByRole('link', { name: /Sobre o processo/ }))
+
+    expect(await screen.findByText('Página do processo proc-1')).toBeInTheDocument()
+  })
+
+  it('o botão aponta para o processo desta candidatura', async () => {
+    vi.mocked(getMyApplication).mockResolvedValue({
+      ...application,
+      process_id: 'proc-outro',
+    })
+    renderPage()
+
+    expect(await screen.findByRole('link', { name: /Sobre o processo/ })).toHaveAttribute(
+      'href',
+      '/processes/proc-outro',
+    )
+  })
+
+  it('a entrega continua à mão depois que a etapa passa', async () => {
+    // O PDF do case sumia da tela assim que o candidato avançava, e ele não
+    // tinha mais como reler o que entregou.
+    vi.mocked(getMyApplication).mockResolvedValue(caseEntregue)
+    renderPage()
+
+    expect(await screen.findByText('O que você entregou')).toBeInTheDocument()
+    expect(screen.getByText('meu-case.pdf')).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Baixar meu-case.pdf' }),
+    ).toBeInTheDocument()
+  })
+
+  it('entrega de etapa passada não pode mais ser apagada', async () => {
+    vi.mocked(getMyApplication).mockResolvedValue(caseEntregue)
+    renderPage()
+
+    expect(await screen.findByText('meu-case.pdf')).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Remover meu-case.pdf' }),
+    ).not.toBeInTheDocument()
+    // Nem de mandar outro por cima: a área de envio é só da etapa atual.
+    expect(screen.queryByText('Sua entrega')).not.toBeInTheDocument()
+  })
+
+  it('candidatura encerrada ainda mostra o que foi entregue', async () => {
+    vi.mocked(getMyApplication).mockResolvedValue({
+      ...caseEntregue,
+      status: 'rejected',
+    })
+    renderPage()
+
+    expect(await screen.findByText('Não aprovado')).toBeInTheDocument()
+    expect(screen.getByText('meu-case.pdf')).toBeInTheDocument()
+  })
+
+  it('etapa sem entrega não mostra o bloco vazio', async () => {
+    renderPage()
+
+    expect(await screen.findByText('Em andamento')).toBeInTheDocument()
+    expect(screen.queryByText('O que você entregou')).not.toBeInTheDocument()
   })
 
   it('404 mostra "não encontrada"', async () => {

@@ -21,10 +21,11 @@ import {
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import logo from '../assets/logo.svg'
+import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
+import { WHATSAPP_LINK } from '../links'
 import { Button } from '../components/ui/Button'
 import { useOpenProcess } from '../hooks/useOpenProcess'
 
-const WHATSAPP_LINK = (import.meta as unknown as { env: Record<string, string> }).env.VITE_WHATSAPP_LINK || '#'
 
 const STAGES = [
   {
@@ -196,9 +197,24 @@ function Hero() {
             <a href="#etapas" className="transition hover:text-white">Etapas</a>
             <a href="#faq" className="transition hover:text-white">FAQ</a>
           </div>
-          <a href="#acesso" className="rounded-full border border-white/15 bg-white/[0.055] px-4 py-2 font-semibold text-white transition hover:bg-white/10 hover:text-white md:border-0 md:bg-white md:text-black md:hover:bg-black md:hover:text-white">
-            Entrar
-          </a>
+          <div className="flex items-center gap-2">
+            {/* A frase inteira só a partir de lg. Abaixo disso o cabeçalho
+                tem o logo, quatro âncoras e o "Entrar" na mesma linha, e ela
+                estouraria. Fica o ícone, com o nome para leitor de tela. */}
+            <a
+              href={WHATSAPP_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-[#149e61] px-3 py-2 font-semibold text-white transition hover:bg-[#108150] lg:px-4"
+            >
+              <WhatsAppIcon className="h-3.5 w-3.5" />
+              <span className="hidden lg:inline">Acesse o grupo da Liga</span>
+              <span className="sr-only lg:hidden">Acesse o grupo da Liga</span>
+            </a>
+            <a href="#acesso" className="rounded-full border border-white/15 bg-white/[0.055] px-4 py-2 font-semibold text-white transition hover:bg-white/10 hover:text-white md:border-0 md:bg-white md:text-black md:hover:bg-black md:hover:text-white">
+              Entrar
+            </a>
+          </div>
         </nav>
 
         <div className="relative z-10 mx-auto flex min-h-[calc(100svh-6.25rem)] w-[calc(100%-1.5rem)] flex-col justify-between md:min-h-[calc(100vh-8rem)] md:w-[min(94vw,88rem)]">
@@ -629,10 +645,11 @@ function FinalCTA() {
                 Quero me candidatar
               </Button>
             </Link>
-            {WHATSAPP_LINK !== '#' && (
+            {(
               <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">
                 <Button variant="outlined" className="h-12 w-full rounded-full border-white/20 bg-white/[0.06] px-7 text-white hover:bg-white/10 hover:text-white sm:w-auto">
-                  Grupo WhatsApp
+                  <WhatsAppIcon className="h-4 w-4" />
+                  Acesse o grupo da Liga
                 </Button>
               </a>
             )}

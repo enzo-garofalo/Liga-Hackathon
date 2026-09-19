@@ -11,6 +11,7 @@ import { DashboardPage } from '../pages/DashboardPage'
 import type { ApplicationSummary } from '../types/application'
 import type { MeProfile } from '../types/participant'
 import type { ProcessSummary } from '../types/process'
+import { WHATSAPP_LINK } from '../links'
 import { httpError } from './http'
 import { renderWithProviders } from './render'
 
@@ -271,5 +272,33 @@ describe('DashboardPage: ainda não se inscreveu', () => {
     await waitFor(() =>
       expect(screen.queryByText('Você ainda não se inscreveu')).not.toBeInTheDocument(),
     )
+  })
+})
+
+describe('DashboardPage: grupo no WhatsApp', () => {
+  beforeEach(() => {
+    vi.mocked(getMe).mockResolvedValue(me)
+    vi.mocked(getMyApplications).mockResolvedValue([application])
+    vi.mocked(getProcesses).mockResolvedValue([openProcess])
+  })
+
+  it('o convite fica no topo, à vista', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    const link = await screen.findByRole('link', { name: /acesse o grupo da liga/i })
+    expect(link).toHaveAttribute('href', WHATSAPP_LINK)
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link.getAttribute('rel')).toContain('noopener')
+  })
+
+  it('aparece também para quem ainda não se inscreveu', async () => {
+    // Antes o convite só existia no estado "nenhum processo aberto", que quase
+    // ninguém chega a ver.
+    vi.mocked(getMyApplications).mockResolvedValue([])
+    renderWithProviders(<DashboardPage />)
+
+    expect(
+      await screen.findByRole('link', { name: /acesse o grupo da liga/i }),
+    ).toBeInTheDocument()
   })
 })

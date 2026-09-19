@@ -23,9 +23,10 @@ import {
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import logo from '../assets/logo.svg'
+import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
+import { WHATSAPP_LINK } from '../links'
 import { Button } from '../components/ui/Button'
 
-const WHATSAPP_LINK = (import.meta as unknown as { env: Record<string, string> }).env.VITE_WHATSAPP_LINK || '#'
 const EVENT_DATE = new Date('2026-06-20T10:00:00')
 
 const SCHEDULE = [
@@ -498,10 +499,11 @@ function FinalCTA() {
           <Link to="/register">
             <Button className="h-12 w-full rounded-full bg-black px-7 text-white hover:bg-brand sm:w-auto">Participar do Hackathon</Button>
           </Link>
-          {WHATSAPP_LINK !== '#' && (
+          {(
             <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">
               <Button variant="outlined" className="h-12 w-full rounded-full border-white/20 bg-white/[0.06] px-7 text-white hover:bg-white/10 hover:text-white sm:w-auto">
-                Grupo WhatsApp
+                <WhatsAppIcon className="h-4 w-4" />
+                Acesse o grupo da Liga
               </Button>
             </a>
           )}

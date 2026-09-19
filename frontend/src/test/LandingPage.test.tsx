@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getOpenProcess } from '../api/openProcess'
 import { LandingPage } from '../pages/LandingPage'
 import { LandingPageHackathon } from '../pages/LandingPageHackathon'
+import { WHATSAPP_LINK } from '../links'
 import { renderWithProviders } from './render'
 
 vi.mock('../api/openProcess', () => ({ getOpenProcess: vi.fn() }))
@@ -187,5 +188,50 @@ describe('LandingPageHackathon (preservada atrás da chave)', () => {
   it('também não cita mais a empresa parceira', () => {
     renderWithProviders(<LandingPageHackathon />)
     expect(screen.queryByText(/wehandle/i)).not.toBeInTheDocument()
+  })
+})
+
+// ── Grupo no WhatsApp ─────────────────────────────────────────────
+//
+// O convite ficava só no rodapé, e só se a variável de ambiente estivesse
+// configurada — sem ela o link sumia da tela sem erro nenhum.
+
+describe('LandingPage: grupo no WhatsApp', () => {
+  beforeEach(() => {
+    vi.mocked(getOpenProcess).mockResolvedValue(null)
+  })
+
+  it('o cabeçalho leva ao grupo', () => {
+    renderWithProviders(<LandingPage />)
+
+    const nav = screen.getByRole('navigation')
+    const link = within(nav).getByRole('link', { name: /acesse o grupo da liga/i })
+    expect(link).toHaveAttribute('href', WHATSAPP_LINK)
+  })
+
+  it('o link do grupo abre em outra aba, sem passar a página de origem', () => {
+    // target="_blank" sem rel deixa a página aberta manipular esta pelo
+    // window.opener.
+    renderWithProviders(<LandingPage />)
+
+    const nav = screen.getByRole('navigation')
+    const link = within(nav).getByRole('link', { name: /acesse o grupo da liga/i })
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link.getAttribute('rel')).toContain('noopener')
+  })
+
+  it('o convite aponta para o grupo da Liga', () => {
+    // Se o endereço mudar, é aqui que se percebe.
+    expect(WHATSAPP_LINK).toMatch(/^https:\/\/chat\.whatsapp\.com\//)
+  })
+
+  it('o botão mostra o símbolo do WhatsApp', () => {
+    // O texto não fala mais em WhatsApp: é o símbolo que diz para onde leva.
+    // Sem ele o botão vira "Acesse o grupo da Liga" e não diz de qual grupo.
+    renderWithProviders(<LandingPage />)
+
+    const nav = screen.getByRole('navigation')
+    const link = within(nav).getByRole('link', { name: /acesse o grupo da liga/i })
+    expect(link.querySelector('svg')).not.toBeNull()
   })
 })

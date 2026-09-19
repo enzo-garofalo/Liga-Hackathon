@@ -111,7 +111,9 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
 ## Variáveis de ambiente
 Existentes (v2):
 - `TEAM_DEADLINE=2026-05-30` — data de corte para formação de equipes
-- `VITE_WHATSAPP_LINK=https://chat.whatsapp.com/...` — link fixo do grupo
+- `VITE_WHATSAPP_LINK=https://chat.whatsapp.com/...` — convite do grupo. **Opcional**:
+  `frontend/src/links.ts` já traz o convite atual como padrão. Antes o valor caía para
+  `'#'` sem a variável e o botão sumia da tela sem erro nenhum.
 
 Para a v3 (entregáveis):
 - `MEDIA_ROOT` — em produção, caminho do volume do Railway montado no backend.

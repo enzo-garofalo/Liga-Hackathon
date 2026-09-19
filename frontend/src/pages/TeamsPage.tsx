@@ -1,6 +1,8 @@
-import { MessageCircle, Users } from 'lucide-react'
+import { Users } from 'lucide-react'
 import { useState } from 'react'
 import { CreateTeamModal } from '../components/CreateTeamModal'
+import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
+import { WHATSAPP_LINK } from '../links'
 import { TeamCard } from '../components/TeamCard'
 import { TeamPreviewModal } from '../components/TeamPreviewModal'
 import { Button } from '../components/ui/Button'
@@ -15,7 +17,7 @@ export function TeamsPage() {
 
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
   const [createModalOpen, setCreateModalOpen] = useState(false)
-  const whatsappLink = (import.meta.env.VITE_WHATSAPP_LINK as string | undefined)?.trim()
+  const whatsappLink = WHATSAPP_LINK
 
   return (
     <main className="px-4 py-6 text-ink md:px-10 md:py-10">
@@ -40,8 +42,8 @@ export function TeamsPage() {
               rel="noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#149e61] px-5 py-2.5 font-ui text-sm font-semibold text-white shadow-[0_14px_32px_rgba(20,158,97,0.18)] transition-colors hover:bg-[#108150]"
             >
-              <MessageCircle className="h-4 w-4" />
-              Grupo WhatsApp
+              <WhatsAppIcon className="h-4 w-4" />
+              Acesse o grupo da Liga
             </a>
           )}
         </div>

@@ -21,6 +21,7 @@ from .models import (
 from .serializers import (
     AdminTokenObtainPairSerializer,
     EmailTokenObtainPairSerializer,
+    ParticipantTokenObtainPairSerializer,
     HackathonInfoSerializer,
     JoinRequestCreateSerializer,
     JoinRequestSerializer,
@@ -74,7 +75,7 @@ class RegisterView(generics.CreateAPIView):
 
 
 class EmailTokenObtainPairView(TokenObtainPairView):
-    serializer_class = EmailTokenObtainPairSerializer
+    serializer_class = ParticipantTokenObtainPairSerializer
 
 
 class AdminTokenObtainPairView(TokenObtainPairView):

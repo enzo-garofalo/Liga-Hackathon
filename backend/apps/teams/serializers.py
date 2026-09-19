@@ -368,6 +368,28 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
         return super().validate(attrs)
 
 
+class ParticipantTokenObtainPairSerializer(EmailTokenObtainPairSerializer):
+    """Login da área do candidato: exige cadastro de participante.
+
+    Sem esta checagem, um organizador entrava por `/login` com sucesso e caía
+    num painel quebrado: `/me/` e `/me/applications/` respondem 404 e as
+    notificações 403, porque a conta dele não tem `Participant`. O erro
+    aparecia depois do login, em três telas diferentes, sem dizer o que fazer.
+
+    A checagem é por perfil, não por `is_staff`: quem for organizador e também
+    tiver se candidatado continua entrando pelas duas portas.
+    """
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        if not hasattr(self.user, 'participant'):
+            raise AuthenticationFailed(
+                'Esta conta não tem cadastro de candidato. '
+                'Se você é da organização, entre pela área do organizador.'
+            )
+        return data
+
+
 class AdminTokenObtainPairSerializer(EmailTokenObtainPairSerializer):
     def validate(self, attrs):
         data = super().validate(attrs)

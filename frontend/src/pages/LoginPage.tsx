@@ -86,7 +86,7 @@ export function LoginPage() {
                 Entre com seu e-mail e senha para acessar a plataforma.
               </p>
 
-              <form onSubmit={onSubmit} className="space-y-4">
+              <form onSubmit={onSubmit} noValidate className="space-y-4">
                 <Input
                   label="E-mail"
                   type="email"

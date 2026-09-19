@@ -29,10 +29,10 @@ export function AuthLeftPanel({ sticky = false }: { sticky?: boolean }) {
         <div className="max-w-md">
           <p className="kicker mb-4">Hackathon Liga de TI</p>
           <h2 className="font-display leading-[0.92] tracking-normal">
-            <span className="block text-6xl font-normal text-white/70">Ideias</span>
+            <span className="block text-6xl font-normal text-white/72">Ideias</span>
             <span className="block text-6xl font-semibold text-white">em código</span>
           </h2>
-          <p className="font-ui text-base text-white/50 mt-5">
+          <p className="font-ui text-base text-white/52 mt-5">
             20 de junho de 2026. Equipes de 4 pessoas, uma maratona para construir sob pressão real.
           </p>
         </div>

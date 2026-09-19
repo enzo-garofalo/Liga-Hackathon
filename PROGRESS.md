@@ -168,7 +168,12 @@ comunica, de propósito.
   5, a classe some do CSS e o elemento herda a cor do ancestral. Em painel claro isso vira
   texto invisível — foi o que aconteceu com a data no pop-up de notificação. Usar múltiplo de
   5 (`text-ink/70`) ou colchetes (`text-ink/[0.68]`).
-  As 199 ocorrências que existiam foram arredondadas de uma vez, e
-  `src/test/tailwindOpacity.test.ts` impede que voltem: ele varre o `src` e aponta arquivo e
-  linha. **Não é só questão de cor**: fundo e borda fora da escala também não renderizavam, e
-  por isso o item ativo do menu não tinha realce e os selos verdes não tinham preenchimento.
+  **Fundo e borda foram arredondados** e `src/test/tailwindOpacity.test.ts` impede que
+  voltem: ali fora da escala não é tom errado, é estilo que não pinta, e por isso o item ativo
+  do menu não tinha realce e os selos verdes não tinham preenchimento.
+  **Cor de texto ficou como estava, de propósito.** As 135 classes de texto foram
+  arredondadas uma vez e a interface ficou visivelmente mais clara: elas vinham renderizando a
+  100% ao herdar a cor do ancestral, e o Pedro preferiu o que já estava na tela. O commit foi
+  desfeito. Elas continuam mortas e continuam sendo armadilha em painel claro dentro de casca
+  escura — se aparecer texto branco onde não devia, é isto. Para achar:
+  `grep -roh "text-ink/[0-9]*" frontend/src --include=*.tsx | awk -F/ '{if ($2%5!=0) print}'`.

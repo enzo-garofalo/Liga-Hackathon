@@ -11,13 +11,24 @@ import { describe, expect, it } from 'vitest'
  * É invisível em revisão de código, porque a classe parece certa. Por isso vira
  * teste. Para um valor fora da escala, use colchetes: `text-ink/[0.68]`.
  *
- * Este arquivo cita classes erradas de proposito e fica fora da varredura.
+ * **Cor de texto fica de fora desta regra, de propósito.** Havia 135 classes de
+ * texto fora da escala; arredondar todas deixou a interface visivelmente mais
+ * clara, porque elas vinham renderizando a 100% ao herdar a cor do ancestral, e
+ * a Liga preferiu o que já estava na tela. Elas continuam mortas, e continuam
+ * sendo uma armadilha: em painel claro dentro de casca escura, o texto sai
+ * branco. Foi o que aconteceu no pop-up de notificação, corrigido à mão ali.
+ *
+ * Fundo e borda não têm essa saída: fora da escala, o fundo não pinta e a borda
+ * cai no cinza padrão do Tailwind. Não é tom errado, é estilo faltando. Por isso
+ * a varredura cobre esses.
+ *
+ * Este arquivo cita classes erradas de propósito e fica fora da varredura.
  */
 const ESCALA = new Set([
   0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100,
 ])
 
-const UTILITARIOS = 'text|bg|border|divide|ring|from|via|to'
+const UTILITARIOS = 'bg|border|divide|ring|from|via|to'
 // Só a forma com número depois da barra. A de colchetes é válida e fica de fora.
 const PADRAO = new RegExp(
   `(?<![\\w:-])((?:[a-z-]+:)*(?:${UTILITARIOS})-[a-z0-9-]+)/(\\d+)(?![\\w/-])`,
@@ -61,12 +72,15 @@ describe('opacidade das classes do Tailwind', () => {
   })
 
   it('reconhece um valor fora da escala', () => {
-    // A regra só vale se o detector pegar. Este é o caso que passou batido.
-    expect(classesForaDaEscala('<p className="text-ink/68">', 'x.tsx')).toEqual([
-      'x.tsx:1  text-ink/68',
+    // A regra só vale se o detector pegar. Um detector que nunca dispara é um
+    // teste que sempre passa.
+    expect(classesForaDaEscala('<div className="bg-brand/12">', 'x.tsx')).toEqual([
+      'x.tsx:1  bg-brand/12',
     ])
-    expect(classesForaDaEscala('<p className="text-ink/70">', 'x.tsx')).toEqual([])
+    expect(classesForaDaEscala('<div className="bg-brand/10">', 'x.tsx')).toEqual([])
     // A forma com colchetes é válida e não pode ser acusada.
-    expect(classesForaDaEscala('<p className="text-ink/[0.68]">', 'x.tsx')).toEqual([])
+    expect(classesForaDaEscala('<div className="bg-brand/[0.12]">', 'x.tsx')).toEqual([])
+    // Cor de texto está fora da regra: ver o comentário no topo.
+    expect(classesForaDaEscala('<p className="text-ink/68">', 'x.tsx')).toEqual([])
   })
 })

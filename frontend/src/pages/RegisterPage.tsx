@@ -107,21 +107,21 @@ function RegisterShowcase() {
       <div className="relative z-10 flex min-h-full flex-col justify-between p-8 xl:p-10">
         <Link to="/" className="flex items-center gap-3">
           <img src={logo} alt="Liga de TI" className="h-8 brightness-0 invert" />
-          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">Arena</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/72">Arena</span>
         </Link>
 
         <div />
 
         <div className="max-w-xl pb-28">
           <h2 className="font-display text-4xl leading-[1.02] tracking-[-0.06em] text-white xl:text-5xl">
-            <span className="font-light text-white/55">Faça</span>{' '}
+            <span className="font-light text-white/54">Faça</span>{' '}
             <span className="font-extrabold">parte da Liga</span>
           </h2>
-          <p className="mt-5 max-w-sm text-base leading-7 text-white/45">
+          <p className="mt-5 max-w-sm text-base leading-7 text-white/46">
             Processo seletivo da Liga de TI e Empreendedorismo, PUC-Campinas.
           </p>
-          <div className="mt-7 flex items-center gap-3 text-white/60">
-            <span className="inline-flex h-7 items-center rounded-full border border-white/15 bg-white/[0.06] px-3 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-white/60">Processo Seletivo</span>
+          <div className="mt-7 flex items-center gap-3 text-white/58">
+            <span className="inline-flex h-7 items-center rounded-full border border-white/15 bg-white/[0.06] px-3 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-white/62">Processo Seletivo</span>
           </div>
         </div>
       </div>
@@ -190,11 +190,11 @@ export function RegisterPage() {
 
           <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col justify-center">
             <div className="mb-6 flex items-center justify-end md:justify-between">
-              <Link to="/" className="hidden items-center gap-2 text-sm font-semibold text-black/45 transition hover:text-brand md:flex">
+              <Link to="/" className="hidden items-center gap-2 text-sm font-semibold text-black/46 transition hover:text-brand md:flex">
                 <ArrowLeft className="h-4 w-4" />
                 Voltar
               </Link>
-              <p className="ml-auto text-sm text-black/45">
+              <p className="ml-auto text-sm text-black/46">
                 Já tem conta?{' '}
                 <Link to="/login" className="font-semibold text-brand hover:text-brand-soft">
                   Entrar

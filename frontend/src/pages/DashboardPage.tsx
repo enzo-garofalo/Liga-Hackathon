@@ -122,13 +122,13 @@ export function DashboardPage() {
     <main className="px-4 py-6 text-ink md:px-8 md:py-8">
       <div className="purple-cta relative overflow-hidden rounded-[32px] p-8 text-panel">
         <div className="relative">
-          <p className="mb-2 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-white/70">Dashboard</p>
+          <p className="mb-2 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-white/72">Dashboard</p>
           <h1 className="font-display leading-tight">
-            <span className="text-5xl font-light text-white/80">Olá, </span>
+            <span className="text-5xl font-light text-white/78">Olá, </span>
             <span className="text-5xl font-light text-white">{firstName}.</span>
           </h1>
           {me && (
-            <p className="mt-2 text-sm font-medium text-white/80">
+            <p className="mt-2 text-sm font-medium text-white/78">
               {me.course} - {me.semester} semestre
             </p>
           )}
@@ -234,7 +234,7 @@ export function DashboardPage() {
             <h2 className="font-display text-2xl font-semibold text-white">
               Nenhum processo aberto no momento
             </h2>
-            <p className="mt-2 max-w-md text-sm font-medium leading-relaxed text-white/80">
+            <p className="mt-2 max-w-md text-sm font-medium leading-relaxed text-white/78">
               Quando a Liga abrir um novo processo seletivo, ele aparece aqui e você
               recebe um aviso por e-mail.
             </p>
@@ -335,7 +335,7 @@ export function DashboardPage() {
                   </div>
 
                   <h2 className="font-display text-2xl font-semibold text-white">Você ainda não está em uma equipe</h2>
-                  <p className="mt-2 max-w-md text-sm font-medium leading-relaxed text-white/80">
+                  <p className="mt-2 max-w-md text-sm font-medium leading-relaxed text-white/78">
                     Monte sua equipe, convide membros e submeta antes do prazo.
                   </p>
                   <p className="mt-1 max-w-md text-sm font-semibold leading-relaxed text-white">

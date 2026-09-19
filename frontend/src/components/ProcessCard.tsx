@@ -108,12 +108,12 @@ export function ProcessCard({
       {/* Só enquanto a candidatura corre: dizer "Etapa atual: Entrevista" ao lado
           do selo "Aprovado" faz o candidato achar que ainda falta alguma coisa. */}
       {currentStageName && applicationStatus === 'in_progress' && (
-        <p className="mb-4 text-xs text-ink/70">
-          Etapa atual: <span className="font-medium text-ink/80">{currentStageName}</span>
+        <p className="mb-4 text-xs text-ink/68">
+          Etapa atual: <span className="font-medium text-ink/82">{currentStageName}</span>
         </p>
       )}
 
-      <div className="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-ink/70">
+      <div className="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-ink/68">
         {registrationStart && registrationEnd && (
           <span className="inline-flex items-center gap-1.5">
             <CalendarDays className="h-3.5 w-3.5 text-brand" />

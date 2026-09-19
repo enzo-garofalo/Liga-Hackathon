@@ -89,7 +89,7 @@ function FormingBanner({ me, team }: { me: MeProfile; team: TeamMinimal }) {
       {isLeader && remainingSlots > 0 && (
         <div className="mb-5 rounded-2xl border border-brand/20 bg-brand/[0.07] px-4 py-3">
           <p className="text-sm font-medium text-ink">Ainda faltam {remainingSlots} membro{remainingSlots > 1 ? 's' : ''}.</p>
-          <p className="mt-1 text-xs font-medium text-ink/70">Convide participantes agora para completar a equipe antes do prazo.</p>
+          <p className="mt-1 text-xs font-medium text-ink/68">Convide participantes agora para completar a equipe antes do prazo.</p>
         </div>
       )}
 
@@ -127,7 +127,7 @@ function FormingBanner({ me, team }: { me: MeProfile; team: TeamMinimal }) {
       </div>
 
       {!canSubmit && (
-        <p className="mt-4 text-sm text-ink/50">
+        <p className="mt-4 text-sm text-ink/52">
           A equipe precisa ter 4 membros para ser submetida.
         </p>
       )}
@@ -171,7 +171,7 @@ function ApprovedBanner({ team }: { team: TeamMinimal }) {
         <h2 className="font-display text-2xl font-semibold text-ink">{team.name}</h2>
         <Badge variant="success">Aprovada</Badge>
       </div>
-      <p className="mb-6 text-sm text-ink/70">
+      <p className="mb-6 text-sm text-ink/72">
         Parabéns! A equipe foi selecionada para o Hackathon.
       </p>
       <Link

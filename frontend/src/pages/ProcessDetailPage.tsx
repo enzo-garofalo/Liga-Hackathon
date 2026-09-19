@@ -72,14 +72,14 @@ export function ProcessDetailPage() {
 
       <div className="purple-cta relative overflow-hidden rounded-[32px] p-8 text-panel">
         <div className="relative">
-          <p className="mb-2 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-white/70">
+          <p className="mb-2 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-white/72">
             Processo Seletivo
           </p>
           <h1 className="font-display text-4xl font-light leading-tight text-white">
             {process.name}
           </h1>
 
-          <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-white/80">
+          <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-white/78">
             <span className="inline-flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-brand-soft" />
               {formatDate(process.registration_start)} a {formatDate(process.registration_end)}
@@ -127,7 +127,7 @@ export function ProcessDetailPage() {
                     </h3>
                   </div>
                   {stage.description && (
-                    <p className="mt-2 text-xs leading-relaxed text-ink/70">
+                    <p className="mt-2 text-xs leading-relaxed text-ink/68">
                       {stage.description}
                     </p>
                   )}

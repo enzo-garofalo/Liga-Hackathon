@@ -136,12 +136,11 @@ export function NewCommunicationModal({
             rows={6}
             value={message}
             onChange={(event) => setMessage(event.target.value)}
-            placeholder="Olá {nome}, ..."
+            placeholder="Escreva o recado para os candidatos..."
             className="w-full rounded-xl border border-ink/20 bg-transparent px-3 py-2.5 font-ui text-sm text-ink placeholder:text-ink/40 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
           />
           <p className="text-xs text-ink/55">
-            Use <code className="font-code">{'{nome}'}</code> para inserir o nome do
-            candidato. Cada pessoa recebe um e-mail separado.
+            Cada pessoa recebe um e-mail separado e uma notificação na plataforma.
           </p>
         </div>
 

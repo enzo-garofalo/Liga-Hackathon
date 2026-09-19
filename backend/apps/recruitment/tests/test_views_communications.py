@@ -2,6 +2,7 @@ import pytest
 from django.core import mail
 
 from apps.recruitment.models import (
+    Application,
     ApplicationStatus,
     Communication,
     CommunicationType,
@@ -53,7 +54,7 @@ def payload(**overrides):
     data = {
         'audience': 'all',
         'subject': 'Aviso importante',
-        'message': 'Olá {nome}, leia com atenção.',
+        'message': 'Leia com atenção, por favor.',
     }
     data.update(overrides)
     return data
@@ -109,16 +110,15 @@ def test_specific_audience_requires_recipients(admin_client, process, scenario):
     assert r.status_code == 400
 
 
-def test_message_placeholder_replaced_with_candidate_name(
-    admin_client, process, scenario
-):
+def test_message_goes_out_exactly_as_written(admin_client, process, scenario):
+    """Sem substituição de variável: o texto sai como o organizador escreveu."""
     mail.outbox.clear()
     admin_client.post(
         url(process.id),
-        payload(audience='approved', message='Olá {nome}, parabéns!'),
+        payload(audience='approved', message='Parabéns pela aprovação!'),
         format='json',
     )
-    assert 'Olá Bruno, parabéns!' in mail.outbox[0].body
+    assert 'Parabéns pela aprovação!' in mail.outbox[0].body
 
 
 def test_communication_creates_notification_per_recipient(
@@ -228,7 +228,7 @@ def test_detail_returns_message_and_recipients(admin_client, process, scenario):
 
     r = admin_client.get(f'/api/v1/admin/communications/{created.data["id"]}/')
     assert r.status_code == 200
-    assert r.data['message'] == 'Olá {nome}, leia com atenção.'
+    assert r.data['message'] == 'Leia com atenção, por favor.'
     assert len(r.data['recipients']) == 3
 
 

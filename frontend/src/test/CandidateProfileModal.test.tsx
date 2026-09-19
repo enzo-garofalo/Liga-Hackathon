@@ -96,6 +96,7 @@ describe('CandidateProfileModal', () => {
         phone: null,
         github: null,
         linkedin: null,
+        bio: null,
       }),
     )
     render()
@@ -103,6 +104,39 @@ describe('CandidateProfileModal', () => {
     expect(await screen.findByText('C-0001')).toBeInTheDocument()
     expect(screen.queryByText('ana@aluno.dev')).not.toBeInTheDocument()
     expect(screen.getByText(/Correção anônima/)).toBeInTheDocument()
+    // A bio é texto livre e costuma entregar quem escreveu.
+    expect(screen.queryByText('Bio')).not.toBeInTheDocument()
+  })
+
+  it('a nota da etapa aparece enquanto o avaliador digita', async () => {
+    // Antes só aparecia depois de salvar, então quem avaliava e aprovava
+    // direto nunca via o número.
+    render()
+    await screen.findByLabelText(/Nota de Pensamento crítico/)
+
+    await userEvent.type(screen.getByLabelText(/Nota de Pensamento crítico/), '5')
+    await userEvent.type(screen.getByLabelText(/Nota de Viabilidade/), '3')
+
+    // Pesos 60 e 40: média ponderada é 4,20, não 4,00.
+    expect(await screen.findByText('4,20')).toBeInTheDocument()
+    expect(screen.getByText(/Nota desta etapa/)).toBeInTheDocument()
+  })
+
+  it('sem nota preenchida, não mostra número nenhum', async () => {
+    render()
+    await screen.findByLabelText(/Nota de Pensamento crítico/)
+    expect(screen.queryByText(/Nota desta etapa/)).not.toBeInTheDocument()
+  })
+
+  it('a ficha mostra a bio que o candidato escreveu no cadastro', async () => {
+    vi.mocked(getApplication).mockResolvedValue(
+      makeApplicationDetail({
+        bio: 'Curso Engenharia de Software e organizo o grupo de estudos de dados.',
+      }),
+    )
+    render()
+
+    expect(await screen.findByText(/organizo o grupo de estudos de dados/)).toBeInTheDocument()
   })
 
   it('nota fora da escala nem chega a ser enviada', async () => {

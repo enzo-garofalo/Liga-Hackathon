@@ -16,6 +16,7 @@ import { saveBlob } from '../utils/download'
 import { getApiError } from '../utils/errors'
 import { Button } from './ui/Button'
 import { isValidScore, parseScore, ScoreInput } from './ui/ScoreInput'
+import { formatScore, stageAverage } from '../utils/scoring'
 import { Modal } from './ui/Modal'
 
 function Field({
@@ -68,6 +69,10 @@ export function CandidateProfileModal({
   const [notes, setNotes] = useState('')
   const [downloading, setDownloading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+
+  // Nota da etapa enquanto a pessoa digita: antes ela só aparecia depois de
+  // salvar, então quem avaliava e aprovava direto nunca via o número.
+  const notaDaEtapa = application ? stageAverage(scores, application.criteria) : null
 
   // Pré-carrega as notas que este avaliador já deu.
   useEffect(() => {
@@ -206,6 +211,17 @@ export function CandidateProfileModal({
             )}
           </div>
 
+          {/* Some junto com o resto da identidade na correção anônima: a bio é
+              texto livre e costuma entregar quem escreveu. */}
+          {application.bio && (
+            <div>
+              <p className="kicker mb-2">Bio</p>
+              <p className="whitespace-pre-line rounded-xl border border-ink/10 px-4 py-3 text-sm leading-6 text-ink/75">
+                {application.bio}
+              </p>
+            </div>
+          )}
+
           {application.email === null && (
             <p className="rounded-xl border border-brand/25 bg-brand/[0.06] px-3 py-2 text-xs text-ink/75">
               Correção anônima: os dados de identificação ficam ocultos para o avaliador.
@@ -254,7 +270,7 @@ export function CandidateProfileModal({
           {canEvaluate ? (
             <div>
               <p className="kicker mb-2">
-                Avaliação — {application.current_stage_name} (escala {scaleMin} a {scaleMax})
+                Avaliação de {application.current_stage_name} (escala {scaleMin} a {scaleMax})
               </p>
               <div className="space-y-3">
                 {application.criteria.map((criterion) => (
@@ -285,6 +301,20 @@ export function CandidateProfileModal({
                   </div>
                 ))}
               </div>
+
+              {notaDaEtapa !== null && (
+                <div className="mt-3 flex items-center justify-between gap-4 rounded-xl border border-brand/25 bg-brand/[0.06] px-4 py-2.5">
+                  <span className="min-w-0 font-ui text-sm font-medium text-ink/82">
+                    Nota desta etapa
+                    <span className="ml-2 text-xs font-normal text-ink/55">
+                      sua avaliação, ainda não salva
+                    </span>
+                  </span>
+                  <span className="font-display text-lg font-semibold tabular-nums text-brand">
+                    {formatScore(notaDaEtapa)}
+                  </span>
+                </div>
+              )}
 
               <div className="mt-4 flex flex-col gap-1">
                 <label

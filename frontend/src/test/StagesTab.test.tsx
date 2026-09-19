@@ -41,7 +41,7 @@ describe('StagesTab', () => {
     renderWithProviders(<StagesTab processId="proc-1" />)
     expect(await screen.findByText('Resolução do Case')).toBeInTheDocument()
     expect(screen.getByText('3 candidatos')).toBeInTheDocument()
-    expect(screen.getByText('Peso na nota final: 35%')).toBeInTheDocument()
+    expect(screen.getByText('35%')).toBeInTheDocument()
     expect(screen.getByText('2 critérios')).toBeInTheDocument()
     expect(screen.getByText('pdf')).toBeInTheDocument()
   })
@@ -134,24 +134,80 @@ describe('StagesTab — quem está em cada etapa', () => {
     })
   })
 
-  it('mostra o nome de quem está em cada etapa, não só o total', async () => {
+  it('a descrição aparece inteira, sem corte', async () => {
+    const longa =
+      'Inscrição confirmada. O case é divulgado no início da próxima etapa, ' +
+      'e você recebe um aviso por e-mail assim que isso acontecer.'
+    vi.mocked(listStages).mockResolvedValue([makeStage({ description: longa })])
+
+    renderWithProviders(<StagesTab processId="proc-1" />)
+    expect(await screen.findByText(longa)).toBeInTheDocument()
+  })
+
+  it('o card mostra a contagem; os nomes ficam atrás do botão', async () => {
+    // Nome solto no card esticava a etapa e desalinhava a grade com muita gente.
     renderWithProviders(<StagesTab processId="proc-1" />)
 
     const caseCard = (await screen.findByText('Resolução do Case')).closest(
       'div.dark-card',
     ) as HTMLElement
     expect(within(caseCard).getByText('2 candidatos')).toBeInTheDocument()
-    expect(within(caseCard).getByText('Ana Lima')).toBeInTheDocument()
-    expect(within(caseCard).getByText('João Silva')).toBeInTheDocument()
-    expect(within(caseCard).queryByText('Bruno Reitano')).not.toBeInTheDocument()
+    expect(within(caseCard).queryByText('Ana Lima')).not.toBeInTheDocument()
 
-    const interviewCard = screen.getByText('Entrevista').closest('div.dark-card') as HTMLElement
-    expect(within(interviewCard).getByText('Bruno Reitano')).toBeInTheDocument()
+    await userEvent.click(within(caseCard).getByRole('button', { name: /ver lista/i }))
+
+    const modal = await screen.findByRole('dialog')
+    expect(within(modal).getByText('Ana Lima')).toBeInTheDocument()
+    expect(within(modal).getByText('João Silva')).toBeInTheDocument()
+    expect(within(modal).queryByText('Bruno Reitano')).not.toBeInTheDocument()
+  })
+
+  it('a lista de cada etapa traz só quem está nela', async () => {
+    renderWithProviders(<StagesTab processId="proc-1" />)
+    const interviewCard = (await screen.findByText('Entrevista')).closest(
+      'div.dark-card',
+    ) as HTMLElement
+
+    await userEvent.click(within(interviewCard).getByRole('button', { name: /ver lista/i }))
+
+    const modal = await screen.findByRole('dialog')
+    expect(within(modal).getByText('Bruno Reitano')).toBeInTheDocument()
+    expect(within(modal).queryByText('Ana Lima')).not.toBeInTheDocument()
+  })
+
+  it('com muita gente, o card não cresce: a lista inteira vai para o modal', async () => {
+    const muitos = Array.from({ length: 30 }, (_, i) =>
+      makeRow({
+        id: `app-${i}`,
+        participant_name: `Candidato ${i}`,
+        current_stage: 'stage-1',
+      }),
+    )
+    vi.mocked(listApplications).mockResolvedValue({
+      count: muitos.length,
+      next: null,
+      previous: null,
+      results: muitos,
+    })
+
+    renderWithProviders(<StagesTab processId="proc-1" />)
+
+    const caseCard = (await screen.findByText('Resolução do Case')).closest(
+      'div.dark-card',
+    ) as HTMLElement
+    // Nenhum nome no card, independentemente de quantos sejam.
+    expect(within(caseCard).queryByText('Candidato 0')).not.toBeInTheDocument()
+
+    await userEvent.click(within(caseCard).getByRole('button', { name: /ver lista/i }))
+
+    const modal = await screen.findByRole('dialog')
+    expect(within(modal).getByText('Candidato 0')).toBeInTheDocument()
+    expect(within(modal).getByText('Candidato 29')).toBeInTheDocument()
   })
 
   it('pede a lista inteira, não só a primeira página', async () => {
     renderWithProviders(<StagesTab processId="proc-1" />)
-    await screen.findByText('Ana Lima')
+    await screen.findAllByRole('button', { name: /ver lista/i })
 
     expect(listApplications).toHaveBeenCalledWith(
       'proc-1',
@@ -171,6 +227,9 @@ describe('StagesTab — quem está em cada etapa', () => {
     const caseCard = (await screen.findByText('Resolução do Case')).closest(
       'div.dark-card',
     ) as HTMLElement
-    expect(within(caseCard).queryByRole('list')).not.toBeInTheDocument()
+    // Etapa sem ninguém não oferece o botão: não há lista para abrir.
+    expect(
+      within(caseCard).queryByRole('button', { name: /ver lista/i }),
+    ).not.toBeInTheDocument()
   })
 })

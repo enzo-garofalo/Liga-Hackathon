@@ -61,6 +61,9 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
   ao dono da candidatura e a organizadores.
 - Sem teto de aprovados no seletivo (o limite de 10 é regra só do hackathon).
 - Notificações são criadas no banco junto com o disparo de e-mail — nunca um sem o outro.
+- `Notification.message` guarda o aviso inteiro: primeira linha é o resumo que o sino
+  lista, e o que vem depois de uma linha em branco é o detalhe que o pop-up mostra.
+  Vale também para o comunicado manual, que guarda assunto e corpo (decisions.md §24).
 - Mover de etapa, aprovar e reprovar **já comunicam sozinhos**: notificação + e-mail + linha
   `type=auto` no histórico. O organizador não escreve nada. O comunicado manual é só para
   recado extra. Cada aviso diz o que aconteceu ("Você avançou para a etapa X", "não seguiu

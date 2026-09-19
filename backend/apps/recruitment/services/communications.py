@@ -77,11 +77,14 @@ def send_communication(
     )
     communication.recipients.set(recipients)
 
+    # Assunto na primeira linha, texto completo abaixo: a notificação guarda o
+    # comunicado inteiro, e não só o título. Quem não abriu o e-mail lê aqui.
+    corpo = f'{subject}\n\n{message}'
     for participant in recipients:
         notify(
             participant,
             NotificationType.CUSTOM_COMMUNICATION,
-            subject,
+            corpo,
             link_to=f'/processes/{process.id}',
             subject_id=communication.id,
         )

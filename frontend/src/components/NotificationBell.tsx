@@ -1,8 +1,10 @@
-import { Bell, CheckCircle2, Circle, Inbox, X } from 'lucide-react'
+import { ArrowRight, Bell, CheckCircle2, Circle, Inbox, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMarkNotificationRead, useNotifications } from '../hooks/useNotifications'
 import type { Notification } from '../types/notification'
+import { Button } from './ui/Button'
+import { Modal } from './ui/Modal'
 
 const MAX_VISIBLE = 10
 const DISMISSED_READ_STORAGE_KEY = 'dismissed_read_notifications'
@@ -30,6 +32,38 @@ function relativeTime(iso: string): string {
   if (diffH < 24) return `${diffH} h`
   const diffD = Math.floor(diffH / 24)
   return diffD === 1 ? '1 dia' : `${diffD} dias`
+}
+
+/**
+ * A mensagem guarda resumo e detalhe no mesmo campo: primeira linha, linha em
+ * branco, resto. A lista mostra só o resumo; o pop-up mostra tudo.
+ */
+function resumoDe(message: string): string {
+  return message.split('\n')[0].trim()
+}
+
+function detalheDe(message: string): string {
+  return message.split('\n').slice(1).join('\n').trim()
+}
+
+function dataCompleta(iso: string): string {
+  return new Date(iso).toLocaleString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+/** Rótulo do botão que leva ao que a notificação fala. */
+function labelDoLink(linkTo: string): string {
+  if (linkTo.startsWith('/applications/')) return 'Ver minha candidatura'
+  if (linkTo.startsWith('/processes/')) return 'Ver o processo seletivo'
+  if (linkTo === '/teams/' || linkTo === '/teams') return 'Ver as equipes'
+  if (linkTo.startsWith('/teams/')) return 'Ver a equipe'
+  if (linkTo.startsWith('/dashboard')) return 'Ir para o painel'
+  return 'Abrir'
 }
 
 const TONE_BRAND = [
@@ -61,6 +95,58 @@ function notificationTone(type: Notification['type']) {
   return 'bg-ink/30'
 }
 
+/**
+ * Pop-up com a notificação inteira.
+ *
+ * O sino mostrava só a frase de uma linha; quem não abriu o e-mail não tinha
+ * onde ler o resto dentro da plataforma. É aqui que o texto completo aparece.
+ */
+function NotificationDetail({
+  notification,
+  onClose,
+  onNavigate,
+}: {
+  notification: Notification
+  onClose: () => void
+  onNavigate: (to: string) => void
+}) {
+  const detalhe = detalheDe(notification.message)
+
+  return (
+    <Modal
+      title={notification.type_display}
+      subtitle={dataCompleta(notification.created_at)}
+      onClose={onClose}
+      footer={
+        notification.link_to ? (
+          <>
+            <Button variant="outlined" onClick={onClose}>
+              Fechar
+            </Button>
+            <Button onClick={() => onNavigate(notification.link_to)}>
+              {labelDoLink(notification.link_to)}
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </>
+        ) : (
+          <Button variant="outlined" onClick={onClose}>
+            Fechar
+          </Button>
+        )
+      }
+    >
+      <p className="font-display text-base font-semibold leading-snug text-ink">
+        {resumoDe(notification.message)}
+      </p>
+      {detalhe && (
+        <p className="mt-4 whitespace-pre-line text-sm leading-relaxed text-ink/75">
+          {detalhe}
+        </p>
+      )}
+    </Modal>
+  )
+}
+
 interface NotificationBellProps {
   tone?: 'light' | 'dark'
   panelAlign?: 'left' | 'right'
@@ -68,6 +154,8 @@ interface NotificationBellProps {
 
 export function NotificationBell({ tone = 'light', panelAlign = 'right' }: NotificationBellProps) {
   const [open, setOpen] = useState(false)
+  // Notificação aberta no pop-up. O painel fecha junto: um fica na frente do outro.
+  const [detalhe, setDetalhe] = useState<Notification | null>(null)
   const [dismissedReadIds, setDismissedReadIds] = useState<string[]>(loadDismissedReadIds)
   const containerRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -105,10 +193,13 @@ export function NotificationBell({ tone = 'light', panelAlign = 'right' }: Notif
 
   const handleNotificationClick = (notification: Notification) => {
     if (!notification.read) markRead.mutate(notification.id)
-    if (notification.link_to) {
-      setOpen(false)
-      navigate(notification.link_to)
-    }
+    setOpen(false)
+    setDetalhe(notification)
+  }
+
+  const handleNavigate = (to: string) => {
+    setDetalhe(null)
+    navigate(to)
   }
 
   const handleMarkRead = (notification: Notification) => {
@@ -134,7 +225,7 @@ export function NotificationBell({ tone = 'light', panelAlign = 'right' }: Notif
         className={[
           'relative inline-flex h-10 w-10 items-center justify-center rounded-xl transition-colors',
           tone === 'dark'
-            ? 'text-white/72 hover:bg-white/[0.08] hover:text-white'
+            ? 'text-white/70 hover:bg-white/[0.08] hover:text-white'
             : 'text-near-black hover:bg-brand/5',
         ].join(' ')}
       >
@@ -156,7 +247,7 @@ export function NotificationBell({ tone = 'light', panelAlign = 'right' }: Notif
           role="dialog"
           aria-label="Central de notificações"
         >
-          <div className="flex items-start justify-between gap-3 border-b border-ink/12 bg-white px-4 py-3.5">
+          <div className="flex items-start justify-between gap-3 border-b border-ink/10 bg-white px-4 py-3.5">
             <div>
               <p className="font-display text-base font-semibold text-near-black">Notificações</p>
               <p className="mt-0.5 text-xs font-medium text-ink/70">
@@ -175,7 +266,7 @@ export function NotificationBell({ tone = 'light', panelAlign = 'right' }: Notif
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-lg p-1.5 text-ink/62 transition-colors hover:bg-ink/10 hover:text-ink"
+                className="rounded-lg p-1.5 text-ink/60 transition-colors hover:bg-ink/10 hover:text-ink"
                 aria-label="Fechar notificações"
               >
                 <X className="h-4 w-4" />
@@ -209,8 +300,8 @@ export function NotificationBell({ tone = 'light', panelAlign = 'right' }: Notif
                         onClick={() => handleNotificationClick(notification)}
                         className="min-w-0 flex-1 text-left"
                       >
-                        <p className="font-ui text-sm font-semibold leading-snug text-ink">
-                          {notification.message}
+                        <p className="line-clamp-2 font-ui text-sm font-semibold leading-snug text-ink">
+                          {resumoDe(notification.message)}
                         </p>
                         <p className="mt-1 text-xs font-semibold text-ink/70">{relativeTime(notification.created_at)}</p>
                       </button>
@@ -231,6 +322,14 @@ export function NotificationBell({ tone = 'light', panelAlign = 'right' }: Notif
             )}
           </div>
         </div>
+      )}
+
+      {detalhe && (
+        <NotificationDetail
+          notification={detalhe}
+          onClose={() => setDetalhe(null)}
+          onNavigate={handleNavigate}
+        />
       )}
     </div>
   )

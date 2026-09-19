@@ -497,3 +497,25 @@ contraria um documento da própria Liga, e quem reabrir o assunto merece saber d
 **Consequência prática:** `is_coordinator` perde metade da sua razão de existir. Continua
 marcando quem administra a distribuição de avaliadores, mas a diferença de enxergar a
 identidade some — todos enxergam.
+\n
+
+## 24. A notificação guarda resumo e detalhe no mesmo campo
+
+**Decisão:** `Notification.message` passa a carregar o aviso inteiro, com uma convenção de
+formato: a primeira linha é o resumo, e o que vem depois de uma linha em branco é o detalhe.
+O sino lista o resumo; o pop-up da notificação mostra o texto completo.
+
+**Motivo:** o comunicado manual guardava só o assunto na notificação. O corpo que o
+organizador escreveu ia apenas para o e-mail. Quem não abriu o e-mail, ou usou um endereço
+que joga a Liga no spam, via "Prazo do case prorrogado" no sino e não tinha onde ler o
+resto dentro da plataforma. Os avisos automáticos tinham o mesmo problema em menor grau:
+uma frase só, sem prazo nem o que é pedido.
+
+**Por que não uma coluna nova:** `Notification` mora em `apps/teams`, que está em produção
+com o hackathon, e a fronteira entre os domínios proíbe mexer na estrutura desses modelos.
+O campo já é `TextField`, então a convenção resolve sem migração e sem tocar na tabela.
+
+**Consequência:** quem escrever uma notificação nova precisa respeitar o formato. Um texto
+de linha única continua funcionando: o resumo é a própria linha e o pop-up fica só com ela.
+O rótulo humano do tipo vai junto no JSON, como `type_display`, para o frontend não manter
+uma segunda cópia da lista de tipos.

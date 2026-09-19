@@ -287,9 +287,21 @@ class JoinRequestCreateSerializer(serializers.Serializer):
 
 
 class NotificationSerializer(serializers.ModelSerializer):
+    # Rótulo humano do tipo, para o detalhe da notificação não repetir no frontend
+    # a lista de tipos. Sai de NotificationType.CHOICES, que já é a fonte.
+    type_display = serializers.CharField(source='get_type_display', read_only=True)
+
     class Meta:
         model = Notification
-        fields = ['id', 'type', 'message', 'read', 'link_to', 'created_at']
+        fields = [
+            'id',
+            'type',
+            'type_display',
+            'message',
+            'read',
+            'link_to',
+            'created_at',
+        ]
         read_only_fields = fields
 
 

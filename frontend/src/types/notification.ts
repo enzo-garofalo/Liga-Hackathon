@@ -20,6 +20,12 @@ export type NotificationType =
 export interface Notification {
   id: string
   type: NotificationType
+  /** Rótulo humano do tipo, vindo de NotificationType.CHOICES no backend. */
+  type_display: string
+  /**
+   * Primeira linha: o resumo que aparece na lista do sino.
+   * Depois da linha em branco: o detalhe, lido no pop-up.
+   */
   message: string
   read: boolean
   link_to: string

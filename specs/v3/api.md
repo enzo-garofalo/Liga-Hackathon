@@ -108,6 +108,10 @@ em `/media/` seria adivinhável. Todo acesso passa por este endpoint.
 ## GET /api/v1/me/notifications/
 Reaproveita o endpoint da v2. Ganha os tipos novos listados em [email.md](email.md).
 
+Cada item traz `type_display`, o rótulo humano do tipo, e um `message` que carrega o aviso
+inteiro: primeira linha é o resumo que o sino lista, o resto (depois de uma linha em branco)
+é o detalhe que o pop-up da notificação mostra (decisions.md §24).
+
 ---
 
 # Área do organizador

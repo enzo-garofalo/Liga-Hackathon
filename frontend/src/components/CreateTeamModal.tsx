@@ -93,7 +93,7 @@ export function CreateTeamModal({ onClose }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg p-1.5 text-ink/45 transition-colors hover:bg-ink/10 hover:text-ink"
+              className="rounded-lg p-1.5 text-ink/46 transition-colors hover:bg-ink/10 hover:text-ink"
               aria-label="Fechar"
             >
               <X className="h-4 w-4" />
@@ -116,15 +116,15 @@ export function CreateTeamModal({ onClose }: Props) {
               />
               <div>
                 <p className="text-sm font-medium text-ink">Equipe aberta</p>
-                <p className="mt-0.5 text-xs text-ink/45">
+                <p className="mt-0.5 text-xs text-ink/46">
                   Outros participantes podem solicitar entrada na sua equipe
                 </p>
               </div>
             </label>
 
             <div>
-              <p className="mb-1.5 text-sm font-medium text-ink/80">
-                Convidar participantes <span className="font-normal text-ink/40">(opcional)</span>
+              <p className="mb-1.5 text-sm font-medium text-ink/82">
+                Convidar participantes <span className="font-normal text-ink/42">(opcional)</span>
               </p>
 
               {selected.length > 0 && (
@@ -151,7 +151,7 @@ export function CreateTeamModal({ onClose }: Props) {
               {selected.length < MAX_INVITEES ? (
                 <div ref={dropdownRef} className="relative">
                   <div className="relative">
-                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/40" />
+                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/42" />
                     <input
                       type="text"
                       value={searchInput}
@@ -163,17 +163,17 @@ export function CreateTeamModal({ onClose }: Props) {
                         if (searchInput.trim()) setShowDropdown(true)
                       }}
                       placeholder="Buscar por nome ou e-mail..."
-                      className="w-full rounded-xl border border-ink/10 bg-transparent py-2.5 pl-9 pr-9 text-sm text-ink placeholder:text-ink/35 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
+                      className="w-full rounded-xl border border-ink/10 bg-transparent py-2.5 pl-9 pr-9 text-sm text-ink placeholder:text-ink/34 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
                     />
                     {isSearching && (
-                      <Loader2 className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-ink/40" />
+                      <Loader2 className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-ink/42" />
                     )}
                   </div>
 
                   {showDropdown && debouncedSearch.trim().length > 0 && (
                     <div className="glass-panel absolute top-full z-10 mt-1 w-full overflow-hidden rounded-xl">
                       {!isSearching && filtered.length === 0 ? (
-                        <div className="flex items-center gap-2.5 px-4 py-3 text-sm text-ink/45">
+                        <div className="flex items-center gap-2.5 px-4 py-3 text-sm text-ink/46">
                           <UserRound className="h-4 w-4 flex-shrink-0" />
                           Nenhum participante encontrado
                         </div>
@@ -192,7 +192,7 @@ export function CreateTeamModal({ onClose }: Props) {
                                 </div>
                                 <div className="min-w-0">
                                   <p className="truncate text-sm font-medium text-ink">{p.full_name}</p>
-                                  <p className="truncate text-xs text-ink/45">{p.course} - {p.semester} sem.</p>
+                                  <p className="truncate text-xs text-ink/46">{p.course} - {p.semester} sem.</p>
                                 </div>
                               </button>
                             </li>
@@ -203,7 +203,7 @@ export function CreateTeamModal({ onClose }: Props) {
                   )}
                 </div>
               ) : (
-                <p className="text-xs text-ink/45">Limite de {MAX_INVITEES} convidados atingido</p>
+                <p className="text-xs text-ink/46">Limite de {MAX_INVITEES} convidados atingido</p>
               )}
             </div>
 

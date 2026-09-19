@@ -34,7 +34,7 @@ export function Header({ me, admin = false }: HeaderProps) {
               <NotificationBell tone="dark" />
               <Link
                 to="/profile"
-                className="font-ui text-sm text-white/70 hover:text-brand-soft"
+                className="font-ui text-sm text-white/72 hover:text-brand-soft"
               >
                 {me.full_name}
               </Link>

@@ -185,10 +185,10 @@ function Hero() {
       <div className="aeline-floating-canvas relative min-h-[calc(100svh-1rem)] overflow-hidden rounded-[1.45rem] md:min-h-[calc(100vh-1.5rem)] md:rounded-[1.75rem]">
         <div className="aeline-grid" />
         <div className="aeline-particles" />
-        <nav className="relative z-30 mx-auto mt-5 flex h-12 w-[min(90vw,74rem)] items-center justify-between px-1 text-[0.66rem] uppercase tracking-[0.18em] text-white/60">
+        <nav className="relative z-30 mx-auto mt-5 flex h-12 w-[min(90vw,74rem)] items-center justify-between px-1 text-[0.66rem] uppercase tracking-[0.18em] text-white/58">
           <Link to="/" aria-label="Liga de TI" className="flex items-center gap-3">
             <img src={logo} alt="Liga de TI" className="h-7 brightness-0 invert" />
-            <span className="hidden font-semibold text-white/80 sm:inline">Arena</span>
+            <span className="hidden font-semibold text-white/78 sm:inline">Arena</span>
           </Link>
           <div className="hidden items-center gap-7 md:flex">
             <a href="#liga" className="transition hover:text-white">A Liga</a>
@@ -212,7 +212,7 @@ function Hero() {
                   Liga de TI
                 </span>
               </h1>
-              <p className="mx-auto mt-5 max-w-sm text-sm leading-6 text-white/60 md:mx-0 md:mt-6 md:max-w-2xl md:text-lg md:leading-7">
+              <p className="mx-auto mt-5 max-w-sm text-sm leading-6 text-white/58 md:mx-0 md:mt-6 md:max-w-2xl md:text-lg md:leading-7">
                 Não buscamos quem já sabe mais, e sim quem tem mais potencial para aprender, contribuir e permanecer.
                 Três etapas para mostrar como você pensa, comunica e se compromete.
               </p>
@@ -252,7 +252,7 @@ function ValuesStrip() {
           <ArrowRight className="mx-3 inline h-[0.72em] w-[0.72em] translate-y-1 text-brand" />
           mais do que currículo pronto
         </h2>
-        <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-black/50">
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-black/48">
           Comprometimento, responsabilidade com prazos, iniciativa, trabalho em equipe, comunicação,
           pensamento crítico e vontade de aprender. É isso que as três etapas medem.
         </p>
@@ -301,7 +301,7 @@ function AboutLiga() {
           <h2 className="mt-2 font-display text-[clamp(1.55rem,8vw,2.2rem)] font-semibold leading-[1.08] tracking-[-0.045em] md:text-[clamp(1.8rem,3.25vw,3.35rem)] md:tracking-[-0.06em]">
             Por que a Liga existe
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-black/50">
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-black/48">
             Em março de 2024, um grupo de estudantes da PUC-Campinas percebeu algo que incomodava: havia
             cursos técnicos, aulas teóricas e muita vontade de aprender, mas nenhum espaço dentro da
             universidade que conectasse os alunos ao mercado de forma prática e estruturada. A Liga nasceu
@@ -330,7 +330,7 @@ function AboutLiga() {
             <h3 className="mt-4 text-lg font-semibold tracking-[-0.04em] md:text-xl">
               Visão <span className="text-sm font-normal text-white/40">(3 anos)</span>
             </h3>
-            <p className="mt-2 text-sm leading-7 text-white/60">
+            <p className="mt-2 text-sm leading-7 text-white/58">
               Ser a principal referência em tecnologia e empreendedorismo da PUC-Campinas, reconhecida por
               empresas, professores e alunos como o centro de excelência e inovação da universidade.
             </p>
@@ -383,7 +383,7 @@ function AboutLiga() {
         <h3 className="mb-1 mt-12 text-center font-display text-xl font-semibold tracking-[-0.04em] text-black md:text-2xl">
           Nossos valores
         </h3>
-        <p className="mx-auto mb-4 max-w-xl text-center text-sm leading-6 text-black/50">
+        <p className="mx-auto mb-4 max-w-xl text-center text-sm leading-6 text-black/48">
           Não são decorativos. Definem quem somos, como trabalhamos e como nos cobramos mutuamente.
         </p>
         <div className="grid gap-3 rounded-[1.35rem] bg-[#eeeeee] p-3 sm:grid-cols-2 md:grid-cols-5 md:rounded-[1.8rem]">
@@ -421,7 +421,7 @@ function HowItWorks() {
           <h2 className="mt-2 font-display text-[clamp(1.55rem,8vw,2.2rem)] font-semibold leading-[1.08] tracking-[-0.045em] md:text-[clamp(1.8rem,3.25vw,3.35rem)] md:tracking-[-0.06em]">
             Como funciona o processo
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-black/50">
+          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-black/48">
             Cada etapa avalia coisas diferentes, para que nenhuma habilidade isolada decida o resultado.
             Tudo acontece nesta plataforma: entrega, acompanhamento e comunicação.
           </p>
@@ -433,13 +433,13 @@ function HowItWorks() {
               className="group min-h-[13.5rem] rounded-[1.1rem] border border-black/10 bg-white p-5 shadow-[0_18px_45px_rgba(20,16,30,0.04)] transition duration-300 md:min-h-[16rem] md:rounded-[1.2rem] md:hover:z-10 md:hover:scale-[1.045] md:hover:shadow-[0_26px_70px_rgba(20,16,30,0.12)]"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs text-black/35">{n}</span>
+                <span className="text-xs text-black/34">{n}</span>
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-brand transition duration-300 group-hover:bg-brand group-hover:text-white">
                   <Icon className="h-4 w-4" />
                 </div>
               </div>
               <h3 className="mt-10 text-lg font-semibold tracking-[-0.04em] md:mt-14 md:text-xl md:tracking-[-0.05em]">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-black/50">{desc}</p>
+              <p className="mt-2 text-sm leading-6 text-black/48">{desc}</p>
             </article>
           ))}
         </div>
@@ -456,7 +456,7 @@ function Stages() {
           <h2 className="font-display text-[clamp(1.55rem,8vw,2.2rem)] font-semibold leading-[1.08] tracking-[-0.045em] md:text-[clamp(1.8rem,3.25vw,3.35rem)] md:tracking-[-0.06em]">
             O que cada etapa avalia
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-black/50">
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-black/48">
             Os critérios são públicos desde o início. Nenhuma regra usada para avaliar alguém aparece pela primeira vez no resultado.
           </p>
         </div>
@@ -478,10 +478,10 @@ function Stages() {
               </div>
 
               <div className="mt-5 border-t border-black/10 pt-4">
-                <p className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-black/40">Competências</p>
+                <p className="text-[0.62rem] font-semibold uppercase tracking-[0.16em] text-black/38">Competências</p>
                 <ul className="mt-2.5 flex flex-wrap gap-1.5">
                   {observes.map((item) => (
-                    <li key={item} className="rounded-full border border-black/10 bg-[#f7f7f7] px-2.5 py-1 text-[0.7rem] font-medium text-black/60">
+                    <li key={item} className="rounded-full border border-black/10 bg-[#f7f7f7] px-2.5 py-1 text-[0.7rem] font-medium text-black/62">
                       {item}
                     </li>
                   ))}
@@ -504,7 +504,7 @@ function Access() {
           <h2 className="font-display text-[clamp(1.55rem,8vw,2.2rem)] font-semibold leading-[1.08] tracking-[-0.045em] md:text-[clamp(1.8rem,3.25vw,3.35rem)] md:tracking-[-0.06em]">
             Entrar na plataforma
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-black/50">
+          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-black/48">
             Dois acessos diferentes, cada um com sua área.
           </p>
         </div>
@@ -539,7 +539,7 @@ function Access() {
               <ShieldCheck className="h-4 w-4" />
             </div>
             <h3 className="mt-5 text-xl font-semibold tracking-[-0.04em] md:text-2xl">Sou organizador</h3>
-            <p className="mt-2 max-w-md text-sm leading-6 text-white/50">
+            <p className="mt-2 max-w-md text-sm leading-6 text-white/52">
               Área da comissão avaliadora: configurar etapas e baremas, corrigir entregas, mover candidatos
               de fase e enviar comunicados.
             </p>
@@ -551,7 +551,7 @@ function Access() {
                 </Button>
               </Link>
             </div>
-            <p className="mt-4 text-xs leading-5 text-white/40">
+            <p className="mt-4 text-xs leading-5 text-white/38">
               O acesso é liberado pela coordenação do processo. Se você é da comissão e ainda não consegue entrar, fale com quem coordena.
             </p>
           </article>
@@ -592,13 +592,13 @@ function FAQ() {
             return (
               <div key={q} className={index > 0 ? 'border-t border-black/10' : ''}>
                 <button className="flex w-full items-center gap-3 px-4 py-4 text-left md:gap-5 md:px-8 md:py-5" onClick={() => setOpen(isOpen ? null : index)}>
-                  <span className="text-xs text-brand/30">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="text-xs text-brand/32">{String(index + 1).padStart(2, '0')}</span>
                   <span className="flex-1 text-sm font-semibold tracking-[-0.02em] text-black md:text-base">{q}</span>
                   <ChevronDown className={['h-4 w-4 text-brand transition-transform', isOpen ? 'rotate-180' : ''].join(' ')} />
                 </button>
                 <div className="grid transition-all" style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}>
                   <div className="overflow-hidden">
-                    <p className="px-4 pb-5 text-sm leading-7 text-black/50 md:px-[4.6rem] md:pb-6 md:text-base md:leading-8">{a}</p>
+                    <p className="px-4 pb-5 text-sm leading-7 text-black/48 md:px-[4.6rem] md:pb-6 md:text-base md:leading-8">{a}</p>
                   </div>
                 </div>
               </div>
@@ -615,11 +615,11 @@ function FinalCTA() {
     <section className="bg-white px-5 py-20 text-white md:px-10">
       <div className="purple-cta mx-auto max-w-7xl overflow-hidden rounded-[1.35rem] p-5 md:rounded-[2rem] md:p-10">
         <div className="md:p-4">
-          <p className="text-[0.68rem] uppercase tracking-[0.2em] text-white/40">Processo Seletivo 2026.2</p>
+          <p className="text-[0.68rem] uppercase tracking-[0.2em] text-white/42">Processo Seletivo 2026.2</p>
           <h2 className="mt-4 max-w-4xl font-display text-[clamp(1.55rem,8vw,2.2rem)] font-semibold leading-[1.08] tracking-[-0.045em] md:text-[clamp(1.8rem,3.25vw,3.35rem)] md:tracking-[-0.06em]">
             Vem construir a Liga com a gente
           </h2>
-          <p className="mt-5 max-w-2xl text-sm leading-6 text-white/60 md:mt-6 md:text-lg md:leading-8">
+          <p className="mt-5 max-w-2xl text-sm leading-6 text-white/58 md:mt-6 md:text-lg md:leading-8">
             Selecionamos pessoas com potencial e comprometimento para construir a Liga conosco,
             não apenas quem já chega pronto.
           </p>
@@ -674,15 +674,15 @@ function Footer() {
                 <img src={logo} alt="Liga de TI" className="h-7 brightness-0 invert" />
                 <span className="font-semibold">Arena</span>
               </div>
-              <p className="mt-6 max-w-sm text-sm leading-7 text-white/45">
+              <p className="mt-6 max-w-sm text-sm leading-7 text-white/46">
                 Plataforma oficial do processo seletivo da Liga de TI: inscrição, acompanhamento das etapas,
                 entrega do case e comunicação com os candidatos.
               </p>
             </div>
             {columns.map(([title, items]) => (
               <div key={title}>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/35">{title}</h3>
-                <div className="mt-5 flex flex-col gap-3 text-sm text-white/55">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/36">{title}</h3>
+                <div className="mt-5 flex flex-col gap-3 text-sm text-white/54">
                   {items.map(([label, href]) =>
                     href.startsWith('#') ? (
                       <a key={label} href={href} className="hover:text-white">
@@ -698,15 +698,15 @@ function Footer() {
               </div>
             ))}
             <div className="col-span-2 md:col-span-1">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/35">Liga de TI</h3>
-              <div className="mt-5 space-y-4 text-sm text-white/55">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/36">Liga de TI</h3>
+              <div className="mt-5 space-y-4 text-sm text-white/54">
                 <p>PUC-Campinas</p>
                 <p>Tecnologia e empreendedorismo</p>
                 <p>Desde março de 2024</p>
               </div>
             </div>
           </div>
-          <div className="mt-10 flex flex-col gap-5 border-t border-white/10 pt-8 text-xs text-white/30 md:flex-row md:items-center md:justify-between">
+          <div className="mt-10 flex flex-col gap-5 border-t border-white/10 pt-8 text-xs text-white/32 md:flex-row md:items-center md:justify-between">
             <p>2026, Liga de TI - PUC Campinas. Todos os direitos reservados.</p>
           </div>
         </div>

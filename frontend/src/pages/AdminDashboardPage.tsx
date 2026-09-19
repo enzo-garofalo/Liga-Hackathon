@@ -584,7 +584,7 @@ function ProcessesSection() {
         <p className="font-display text-base font-semibold text-ink">
           Nenhum processo seletivo ainda
         </p>
-        <p className="mx-auto mt-1 max-w-md text-sm text-ink/70">
+        <p className="mx-auto mt-1 max-w-md text-sm text-ink/68">
           Crie um processo, configure as etapas e abra as inscrições quando estiver pronto.
         </p>
       </div>

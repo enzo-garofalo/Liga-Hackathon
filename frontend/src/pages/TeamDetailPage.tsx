@@ -226,11 +226,11 @@ function MemberRow({ member, isLeader, canRemove, onRemove, removing }: MemberRo
             </span>
           )}
         </div>
-        <p className="mt-0.5 text-xs font-medium text-ink/70">
+        <p className="mt-0.5 text-xs font-medium text-ink/68">
           {member.course} - {member.semester} semestre
         </p>
         {(member.github || member.linkedin) && (
-          <p className="mt-0.5 flex gap-3 text-xs font-medium text-ink/70">
+          <p className="mt-0.5 flex gap-3 text-xs font-medium text-ink/68">
             {member.github && (
               <a href={member.github} target="_blank" rel="noreferrer" className="hover:text-brand-soft">
                 GitHub

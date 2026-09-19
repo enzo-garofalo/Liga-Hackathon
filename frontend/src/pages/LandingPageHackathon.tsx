@@ -124,7 +124,7 @@ function HeroDashboard() {
 
       <div className="floating-countdown absolute bottom-2 left-[9%] right-[9%] z-20 rounded-[1.2rem] border border-white/15 bg-[#0b0714]/80 p-2.5 shadow-[0_34px_100px_rgba(0,0,0,0.34)] backdrop-blur-2xl md:bottom-8 md:left-[12%] md:right-[12%] md:rounded-[1.45rem] md:p-4">
         <div className="mb-2 flex items-center justify-between md:mb-3">
-          <span className="font-mono text-[0.55rem] uppercase tracking-[0.18em] text-white/50 md:text-[0.62rem] md:tracking-[0.2em]">20 junho 2026</span>
+          <span className="font-mono text-[0.55rem] uppercase tracking-[0.18em] text-white/48 md:text-[0.62rem] md:tracking-[0.2em]">20 junho 2026</span>
           <span className="rounded-full border border-white/10 bg-white/10 px-2.5 py-1 font-mono text-[0.5rem] uppercase tracking-[0.14em] text-brand-soft md:px-3 md:text-[0.58rem] md:tracking-[0.16em]">contagem</span>
         </div>
         <div className="grid grid-cols-4 overflow-hidden rounded-[1.1rem] border border-white/10 bg-white/[0.04] text-center">
@@ -146,10 +146,10 @@ function Hero() {
       <div className="aeline-floating-canvas relative min-h-[calc(100svh-1rem)] overflow-hidden rounded-[1.45rem] md:min-h-[calc(100vh-1.5rem)] md:rounded-[1.75rem]">
         <div className="aeline-grid" />
         <div className="aeline-particles" />
-        <nav className="relative z-30 mx-auto mt-5 flex h-12 w-[min(90vw,74rem)] items-center justify-between px-1 text-[0.66rem] uppercase tracking-[0.18em] text-white/60">
+        <nav className="relative z-30 mx-auto mt-5 flex h-12 w-[min(90vw,74rem)] items-center justify-between px-1 text-[0.66rem] uppercase tracking-[0.18em] text-white/58">
           <Link to="/" aria-label="Liga de TI" className="flex items-center gap-3">
             <img src={logo} alt="Liga de TI" className="h-7 brightness-0 invert" />
-            <span className="hidden font-semibold text-white/80 sm:inline">Arena</span>
+            <span className="hidden font-semibold text-white/78 sm:inline">Arena</span>
           </Link>
           <div className="hidden items-center gap-7 md:flex">
             <a href="#sobre" className="transition hover:text-white">Sobre</a>
@@ -169,7 +169,7 @@ function Hero() {
                 <span className="block text-[clamp(1rem,4.8vw,1.25rem)] font-medium tracking-[0.12em] text-white/70 md:text-[clamp(1.2rem,2.2vw,2.2rem)]">Hackathon #01</span>
                 <span className="mt-2 block font-clash text-[clamp(2.65rem,12.5vw,3.4rem)] font-extrabold text-white md:text-[clamp(3.4rem,6.5vw,7.4rem)]">Liga de TI</span>
               </h1>
-              <p className="mx-auto mt-5 max-w-sm text-sm leading-6 text-white/60 md:mx-0 md:mt-6 md:max-w-2xl md:text-lg md:leading-7">
+              <p className="mx-auto mt-5 max-w-sm text-sm leading-6 text-white/58 md:mx-0 md:mt-6 md:max-w-2xl md:text-lg md:leading-7">
                 O primeiro Hackathon da Liga de TI: um dia inteiro para times de quatro pessoas transformarem um desafio real em solução.</p>
               <div className="mt-7 flex flex-wrap justify-center gap-3 md:justify-start">
                 <Link to="/register">
@@ -192,7 +192,7 @@ function Hero() {
             ].map(({ icon: Icon, text }, index) => (
               <div key={text} className="flex min-w-0 items-center justify-center gap-2 md:justify-start">
                 <Icon className="h-3.5 w-3.5 text-white/40" />
-                <span className="min-w-0 text-xs font-semibold leading-tight text-white/70 md:text-sm">{text}</span>
+                <span className="min-w-0 text-xs font-semibold leading-tight text-white/68 md:text-sm">{text}</span>
                 {index < 3 && <span className="ml-3 hidden text-white/20 md:inline">|</span>}
               </div>
             ))}
@@ -319,7 +319,7 @@ function About() {
           <h2 className="font-display text-[clamp(1.55rem,8vw,2.2rem)] font-semibold leading-[1.08] tracking-[-0.045em] md:text-[clamp(1.8rem,3.25vw,3.35rem)] md:tracking-[-0.06em]">
             Por que participar?
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-black/50">
+          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-black/48">
           </p>
         </div>
         <div className="group/benefits grid gap-3 rounded-[1.35rem] bg-[#eeeeee] p-3 md:flex md:rounded-[1.8rem]">
@@ -363,7 +363,7 @@ function HowItWorks() {
           <h2 className="font-display text-[clamp(1.55rem,8vw,2.2rem)] font-semibold leading-[1.08] tracking-[-0.045em] md:text-[clamp(1.8rem,3.25vw,3.35rem)] md:tracking-[-0.06em]">
             Como funciona a Plataforma?
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-black/50">
+          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-black/48">
             Uma plataforma exclusiva da Liga para facilitar a formação de equipes, submissões e toda a experiência do hackathon.
           </p>
         </div>
@@ -371,13 +371,13 @@ function HowItWorks() {
           {steps.map(({ n, icon: Icon, title, desc }) => (
             <article key={n} className="group min-h-[13.5rem] rounded-[1.1rem] border border-black/10 bg-white p-5 shadow-[0_18px_45px_rgba(20,16,30,0.04)] transition duration-300 md:min-h-[16rem] md:rounded-[1.2rem] md:hover:z-10 md:hover:scale-[1.045] md:hover:shadow-[0_26px_70px_rgba(20,16,30,0.12)]">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-black/35">{n}</span>
+                <span className="text-xs text-black/34">{n}</span>
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand/10 text-brand transition duration-300 group-hover:bg-brand group-hover:text-white">
                   <Icon className="h-4 w-4" />
                 </div>
               </div>
               <h3 className="mt-10 text-lg font-semibold tracking-[-0.04em] md:mt-14 md:text-xl md:tracking-[-0.05em]">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-black/50">{desc}</p>
+              <p className="mt-2 text-sm leading-6 text-black/48">{desc}</p>
             </article>
           ))}
         </div>
@@ -394,7 +394,7 @@ function Schedule() {
           <h2 className="font-display text-[clamp(1.55rem,8vw,2.2rem)] font-semibold leading-[1.08] tracking-[-0.045em] md:text-[clamp(1.8rem,3.25vw,3.35rem)] md:tracking-[-0.06em]">
             Local e Cronograma
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-black/50">
+          <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-black/48">
           </p>
         </div>
         <div className="grid gap-3 overflow-hidden rounded-[1.35rem] bg-[#eeeeee] p-3 md:grid-cols-4 md:rounded-[1.8rem]">
@@ -461,13 +461,13 @@ function FAQ() {
             return (
               <div key={q} className={index > 0 ? 'border-t border-black/10' : ''}>
                 <button className="flex w-full items-center gap-3 px-4 py-4 text-left md:gap-5 md:px-8 md:py-5" onClick={() => setOpen(isOpen ? null : index)}>
-                  <span className="text-xs text-brand/30">{String(index + 1).padStart(2, '0')}</span>
+                  <span className="text-xs text-brand/32">{String(index + 1).padStart(2, '0')}</span>
                   <span className="flex-1 text-sm font-semibold tracking-[-0.02em] text-black md:text-base">{q}</span>
                   <ChevronDown className={['h-4 w-4 text-brand transition-transform', isOpen ? 'rotate-180' : ''].join(' ')} />
                 </button>
                 <div className="grid transition-all" style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}>
                   <div className="overflow-hidden">
-                    <p className="px-4 pb-5 text-sm leading-7 text-black/50 md:px-[4.6rem] md:pb-6 md:text-base md:leading-8">{a}</p>
+                    <p className="px-4 pb-5 text-sm leading-7 text-black/48 md:px-[4.6rem] md:pb-6 md:text-base md:leading-8">{a}</p>
                   </div>
                 </div>
               </div>
@@ -486,11 +486,11 @@ function FinalCTA() {
       <div className="purple-cta mx-auto grid max-w-7xl gap-5 overflow-hidden rounded-[1.35rem] p-5 md:items-stretch md:gap-6 md:rounded-[2rem] md:p-6">
         <div className="flex flex-col justify-between md:p-4">
           <div>
-          <p className="text-[0.68rem] uppercase tracking-[0.2em] text-white/40">Inscrições abertas</p>
+          <p className="text-[0.68rem] uppercase tracking-[0.2em] text-white/42">Inscrições abertas</p>
           <h2 className="mt-4 max-w-4xl font-display text-[clamp(1.55rem,8vw,2.2rem)] font-semibold leading-[1.08] tracking-[-0.045em] md:text-[clamp(1.8rem,3.25vw,3.35rem)] md:tracking-[-0.06em]">
             Pronto para montar sua equipe?
           </h2>
-          <p className="mt-5 max-w-2xl text-sm leading-6 text-white/60 md:mt-6 md:text-lg md:leading-8">
+          <p className="mt-5 max-w-2xl text-sm leading-6 text-white/58 md:mt-6 md:text-lg md:leading-8">
             Inscreva-se, chame seu time e garanta a submissão dentro do prazo.
           </p>
           </div>
@@ -523,7 +523,7 @@ function Footer() {
                 <img src={logo} alt="Liga de TI" className="h-7 brightness-0 invert" />
                 <span className="font-semibold">Arena</span>
               </div>
-              <p className="mt-6 max-w-sm text-sm leading-7 text-white/45">
+              <p className="mt-6 max-w-sm text-sm leading-7 text-white/46">
                 Plataforma oficial para formar equipes, gerenciar convites e acompanhar o fluxo de submissão do evento com nossos parceiros.
               </p>
             </div>
@@ -532,8 +532,8 @@ function Footer() {
               ['Plataforma', ['Entrar', 'Cadastrar', 'Equipes', 'Admin']],
             ].map(([title, items]) => (
               <div key={title as string}>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/35">{title}</h3>
-                <div className="mt-5 flex flex-col gap-3 text-sm text-white/55">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/36">{title}</h3>
+                <div className="mt-5 flex flex-col gap-3 text-sm text-white/54">
                   {(items as string[]).map((item) => (
                     <Link key={item} to={item === 'Admin' ? '/admin/login' : item === 'Entrar' ? '/login' : item === 'Cadastrar' ? '/register' : item === 'Equipes' ? '/teams' : item === 'Regras e FAQ' ? '#faq' : `#${item.toLowerCase()}`} className="hover:text-white">
                       {item}
@@ -543,15 +543,15 @@ function Footer() {
               </div>
             ))}
             <div className="col-span-2 md:col-span-1">
-              <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/35">Detalhes deste hackathon</h3>
-              <div className="mt-5 space-y-4 text-sm text-white/55">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/36">Detalhes deste hackathon</h3>
+              <div className="mt-5 space-y-4 text-sm text-white/54">
                 <p>20 de junho de 2026</p>
                 <p>10h às 19h</p>
                 <p>Av. Alan Turing, 776 - Campinas/SP</p>
               </div>
             </div>
           </div>
-          <div className="mt-10 flex flex-col gap-5 border-t border-white/10 pt-8 text-xs text-white/30 md:flex-row md:items-center md:justify-between">
+          <div className="mt-10 flex flex-col gap-5 border-t border-white/10 pt-8 text-xs text-white/32 md:flex-row md:items-center md:justify-between">
             <p>2026, Liga de TI - PUC Campinas. Todos os direitos reservados.</p>
           </div>
         </div>

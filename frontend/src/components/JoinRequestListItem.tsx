@@ -19,7 +19,7 @@ export function JoinRequestListItem({ request, teamId }: JoinRequestListItemProp
     <li className="py-4 flex items-start justify-between gap-4">
       <div className="min-w-0">
         <p className="font-ui font-medium text-ink">{r.full_name}</p>
-        <p className="text-xs text-ink/45 font-ui mt-1">
+        <p className="text-xs text-ink/46 font-ui mt-1">
           {r.course} · {r.semester}º semestre
         </p>
         <p className="text-sm text-ink/70 font-ui mt-2 line-clamp-2">{r.bio}</p>

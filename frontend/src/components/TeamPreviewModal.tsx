@@ -60,14 +60,14 @@ export function TeamPreviewModal({ team, meId, meHasTeam, onClose }: Props) {
             </div>
             <button
               onClick={onClose}
-              className="flex-shrink-0 rounded-lg p-1.5 text-ink/45 transition-colors hover:bg-ink/10 hover:text-ink"
+              className="flex-shrink-0 rounded-lg p-1.5 text-ink/46 transition-colors hover:bg-ink/10 hover:text-ink"
               aria-label="Fechar"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
 
-          <p className="mb-5 text-sm text-ink/45">
+          <p className="mb-5 text-sm text-ink/46">
             {memberCount}/4 membros - {team.is_open ? 'Aberta' : 'Fechada'}
           </p>
 
@@ -93,7 +93,7 @@ export function TeamPreviewModal({ team, meId, meHasTeam, onClose }: Props) {
                           </span>
                         )}
                       </div>
-                      <p className="mt-0.5 text-xs text-ink/45">
+                      <p className="mt-0.5 text-xs text-ink/46">
                         {member.course} - {member.semester} semestre
                       </p>
                     </div>
@@ -139,14 +139,14 @@ export function TeamPreviewModal({ team, meId, meHasTeam, onClose }: Props) {
             )}
 
             {meHasTeam && !isMember && !isLeader && (
-              <div className="rounded-xl border border-ink/10 bg-ink/[0.06] px-4 py-2.5 text-center text-sm text-ink/55">
+              <div className="rounded-xl border border-ink/10 bg-ink/[0.06] px-4 py-2.5 text-center text-sm text-ink/56">
                 Você já está em uma equipe
               </div>
             )}
 
             <button
               onClick={onClose}
-              className="w-full rounded-xl bg-ink/[0.06] py-2.5 text-sm font-medium text-ink/60 transition-all hover:bg-ink/10 hover:text-ink"
+              className="w-full rounded-xl bg-ink/[0.06] py-2.5 text-sm font-medium text-ink/62 transition-all hover:bg-ink/10 hover:text-ink"
             >
               Fechar
             </button>

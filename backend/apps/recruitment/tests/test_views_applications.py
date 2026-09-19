@@ -162,3 +162,48 @@ def test_in_progress_candidate_still_has_a_current_stage(candidate_client, publi
     r = candidate_client.get(f'{URL}{application.id}/')
     current = [s['name'] for s in r.data['stages'] if s['state'] == 'current']
     assert current == ['Case']
+
+
+def test_instructions_only_reach_the_stages_already_opened(candidate_client, published):
+    """O enunciado do case não pode vazar antes da etapa abrir.
+
+    Sem esta regra bastava abrir a aba de rede do navegador para ler o case
+    dias antes dos outros candidatos.
+    """
+    for stage in published.stages.all():
+        stage.instructions = f'Enunciado de {stage.name}'
+        stage.save()
+
+    application = ApplicationFactory(
+        process=published,
+        participant=candidate_client.participant,
+        current_stage=published.stages.get(order=2),
+    )
+
+    r = candidate_client.get(f'{URL}{application.id}/')
+    por_etapa = {s['name']: s['instructions'] for s in r.data['stages']}
+
+    assert por_etapa['Inscrição'] == 'Enunciado de Inscrição'   # já passou
+    assert por_etapa['Case'] == 'Enunciado de Case'             # está nela
+    assert por_etapa['Entrevista'] == ''                        # ainda não chegou
+
+
+def test_advancing_releases_the_instructions(candidate_client, published):
+    """Contraprova: a regra libera quando a pessoa chega na etapa."""
+    entrevista = published.stages.get(order=3)
+    entrevista.instructions = 'Traga documento com foto.'
+    entrevista.save()
+
+    application = ApplicationFactory(
+        process=published,
+        participant=candidate_client.participant,
+        current_stage=published.stages.get(order=1),
+    )
+    antes = candidate_client.get(f'{URL}{application.id}/').data['stages'][2]
+    assert antes['instructions'] == ''
+
+    application.current_stage = entrevista
+    application.save()
+
+    depois = candidate_client.get(f'{URL}{application.id}/').data['stages'][2]
+    assert depois['instructions'] == 'Traga documento com foto.'

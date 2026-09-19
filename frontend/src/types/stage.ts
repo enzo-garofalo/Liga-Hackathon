@@ -9,6 +9,8 @@ export interface Stage {
   id: string
   name: string
   description: string
+  /** Texto longo do que fazer na etapa. Vazio quando o candidato ainda não chegou nela. */
+  instructions: string
   order: number
   start_at: string | null
   end_at: string | null
@@ -24,6 +26,7 @@ export interface Stage {
 export interface StagePayload {
   name: string
   description?: string
+  instructions?: string
   start_at?: string | null
   end_at?: string | null
   weight?: number

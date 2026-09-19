@@ -31,6 +31,7 @@ interface Props {
 export function StageConfigModal({ stage, onClose, onSave, saving, error }: Props) {
   const [name, setName] = useState(stage?.name ?? '')
   const [description, setDescription] = useState(stage?.description ?? '')
+  const [instructions, setInstructions] = useState(stage?.instructions ?? '')
   const [startAt, setStartAt] = useState(toLocalInput(stage?.start_at ?? null))
   const [endAt, setEndAt] = useState(toLocalInput(stage?.end_at ?? null))
   const [weight, setWeight] = useState(String(stage?.weight ?? 0))
@@ -55,6 +56,7 @@ export function StageConfigModal({ stage, onClose, onSave, saving, error }: Prop
     onSave({
       name,
       description,
+      instructions,
       start_at: toIso(startAt),
       end_at: toIso(endAt),
       weight: Number(weight || 0),
@@ -106,6 +108,23 @@ export function StageConfigModal({ stage, onClose, onSave, saving, error }: Prop
             onChange={(event) => setDescription(event.target.value)}
             className="w-full rounded-xl border border-ink/20 bg-transparent px-3 py-2.5 font-ui text-sm text-ink placeholder:text-ink/40 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
           />
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label htmlFor="stage-instructions" className="font-ui text-sm font-medium text-ink/80">
+            O que o candidato precisa fazer
+          </label>
+          <textarea
+            id="stage-instructions"
+            rows={6}
+            value={instructions}
+            onChange={(event) => setInstructions(event.target.value)}
+            placeholder="Enunciado, formato da entrega, prazos, regras. O candidato lê isto num botão na linha do tempo."
+            className="w-full rounded-xl border border-ink/20 bg-transparent px-3 py-2.5 font-ui text-sm text-ink placeholder:text-ink/40 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
+          />
+          <p className="font-ui text-xs text-ink/55">
+            Só fica visível para quem já chegou nesta etapa.
+          </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">

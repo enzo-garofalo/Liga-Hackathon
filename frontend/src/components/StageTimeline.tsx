@@ -1,5 +1,7 @@
-import { Check, Circle, Loader2 } from 'lucide-react'
+import { BookOpen, Check, Circle, Loader2 } from 'lucide-react'
+import { useState } from 'react'
 import type { TimelineStage } from '../types/application'
+import { Modal } from './ui/Modal'
 
 function formatDate(iso: string | null) {
   if (!iso) return null
@@ -38,7 +40,12 @@ interface StageTimelineProps {
 }
 
 export function StageTimeline({ stages, renderCurrentExtra }: StageTimelineProps) {
+  // Etapa cujas instruções estão abertas. O backend manda '' para quem ainda
+  // não chegou na etapa, então o botão simplesmente não existe nesses casos.
+  const [lendo, setLendo] = useState<TimelineStage | null>(null)
+
   return (
+    <>
     <ol className="space-y-1">
       {stages.map((stage, index) => {
         const isLast = index === stages.length - 1
@@ -89,11 +96,36 @@ export function StageTimeline({ stages, renderCurrentExtra }: StageTimelineProps
                 </p>
               )}
 
+              {stage.instructions && (
+                <button
+                  type="button"
+                  onClick={() => setLendo(stage)}
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-brand/[0.06] px-3 py-1 font-ui text-xs font-medium text-brand transition-colors hover:bg-brand/12"
+                >
+                  <BookOpen className="h-3.5 w-3.5" />
+                  O que preciso fazer
+                </button>
+              )}
+
               {stage.state === 'current' && renderCurrentExtra?.(stage)}
             </div>
           </li>
         )
       })}
     </ol>
+
+    {lendo && (
+      <Modal
+        title={lendo.name}
+        subtitle="O que você precisa fazer nesta etapa"
+        size="lg"
+        onClose={() => setLendo(null)}
+      >
+        <p className="whitespace-pre-line font-ui text-sm leading-7 text-ink/80">
+          {lendo.instructions}
+        </p>
+      </Modal>
+    )}
+    </>
   )
 }

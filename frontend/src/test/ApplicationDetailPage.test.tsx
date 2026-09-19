@@ -20,6 +20,7 @@ function stage(overrides: Partial<TimelineStage>): TimelineStage {
     id: 'x',
     name: 'Etapa',
     description: '',
+    instructions: '',
     order: 1,
     start_at: null,
     end_at: null,

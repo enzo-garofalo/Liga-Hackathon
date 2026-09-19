@@ -7,6 +7,7 @@ export function makeStage(overrides: Partial<Stage> = {}): Stage {
     id: 'stage-1',
     name: 'Resolução do Case',
     description: '',
+    instructions: '',
     order: 1,
     start_at: null,
     end_at: null,

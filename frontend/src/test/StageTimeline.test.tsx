@@ -1,4 +1,5 @@
 import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { StageTimeline } from '../components/StageTimeline'
 import type { TimelineStage } from '../types/application'
@@ -8,6 +9,7 @@ function stage(overrides: Partial<TimelineStage>): TimelineStage {
     id: overrides.name ?? 'x',
     name: 'Etapa',
     description: '',
+    instructions: '',
     order: 1,
     start_at: null,
     end_at: null,
@@ -58,5 +60,39 @@ describe('StageTimeline', () => {
   it('mostra a descrição da etapa', () => {
     render(<StageTimeline stages={stages} />)
     expect(screen.getByText('Entregue o PDF.')).toBeInTheDocument()
+  })
+})
+
+describe('instruções da etapa', () => {
+  it('a etapa com instruções oferece o botão de ler', async () => {
+    render(
+      <StageTimeline
+        stages={[stage({ name: 'Case', state: 'current', instructions: 'Entregue um PDF de até 3 páginas.' })]}
+      />,
+    )
+
+    await userEvent.click(screen.getByRole('button', { name: /o que preciso fazer/i }))
+    expect(await screen.findByText('Entregue um PDF de até 3 páginas.')).toBeInTheDocument()
+  })
+
+  it('etapa que a pessoa ainda não alcançou não tem o botão', () => {
+    // O backend manda instructions vazio para etapa futura: o enunciado do case
+    // não pode ser lido antes de abrir, nem pela aba de rede.
+    render(
+      <StageTimeline stages={[stage({ name: 'Entrevista', state: 'upcoming', instructions: '' })]} />,
+    )
+
+    expect(
+      screen.queryByRole('button', { name: /o que preciso fazer/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('etapa sem instruções escritas não mostra botão vazio', () => {
+    render(
+      <StageTimeline stages={[stage({ name: 'Pitch', state: 'done', instructions: '' })]} />,
+    )
+    expect(
+      screen.queryByRole('button', { name: /o que preciso fazer/i }),
+    ).not.toBeInTheDocument()
   })
 })

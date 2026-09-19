@@ -36,6 +36,7 @@ class StageSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'description',
+            'instructions',
             'order',
             'start_at',
             'end_at',
@@ -330,6 +331,7 @@ class ApplicationTimelineStageSerializer(PublicStageSerializer):
 
     state = serializers.SerializerMethodField()
     deliverables = serializers.SerializerMethodField()
+    instructions = serializers.SerializerMethodField()
 
     class Meta(PublicStageSerializer.Meta):
         fields = PublicStageSerializer.Meta.fields + [
@@ -338,8 +340,20 @@ class ApplicationTimelineStageSerializer(PublicStageSerializer):
             'allowed_file_types',
             'state',
             'deliverables',
+            'instructions',
         ]
         read_only_fields = fields
+
+    def get_instructions(self, stage):
+        """Só de etapa que o candidato já alcançou.
+
+        O texto costuma ser o enunciado do case. Mandar o de todas as etapas
+        deixaria o enunciado legível na API antes da etapa abrir — bastaria
+        abrir a aba de rede do navegador para começar dias antes dos outros.
+        """
+        if self.get_state(stage) == 'upcoming':
+            return ''
+        return stage.instructions
 
     def get_state(self, stage):
         application = self.context['application']
@@ -480,11 +494,20 @@ class AdminApplicationDetailSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_criteria(self, application):
-        """Critérios da etapa atual — vêm da configuração, não são fixos."""
+        """Critérios da etapa atual — vêm da configuração, não são fixos.
+
+        O peso vai junto para a ficha conseguir mostrar a média da etapa
+        enquanto o avaliador digita, com a mesma conta do backend.
+        """
         if application.current_stage is None:
             return []
         return [
-            {'id': str(criterion.id), 'name': criterion.name, 'order': criterion.order}
+            {
+                'id': str(criterion.id),
+                'name': criterion.name,
+                'order': criterion.order,
+                'weight': float(criterion.weight),
+            }
             for criterion in application.current_stage.criteria.order_by('order')
         ]
 

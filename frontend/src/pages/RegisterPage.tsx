@@ -28,6 +28,9 @@ const COURSES = [
   'Outro',
 ].map((course) => ({ value: course, label: course }))
 
+/** Mesmo teto da tela de perfil: os dois formulários editam o mesmo campo. */
+const BIO_MAX = 500
+
 interface FormShape {
   email: string
   password: string
@@ -150,6 +153,7 @@ export function RegisterPage() {
   const mutation = useRegister()
   const selectedCourse = useWatch({ control, name: 'course' })
   const phoneValue = useWatch({ control, name: 'phone' }) ?? ''
+  const bioLength = (useWatch({ control, name: 'bio' }) ?? '').length
   const isOther = selectedCourse === 'Outro'
   const phoneField = register('phone', { required: 'Informe seu telefone.', validate: validatePhone })
 
@@ -306,18 +310,29 @@ export function RegisterPage() {
                       Bio (resumo de habilidades e experiências)
                       <span className="ml-1 text-red-500">*</span>
                     </label>
-                    <textarea
-                      id="register-bio"
-                      rows={4}
-                      {...register('bio', { required: 'Conte um pouco sobre você.' })}
-                      className={[
-                        'auth-textarea w-full resize-y bg-transparent px-4 py-3 font-ui text-sm text-ink',
-                        'placeholder:text-ink/40',
-                        'focus:outline-none focus:ring-2 focus:ring-[#7132f5]/50 focus:border-[#7132f5]',
-                        'transition-colors',
-                        errors.bio ? 'border-red-400' : 'border-ink/20',
-                      ].join(' ')}
-                    />
+                    <div className="relative">
+                      <textarea
+                        id="register-bio"
+                        rows={4}
+                        {...register('bio', {
+                          required: 'Conte um pouco sobre você.',
+                          // Mesmo teto do perfil: sem ele, quem se cadastra com
+                          // uma bio longa não consegue mais salvar o próprio
+                          // perfil depois, porque a edição recusa acima de 500.
+                          maxLength: { value: BIO_MAX, message: `Máximo ${BIO_MAX} caracteres.` },
+                        })}
+                        className={[
+                          'auth-textarea w-full resize-y bg-transparent px-4 py-3 pb-6 font-ui text-sm text-ink',
+                          'placeholder:text-ink/40',
+                          'focus:outline-none focus:ring-2 focus:ring-[#7132f5]/50 focus:border-[#7132f5]',
+                          'transition-colors',
+                          errors.bio ? 'border-red-400' : 'border-ink/20',
+                        ].join(' ')}
+                      />
+                      <span className="pointer-events-none absolute bottom-2 right-3 select-none font-ui text-xs text-ink/45">
+                        {bioLength}/{BIO_MAX}
+                      </span>
+                    </div>
                     {errors.bio && <p className="font-ui text-xs text-red-500">{errors.bio.message}</p>}
                   </div>
                 </div>

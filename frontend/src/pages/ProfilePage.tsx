@@ -220,9 +220,10 @@ export function ProfilePage() {
 
                     {/* Email readonly */}
                     <div className="mb-5">
-                      <label className={labelCls}>E-mail</label>
+                      <label htmlFor="profile-email" className={labelCls}>E-mail</label>
                       <div className="relative">
                         <input
+                          id="profile-email"
                           type="email"
                           value={meQuery.data.email}
                           readOnly
@@ -237,8 +238,9 @@ export function ProfilePage() {
                     <div className="flex flex-col gap-5">
                       {/* Full name */}
                       <div>
-                        <label className={labelCls}>Nome completo</label>
+                        <label htmlFor="profile-full-name" className={labelCls}>Nome completo</label>
                         <input
+                          id="profile-full-name"
                           {...register('full_name', { required: 'Informe seu nome.' })}
                           placeholder="Seu nome completo"
                           className={fieldCls(!!errors.full_name)}
@@ -250,8 +252,9 @@ export function ProfilePage() {
 
                       {/* Phone */}
                       <div>
-                        <label className={labelCls}>Telefone</label>
+                        <label htmlFor="profile-phone" className={labelCls}>Telefone</label>
                         <input
+                          id="profile-phone"
                           {...phoneField}
                           type="tel"
                           inputMode="numeric"
@@ -270,8 +273,9 @@ export function ProfilePage() {
 
                       {/* Course — select */}
                       <div>
-                        <label className={labelCls}>Curso</label>
+                        <label htmlFor="profile-course" className={labelCls}>Curso</label>
                         <select
+                          id="profile-course"
                           {...register('course', { required: 'Informe seu curso.' })}
                           className={fieldCls(!!errors.course)}
                         >
@@ -290,8 +294,9 @@ export function ProfilePage() {
 
                       {/* Semester */}
                       <div>
-                        <label className={labelCls}>Semestre atual</label>
+                        <label htmlFor="profile-semester" className={labelCls}>Semestre atual</label>
                         <input
+                          id="profile-semester"
                           type="number"
                           min={1}
                           max={20}
@@ -322,10 +327,11 @@ export function ProfilePage() {
                       <SectionHeader icon={GitBranch} title="Links profissionais" />
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className={labelCls}>GitHub</label>
+                          <label htmlFor="profile-github" className={labelCls}>GitHub</label>
                           <div className="relative">
                             <GitBranch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9497a9] pointer-events-none" />
                             <input
+                              id="profile-github"
                               {...register('github')}
                               placeholder="github.com/usuario"
                               className="w-full h-11 pl-9 pr-3.5 rounded-xl border border-[#dedee5] font-ui text-sm text-[#101114] placeholder:text-[#9497a9] bg-white focus:outline-none focus:ring-2 focus:ring-[#7132f5]/10 focus:border-[#7132f5] transition-colors"
@@ -333,10 +339,11 @@ export function ProfilePage() {
                           </div>
                         </div>
                         <div>
-                          <label className={labelCls}>LinkedIn</label>
+                          <label htmlFor="profile-linkedin" className={labelCls}>LinkedIn</label>
                           <div className="relative">
                             <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9497a9] pointer-events-none" />
                             <input
+                              id="profile-linkedin"
                               {...register('linkedin')}
                               placeholder="linkedin.com/in/usuario"
                               className="w-full h-11 pl-9 pr-3.5 rounded-xl border border-[#dedee5] font-ui text-sm text-[#101114] placeholder:text-[#9497a9] bg-white focus:outline-none focus:ring-2 focus:ring-[#7132f5]/10 focus:border-[#7132f5] transition-colors"
@@ -350,9 +357,10 @@ export function ProfilePage() {
                     <div className="bg-white border border-[#dedee5] rounded-xl p-6">
                       <SectionHeader icon={User} title="Sobre você" />
                       <div>
-                        <label className={labelCls}>Bio</label>
+                        <label htmlFor="profile-bio" className={labelCls}>Bio</label>
                         <div className="relative">
                           <textarea
+                            id="profile-bio"
                             rows={6}
                             placeholder="Conte um pouco sobre você, suas habilidades e interesses…"
                             {...register('bio', {

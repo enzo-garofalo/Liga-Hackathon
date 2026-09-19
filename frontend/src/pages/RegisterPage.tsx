@@ -107,7 +107,7 @@ function RegisterShowcase() {
       <div className="relative z-10 flex min-h-full flex-col justify-between p-8 xl:p-10">
         <Link to="/" className="flex items-center gap-3">
           <img src={logo} alt="Liga de TI" className="h-8 brightness-0 invert" />
-          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/72">Arena</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/72">Processo Seletivo</span>
         </Link>
 
         <div />
@@ -181,7 +181,7 @@ export function RegisterPage() {
           <div className="mb-8 flex items-center justify-between md:hidden">
             <Link to="/" className="flex items-center gap-3">
               <img src={logo} alt="Liga de TI" className="h-8" />
-              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-black/60">Arena</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-black/60">Processo Seletivo</span>
             </Link>
             <Link to="/" className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-[0_10px_30px_rgba(20,16,30,0.08)]" aria-label="Voltar">
               <ArrowLeft className="h-4 w-4" />

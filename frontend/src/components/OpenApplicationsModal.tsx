@@ -58,7 +58,7 @@ export function OpenApplicationsModal({ process, onClose }: Props) {
       }
     >
       <div className="space-y-5">
-        <div className="rounded-xl border border-ink/12 bg-ink/[0.02] p-4">
+        <div className="rounded-xl border border-ink/10 bg-ink/[0.02] p-4">
           <p className="font-ui text-sm font-medium text-ink">
             Você está prestes a publicar este processo. Após publicar:
           </p>

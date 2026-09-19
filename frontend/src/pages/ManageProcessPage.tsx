@@ -144,14 +144,14 @@ export function ManageProcessPage() {
         </div>
 
         {process.status === 'closed' && (
-          <p className="mb-6 rounded-xl border border-ink/12 bg-ink/[0.04] px-4 py-2.5 text-sm text-ink/70">
+          <p className="mb-6 rounded-xl border border-ink/10 bg-ink/[0.04] px-4 py-2.5 text-sm text-ink/70">
             Processo encerrado: não aceita inscrições nem novas avaliações.
           </p>
         )}
 
         <ProcessStats stats={process.stats} />
 
-        <div className="mb-6 mt-8 flex gap-8 border-b border-ink/12">
+        <div className="mb-6 mt-8 flex gap-8 border-b border-ink/10">
           {TABS.map((item) => (
             <button
               key={item.key}

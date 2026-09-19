@@ -41,7 +41,7 @@ function CandidateCount({
         <button
           type="button"
           onClick={onOpen}
-          className="flex-shrink-0 rounded-full border border-brand/25 bg-brand/[0.06] px-2.5 py-1 font-ui text-xs font-medium text-brand transition-colors hover:bg-brand/12"
+          className="flex-shrink-0 rounded-full border border-brand/25 bg-brand/[0.06] px-2.5 py-1 font-ui text-xs font-medium text-brand transition-colors hover:bg-brand/10"
         >
           Ver lista
         </button>

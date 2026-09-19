@@ -14,7 +14,7 @@ function formatDate(iso: string | null) {
 function StageIcon({ state }: { state: TimelineStage['state'] }) {
   if (state === 'done') {
     return (
-      <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-brand-green/12 ring-1 ring-brand-green/25">
+      <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-brand-green/10 ring-1 ring-brand-green/25">
         <Check className="h-4 w-4 text-brand-green" />
       </div>
     )
@@ -27,7 +27,7 @@ function StageIcon({ state }: { state: TimelineStage['state'] }) {
     )
   }
   return (
-    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-ink/[0.06] ring-1 ring-ink/12">
+    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-ink/[0.06] ring-1 ring-ink/10">
       <Circle className="h-3 w-3 text-ink/35" />
     </div>
   )
@@ -106,7 +106,7 @@ export function StageTimeline({ stages, renderStageExtra }: StageTimelineProps) 
                 <button
                   type="button"
                   onClick={() => setLendo(stage)}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-brand/[0.06] px-3 py-1 font-ui text-xs font-medium text-brand transition-colors hover:bg-brand/12"
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-brand/[0.06] px-3 py-1 font-ui text-xs font-medium text-brand transition-colors hover:bg-brand/10"
                 >
                   <BookOpen className="h-3.5 w-3.5" />
                   O que preciso fazer

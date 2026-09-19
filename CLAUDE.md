@@ -141,6 +141,10 @@ processo seletivo.
   precisam do par manualmente (decisions.md §15).
 - Ao escrever teste de "X não aparece", confirmar que sem a regra X apareceria — um teste
   assim já passou despercebido (tests.md, "Verificação por sabotagem").
+- **Opacidade de classe Tailwind só em múltiplo de 5.** `text-ink/68` não existe na escala
+  padrão: a classe não vira CSS, o elemento herda a cor do ancestral e ninguém vê erro.
+  Fora da escala, usar colchetes (`text-ink/[0.68]`). `src/test/tailwindOpacity.test.ts`
+  varre o `src` e trava a regra.
 
 ## E-mail depende de worker
 Todo e-mail e enfileirado no Celery. Sao necessarios tres processos: backend, redis e

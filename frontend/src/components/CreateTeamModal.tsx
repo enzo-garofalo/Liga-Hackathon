@@ -108,7 +108,7 @@ export function CreateTeamModal({ onClose }: Props) {
               error={errors.name?.message}
             />
 
-            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-ink/12 p-4 transition-colors hover:bg-ink/[0.04]">
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-ink/10 p-4 transition-colors hover:bg-ink/[0.04]">
               <input
                 type="checkbox"
                 {...register('is_open')}
@@ -163,7 +163,7 @@ export function CreateTeamModal({ onClose }: Props) {
                         if (searchInput.trim()) setShowDropdown(true)
                       }}
                       placeholder="Buscar por nome ou e-mail..."
-                      className="w-full rounded-xl border border-ink/12 bg-transparent py-2.5 pl-9 pr-9 text-sm text-ink placeholder:text-ink/35 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
+                      className="w-full rounded-xl border border-ink/10 bg-transparent py-2.5 pl-9 pr-9 text-sm text-ink placeholder:text-ink/35 transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
                     />
                     {isSearching && (
                       <Loader2 className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-ink/40" />

@@ -91,8 +91,8 @@ export function ProcessDetailPage() {
             <span
               className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${
                 process.registration_open
-                  ? 'border-white/18 bg-white/[0.12] text-white'
-                  : 'border-white/12 bg-white/[0.06] text-white/60'
+                  ? 'border-white/20 bg-white/[0.12] text-white'
+                  : 'border-white/10 bg-white/[0.06] text-white/60'
               }`}
             >
               {process.registration_open
@@ -116,7 +116,7 @@ export function ProcessDetailPage() {
               {process.stages.map((stage) => (
                 <li
                   key={stage.id}
-                  className="rounded-[21px] border border-ink/12 bg-ink/[0.02] p-4"
+                  className="rounded-[21px] border border-ink/10 bg-ink/[0.02] p-4"
                 >
                   <div className="flex items-center gap-2">
                     <span className="flex h-6 w-6 items-center justify-center rounded-full bg-brand/15 font-display text-xs font-semibold text-brand">
@@ -140,7 +140,7 @@ export function ProcessDetailPage() {
 
       <div className="mt-6 flex flex-col items-center gap-3">
         {process.already_applied ? (
-          <div className="inline-flex items-center gap-2 rounded-2xl border border-brand-green/25 bg-brand-green/12 px-5 py-3 font-ui text-sm font-medium text-brand-green">
+          <div className="inline-flex items-center gap-2 rounded-2xl border border-brand-green/25 bg-brand-green/10 px-5 py-3 font-ui text-sm font-medium text-brand-green">
             <CheckCircle2 className="h-4 w-4" />
             Você já está inscrito neste processo
           </div>

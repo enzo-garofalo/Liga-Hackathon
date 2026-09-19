@@ -19,9 +19,9 @@ const statusLabel: Record<ApplicationStatus, string> = {
 
 const statusClass: Record<ApplicationStatus, string> = {
   in_progress: 'border-brand/25 bg-brand/15 text-brand',
-  approved: 'border-brand-green/25 bg-brand-green/12 text-brand-green',
+  approved: 'border-brand-green/25 bg-brand-green/10 text-brand-green',
   rejected: 'border-red-400/25 bg-red-500/10 text-red-600',
-  discarded: 'border-ink/12 bg-ink/[0.06] text-ink/60',
+  discarded: 'border-ink/10 bg-ink/[0.06] text-ink/60',
 }
 
 const processStatusLabel: Record<ProcessStatus, string> = {
@@ -32,8 +32,8 @@ const processStatusLabel: Record<ProcessStatus, string> = {
 
 const processStatusClass: Record<ProcessStatus, string> = {
   draft: 'border-amber-400/30 bg-amber-500/10 text-amber-700',
-  published: 'border-brand-green/25 bg-brand-green/12 text-brand-green',
-  closed: 'border-ink/12 bg-ink/[0.06] text-ink/60',
+  published: 'border-brand-green/25 bg-brand-green/10 text-brand-green',
+  closed: 'border-ink/10 bg-ink/[0.06] text-ink/60',
 }
 
 const actionClass =
@@ -96,8 +96,8 @@ export function ProcessCard({
           <span
             className={`flex-shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium ${
               registrationOpen
-                ? 'border-brand-green/25 bg-brand-green/12 text-brand-green'
-                : 'border-ink/12 bg-ink/[0.06] text-ink/60'
+                ? 'border-brand-green/25 bg-brand-green/10 text-brand-green'
+                : 'border-ink/10 bg-ink/[0.06] text-ink/60'
             }`}
           >
             {registrationOpen ? 'Inscrições abertas' : 'Inscrições encerradas'}

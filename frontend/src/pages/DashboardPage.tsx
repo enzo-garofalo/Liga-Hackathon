@@ -45,7 +45,7 @@ const statusLabel: Record<ApplicationStatus, string> = {
 
 const statusClass: Record<ApplicationStatus, string> = {
   in_progress: 'bg-brand/10 text-brand',
-  approved: 'bg-brand-green/12 text-brand-green',
+  approved: 'bg-brand-green/10 text-brand-green',
   rejected: 'bg-red-500/10 text-red-600',
   discarded: 'bg-ink/[0.06] text-ink/60',
 }
@@ -328,7 +328,7 @@ export function DashboardPage() {
                     <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/10">
                       <Users className="h-5 w-5 text-white" />
                     </div>
-                    <div className="inline-flex items-center gap-1.5 rounded-full border border-white/18 bg-white/[0.12] px-3 py-1 text-xs font-semibold text-white">
+                    <div className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/[0.12] px-3 py-1 text-xs font-semibold text-white">
                       <Clock className="h-3.5 w-3.5" />
                       {daysLeft > 0 ? `${daysLeft} dias restantes` : 'Prazo encerrado'}
                     </div>
@@ -348,7 +348,7 @@ export function DashboardPage() {
                     </Button>
                     <Link
                       to="/teams"
-                      className="inline-flex w-full items-center justify-center rounded-2xl border border-white/18 bg-white/[0.06] px-5 py-2.5 font-ui text-sm font-medium text-white transition-colors hover:bg-white/10 sm:w-auto"
+                      className="inline-flex w-full items-center justify-center rounded-2xl border border-white/20 bg-white/[0.06] px-5 py-2.5 font-ui text-sm font-medium text-white transition-colors hover:bg-white/10 sm:w-auto"
                     >
                       Explorar equipes abertas
                     </Link>

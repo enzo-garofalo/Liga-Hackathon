@@ -78,7 +78,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
                 className={[
                   'relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
                   active
-                    ? 'bg-brand/18 font-semibold text-white'
+                    ? 'bg-brand/20 font-semibold text-white'
                     : 'text-white/80 hover:bg-white/[0.08] hover:text-white',
                 ].join(' ')}
               >

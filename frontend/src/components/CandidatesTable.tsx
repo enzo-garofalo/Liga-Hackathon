@@ -11,7 +11,7 @@ const statusLabel: Record<ApplicationStatus, string> = {
 
 const statusClass: Record<ApplicationStatus, string> = {
   in_progress: 'bg-brand/10 text-brand',
-  approved: 'bg-brand-green/12 text-brand-green',
+  approved: 'bg-brand-green/10 text-brand-green',
   rejected: 'bg-red-500/10 text-red-600',
   discarded: 'bg-ink/[0.06] text-ink/60',
 }

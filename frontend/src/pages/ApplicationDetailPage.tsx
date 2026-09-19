@@ -29,10 +29,10 @@ const statusCopy: Record<ApplicationStatus, { label: string; detail: string }> =
 }
 
 const statusClass: Record<ApplicationStatus, string> = {
-  in_progress: 'border-white/18 bg-white/[0.12] text-white',
+  in_progress: 'border-white/20 bg-white/[0.12] text-white',
   approved: 'border-brand-green/40 bg-brand-green/20 text-white',
   rejected: 'border-red-400/40 bg-red-500/20 text-white',
-  discarded: 'border-white/12 bg-white/[0.06] text-white/70',
+  discarded: 'border-white/10 bg-white/[0.06] text-white/70',
 }
 
 export function ApplicationDetailPage() {

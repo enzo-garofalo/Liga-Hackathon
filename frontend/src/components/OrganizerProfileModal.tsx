@@ -55,14 +55,14 @@ export function OrganizerProfileModal({ onClose }: { onClose: () => void }) {
       ) : (
         <form onSubmit={submit} className="space-y-5">
           <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-full border border-ink/12 bg-ink/[0.04] px-3 py-1 font-ui text-xs text-ink/70">
+            <span className="rounded-full border border-ink/10 bg-ink/[0.04] px-3 py-1 font-ui text-xs text-ink/70">
               {profile?.email}
             </span>
             <span
               className={`rounded-full border px-3 py-1 font-ui text-xs font-medium ${
                 profile?.is_coordinator
-                  ? 'border-brand/25 bg-brand/12 text-brand'
-                  : 'border-ink/12 bg-ink/[0.04] text-ink/70'
+                  ? 'border-brand/25 bg-brand/10 text-brand'
+                  : 'border-ink/10 bg-ink/[0.04] text-ink/70'
               }`}
             >
               {profile?.is_coordinator ? 'Coordenador' : 'Avaliador'}

@@ -159,7 +159,7 @@ describe('CandidatesTab', () => {
     expect(screen.getByText(/1 candidato selecionado: Ana Lima/)).toBeInTheDocument()
 
     await userEvent.type(screen.getByLabelText(/assunto/i), 'Aviso')
-    await userEvent.type(screen.getByLabelText(/mensagem/i), 'Olá {{nome}}')
+    await userEvent.type(screen.getByLabelText(/mensagem/i), 'Recado para a turma')
     await userEvent.click(screen.getByRole('button', { name: 'Enviar' }))
 
     await waitFor(() =>

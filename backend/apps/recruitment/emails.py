@@ -176,8 +176,12 @@ def send_application_rejected(participant, application):
 
 
 def send_custom_communication(participant, communication):
-    """Comunicado escrito pelo organizador. {nome} vira o nome do candidato."""
-    message = communication.message.replace('{nome}', participant.full_name)
+    """Comunicado escrito pelo organizador, enviado como está.
+
+    Sem substituição de variável no texto: a Liga preferiu manter simples, e
+    o mesmo texto vai para todo mundo.
+    """
+    message = communication.message
     subject = communication.subject
 
     text = f'{message}\n\nLiga de TI'

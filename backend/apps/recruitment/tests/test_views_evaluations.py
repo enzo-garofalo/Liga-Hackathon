@@ -156,6 +156,10 @@ def test_application_detail_exposes_stage_criteria(admin_client, scenario):
         'Pensamento crítico',
         'Criatividade',
     ]
+    # O peso vai junto: a ficha mostra a média da etapa enquanto o avaliador
+    # digita, e sem ele a conta do frontend não seria a mesma do backend.
+    assert all('weight' in c for c in r.data['criteria'])
+    assert all(isinstance(c['weight'], float) for c in r.data['criteria'])
 
 
 def test_application_detail_returns_my_scores(admin_client, scenario):

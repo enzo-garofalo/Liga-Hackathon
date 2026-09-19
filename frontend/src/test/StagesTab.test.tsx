@@ -51,7 +51,7 @@ describe('StagesTab', () => {
   })
 
   it('mostra a etapa com participantes, peso e critérios', async () => {
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
     expect(await screen.findByText('Resolução do Case')).toBeInTheDocument()
     expect(screen.getByText('3 candidatos')).toBeInTheDocument()
     expect(screen.getByText('35%')).toBeInTheDocument()
@@ -61,14 +61,14 @@ describe('StagesTab', () => {
 
   it('avisa quando não há etapa, porque publicar exige uma', async () => {
     vi.mocked(listStages).mockResolvedValue([])
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
 
     expect(await screen.findByText('Nenhuma etapa configurada')).toBeInTheDocument()
     expect(screen.getByText(/só pode ser publicado com ao menos uma etapa/)).toBeInTheDocument()
   })
 
   it('cria etapa com critérios e pesos', async () => {
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
     await screen.findByText('Resolução do Case')
 
     await userEvent.click(screen.getByRole('button', { name: /nova etapa/i }))
@@ -89,7 +89,7 @@ describe('StagesTab', () => {
   })
 
   it('avisa quando os pesos não somam 100', async () => {
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
     await screen.findByText('Resolução do Case')
     await userEvent.click(screen.getByRole('button', { name: /editar/i }))
 
@@ -105,7 +105,7 @@ describe('StagesTab', () => {
     vi.mocked(listStages).mockResolvedValue([
       makeStage({ allows_file_upload: false, allowed_file_types: [] }),
     ])
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
     await screen.findByText('Resolução do Case')
     await userEvent.click(screen.getByRole('button', { name: /editar/i }))
 
@@ -118,7 +118,7 @@ describe('StagesTab', () => {
     vi.mocked(deleteStage).mockRejectedValue(
       httpError(400, ['Há candidatos nesta etapa. Mova-os antes de excluí-la.']),
     )
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
     await screen.findByText('Resolução do Case')
 
     await userEvent.click(screen.getByLabelText('Excluir Resolução do Case'))
@@ -153,13 +153,13 @@ describe('StagesTab — quem está em cada etapa', () => {
       'e você recebe um aviso por e-mail assim que isso acontecer.'
     vi.mocked(listStages).mockResolvedValue([makeStage({ description: longa })])
 
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
     expect(await screen.findByText(longa)).toBeInTheDocument()
   })
 
   it('o card mostra a contagem; os nomes ficam atrás do botão', async () => {
     // Nome solto no card esticava a etapa e desalinhava a grade com muita gente.
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
 
     const caseCard = (await screen.findByText('Resolução do Case')).closest(
       'div.dark-card',
@@ -176,7 +176,7 @@ describe('StagesTab — quem está em cada etapa', () => {
   })
 
   it('a lista de cada etapa traz só quem está nela', async () => {
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
     const interviewCard = (await screen.findByText('Entrevista')).closest(
       'div.dark-card',
     ) as HTMLElement
@@ -203,7 +203,7 @@ describe('StagesTab — quem está em cada etapa', () => {
       results: muitos,
     })
 
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
 
     const caseCard = (await screen.findByText('Resolução do Case')).closest(
       'div.dark-card',
@@ -219,7 +219,7 @@ describe('StagesTab — quem está em cada etapa', () => {
   })
 
   it('pede a lista inteira, não só a primeira página', async () => {
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
     await screen.findAllByRole('button', { name: /ver lista/i })
 
     expect(listApplications).toHaveBeenCalledWith(
@@ -235,7 +235,7 @@ describe('StagesTab — quem está em cada etapa', () => {
       previous: null,
       results: [],
     })
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
 
     const caseCard = (await screen.findByText('Resolução do Case')).closest(
       'div.dark-card',
@@ -272,7 +272,7 @@ describe('StagesTab: enunciado em PDF', () => {
   })
 
   async function abrirEdicao() {
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
     await userEvent.click(await screen.findByRole('button', { name: /editar/i }))
     return screen.getByRole('dialog', { name: /editar etapa/i })
   }
@@ -402,7 +402,7 @@ describe('StagesTab: enunciado em PDF', () => {
 
   it('etapa nova não oferece anexo antes de existir', async () => {
     // O arquivo precisa de um id de etapa. Sem isso o upload não teria destino.
-    renderWithProviders(<StagesTab processId="proc-1" />)
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
     await userEvent.click(await screen.findByRole('button', { name: /nova etapa/i }))
     const modal = screen.getByRole('dialog', { name: /nova etapa/i })
     await userEvent.click(within(modal).getByRole('button', { name: 'Anexar PDF' }))
@@ -411,5 +411,64 @@ describe('StagesTab: enunciado em PDF', () => {
     expect(
       within(modal).queryByLabelText(/anexar pdf do enunciado/i),
     ).not.toBeInTheDocument()
+  })
+})
+
+// ── Processo publicado não perde etapa ────────────────────────────
+//
+// O backend recusa (decisions.md §26). A tela não pode oferecer um botão que
+// sempre vai dar erro.
+
+describe('StagesTab: processo publicado', () => {
+  beforeEach(() => {
+    vi.mocked(listStages).mockResolvedValue([makeStage()])
+    vi.mocked(listApplications).mockResolvedValue({
+      count: 0,
+      next: null,
+      previous: null,
+      results: [],
+    })
+  })
+
+  it('não oferece excluir etapa', async () => {
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="published" />)
+
+    await screen.findByText('Resolução do Case')
+    expect(
+      screen.queryByRole('button', { name: /excluir resolução do case/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('diz por que não dá para excluir', async () => {
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="published" />)
+
+    expect(
+      await screen.findByText(/editadas, mas não excluídas/i),
+    ).toBeInTheDocument()
+  })
+
+  it('continua oferecendo editar', async () => {
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="published" />)
+
+    expect(await screen.findByRole('button', { name: /editar/i })).toBeInTheDocument()
+  })
+
+  it('processo encerrado também não oferece excluir', async () => {
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="closed" />)
+
+    await screen.findByText('Resolução do Case')
+    expect(
+      screen.queryByRole('button', { name: /excluir resolução do case/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('em rascunho, excluir continua na tela', async () => {
+    // Sem isto, o teste acima passaria mesmo se o botão sumisse para todo mundo.
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+
+    expect(
+      await screen.findByRole('button', { name: /excluir resolução do case/i }),
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/editadas, mas não excluídas/i)).not.toBeInTheDocument()
   })
 })

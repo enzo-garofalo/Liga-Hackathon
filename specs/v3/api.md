@@ -105,6 +105,10 @@ Baixa o arquivo. Permitido ao dono da candidatura e a qualquer organizador
 Os arquivos **não são servidos por URL pública**: são material de candidatura e o caminho
 em `/media/` seria adivinhável. Todo acesso passa por este endpoint.
 
+## DELETE /api/v1/admin/stages/{id}/
+Exclui a etapa. Só em processo `draft`: publicado ou encerrado responde 400 (decisions.md
+§26). Em rascunho, ainda recusa etapa com candidatos ou com avaliações registradas.
+
 ## POST/DELETE /api/v1/admin/stages/{id}/instructions-file/
 Anexa (multipart, campo `file`) ou remove o enunciado em PDF da etapa. Só organizador.
 Devolve a etapa, com `instructions_file_name` e `instructions_file_url`. Anexar por cima

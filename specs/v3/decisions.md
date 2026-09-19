@@ -551,3 +551,26 @@ porque o upload precisa de um id.
 
 **Anexar por cima apaga o anterior.** Sem isso, cada troca de enunciado deixaria uma cópia
 órfã no volume, que ninguém alcança e ninguém apaga.
+
+
+## 26. Processo publicado não perde etapa
+
+**Decisão:** excluir etapa só vale enquanto o processo está em `draft`. Publicado ou
+encerrado, a etapa pode ser editada, mas não removida. A tela do organizador some com o
+botão de excluir e diz por quê.
+
+**Isto aperta a regra anterior**, que deixava excluir etapa de processo publicado desde que
+ela estivesse vazia de candidatos e de avaliações.
+
+**Motivo:** o candidato lê as etapas antes de decidir se se inscreve, e o e-mail de
+confirmação lista todas. Sumir com uma no meio muda o combinado depois do aceite. "Vazia
+agora" também não quer dizer vazia depois: numa etapa futura ninguém chegou ainda, e é
+justamente a que dá mais vontade de apagar.
+
+**O que continua podendo:** editar nome, descrição, datas, peso, critérios e enunciado de
+qualquer etapa, publicado ou não. Corrigir o que foi combinado é diferente de trocar por
+outra coisa.
+
+**O que se perde:** errar uma etapa a mais no rascunho agora custa republicar o processo.
+É de propósito: publicar é o momento em que o desenho vira promessa.
+

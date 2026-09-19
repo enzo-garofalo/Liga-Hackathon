@@ -40,6 +40,10 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
 - Processo segue `draft` → `published` → `closed`. Só `published` aparece ao candidato.
 - Processo só pode ser publicado se tiver pelo menos uma etapa.
 - Processo só pode ser excluído enquanto estiver em `draft`.
+- **Etapa só pode ser excluída enquanto o processo está em `draft`.** Publicado, o
+  candidato já leu o desenho do processo para decidir se se inscrevia, e o e-mail de
+  confirmação lista as etapas. Editar continua liberado, inclusive publicado: é acertar
+  o que foi combinado, não trocar por outro (decisions.md §26).
 - Etapas são ordenadas. Cada etapa tem seus próprios critérios de avaliação.
 - Cada etapa tem barema com peso por critério; a nota da etapa é média ponderada.
 - A nota final é a média ponderada das etapas, pelo peso de cada uma.

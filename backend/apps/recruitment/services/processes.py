@@ -91,6 +91,19 @@ def next_stage_order(process):
 
 
 def assert_stage_deletable(stage):
+    """Excluir etapa é coisa de rascunho.
+
+    Publicado, o desenho do processo já foi mostrado a gente de fora: o
+    candidato leu as etapas antes de se inscrever, e o e-mail de confirmação
+    lista todas. Sumir com uma no meio do caminho muda o combinado depois do
+    aceite. Editar continua liberado — é acertar o que já foi combinado, não
+    trocar por outro (decisions.md §26).
+    """
+    if stage.process.status != ProcessStatus.DRAFT:
+        raise ValidationError(
+            'Este processo já foi publicado. As etapas podem ser editadas, '
+            'mas não excluídas.'
+        )
     if stage.current_applications.exists():
         raise ValidationError(
             'Há candidatos nesta etapa. Mova-os antes de excluí-la.'

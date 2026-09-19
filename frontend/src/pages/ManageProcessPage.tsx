@@ -175,7 +175,7 @@ export function ManageProcessPage() {
         )}
 
         {tab === 'candidates' && <CandidatesTab process={process} />}
-        {tab === 'stages' && <StagesTab processId={process.id} />}
+        {tab === 'stages' && <StagesTab processId={process.id} processStatus={process.status} />}
         {tab === 'communications' && (
           <CommunicationsTab processId={process.id} stages={process.stages} />
         )}

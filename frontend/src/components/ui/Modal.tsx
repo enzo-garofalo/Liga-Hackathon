@@ -57,12 +57,12 @@ export function Modal({
           <div className="flex items-start justify-between gap-4 border-b border-ink/10 p-6">
             <div className="min-w-0">
               <h2 className="font-display text-xl font-semibold text-ink">{title}</h2>
-              {subtitle && <p className="mt-1 text-sm text-ink/68">{subtitle}</p>}
+              {subtitle && <p className="mt-1 text-sm text-ink/70">{subtitle}</p>}
             </div>
             <button
               type="button"
               onClick={onClose}
-              className="flex-shrink-0 rounded-lg p-1.5 text-ink/46 transition-colors hover:bg-ink/10 hover:text-ink"
+              className="flex-shrink-0 rounded-lg p-1.5 text-ink/45 transition-colors hover:bg-ink/10 hover:text-ink"
               aria-label="Fechar"
             >
               <X className="h-4 w-4" />

@@ -75,7 +75,12 @@ describe('CandidateProfileModal', () => {
     )
     render()
 
-    expect(await screen.findByLabelText('Nota de Pensamento crítico')).toHaveValue('4')
+    // Espera o VALOR, não só o campo: o input nasce vazio e é preenchido por um
+    // efeito depois que a candidatura chega. `findBy` resolve no render de
+    // antes, e a asserção pegava o campo vazio quando a máquina estava ocupada.
+    await waitFor(() =>
+      expect(screen.getByLabelText('Nota de Pensamento crítico')).toHaveValue('4'),
+    )
     expect(screen.getByLabelText('Nota de Viabilidade')).toHaveValue('2')
   })
 

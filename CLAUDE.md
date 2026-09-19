@@ -58,7 +58,9 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
 - Aprovação final só é permitida para candidatos na última etapa.
 - Candidato nunca vê nota nem observação de avaliador.
 - Entregáveis não ficam em URL pública: download passa por endpoint autenticado, liberado
-  ao dono da candidatura e a organizadores.
+  ao dono da candidatura e a organizadores. **Continua liberado depois que a etapa passa e
+  depois da candidatura encerrar**: o candidato precisa poder reler o que entregou. Trocar
+  ou apagar o arquivo, não — isso só na etapa atual.
 - Sem teto de aprovados no seletivo (o limite de 10 é regra só do hackathon).
 - Notificações são criadas no banco junto com o disparo de e-mail — nunca um sem o outro.
 - `Notification.message` guarda o aviso inteiro: primeira linha é o resumo que o sino

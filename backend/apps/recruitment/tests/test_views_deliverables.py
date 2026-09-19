@@ -8,6 +8,8 @@ from django.utils import timezone
 
 from apps.recruitment.models import Deliverable, ProcessStatus
 
+from apps.recruitment.services.applications import move_to_stage, reject
+
 from .factories import ApplicationFactory, StageFactory
 
 pytestmark = pytest.mark.django_db
@@ -254,3 +256,47 @@ def test_upload_blocked_for_finished_application(candidate_client, scenario):
 
     r = candidate_client.post(url(application.id), {'file': pdf()}, format='multipart')
     assert r.status_code == 400
+
+
+# ── A entrega sobrevive à mudança de etapa ────────────────────────
+#
+# O candidato precisa continuar podendo reler o que entregou depois de avançar.
+# A tela só consegue mostrar isso se a API continuar devolvendo o arquivo na
+# etapa antiga e liberando o download.
+
+
+def test_deliverable_stays_on_the_stage_after_advancing(candidate_client, scenario):
+    application = scenario['application']
+    candidate_client.post(url(application.id), {'file': pdf()}, format='multipart')
+
+    pitch = StageFactory(process=application.process, order=2, name='Pitch')
+    move_to_stage(application, pitch)
+
+    r = candidate_client.get(f'/api/v1/me/applications/{application.id}/')
+    case = [s for s in r.data['stages'] if s['name'] == 'Resolução do Case'][0]
+    assert case['state'] == 'done'
+    assert len(case['deliverables']) == 1, 'a entrega sumiu ao mudar de etapa'
+
+
+def test_owner_still_downloads_after_advancing(candidate_client, scenario):
+    application = scenario['application']
+    candidate_client.post(url(application.id), {'file': pdf()}, format='multipart')
+    deliverable = Deliverable.objects.get()
+
+    pitch = StageFactory(process=application.process, order=2, name='Pitch')
+    move_to_stage(application, pitch)
+
+    r = candidate_client.get(f'/api/v1/deliverables/{deliverable.id}/download/')
+    assert r.status_code == 200
+
+
+def test_owner_still_downloads_after_being_rejected(candidate_client, scenario):
+    """Quem não passou também tem direito ao que escreveu."""
+    application = scenario['application']
+    candidate_client.post(url(application.id), {'file': pdf()}, format='multipart')
+    deliverable = Deliverable.objects.get()
+
+    reject(application)
+
+    r = candidate_client.get(f'/api/v1/deliverables/{deliverable.id}/download/')
+    assert r.status_code == 200

@@ -62,7 +62,7 @@ export function CommunicationsTab({
           <p className="font-display text-base font-semibold text-ink">
             Nenhum comunicado enviado
           </p>
-          <p className="mt-1 text-sm text-ink/68">
+          <p className="mt-1 text-sm text-ink/70">
             As mensagens automáticas de cada mudança de etapa também aparecem aqui.
           </p>
         </div>

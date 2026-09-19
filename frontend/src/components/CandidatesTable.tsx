@@ -60,7 +60,7 @@ export function CandidatesTable({
         <p className="font-display text-base font-semibold text-ink">
           Nenhum candidato neste filtro
         </p>
-        <p className="mt-1 text-sm text-ink/68">
+        <p className="mt-1 text-sm text-ink/70">
           Ajuste a busca ou os filtros para ver outros candidatos.
         </p>
       </div>

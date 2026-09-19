@@ -17,21 +17,21 @@ function LoginShowcase() {
       <div className="relative z-10 flex min-h-full flex-col justify-between p-8 xl:p-10">
         <Link to="/" className="flex items-center gap-3">
           <img src={logo} alt="Liga de TI" className="h-8 brightness-0 invert" />
-          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/72">Arena</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">Arena</span>
         </Link>
 
         <div />
 
         <div className="max-w-xl pb-28">
           <h2 className="font-display text-4xl leading-[1.02] tracking-[-0.06em] text-white xl:text-5xl">
-            <span className="font-light text-white/54">Continue</span>{' '}
+            <span className="font-light text-white/55">Continue</span>{' '}
             <span className="font-extrabold">sua jornada</span>
           </h2>
-          <p className="mt-5 max-w-sm text-base leading-7 text-white/46">
+          <p className="mt-5 max-w-sm text-base leading-7 text-white/45">
             Acompanhe sua candidatura, as etapas e os prazos do processo seletivo da Liga de TI.
           </p>
-          <div className="mt-7 flex items-center gap-3 text-white/58">
-            <span className="inline-flex h-7 items-center rounded-full border border-white/14 bg-white/[0.06] px-3 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-white/62">Processo Seletivo</span>
+          <div className="mt-7 flex items-center gap-3 text-white/60">
+            <span className="inline-flex h-7 items-center rounded-full border border-white/14 bg-white/[0.06] px-3 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-white/60">Processo Seletivo</span>
           </div>
         </div>
       </div>
@@ -65,11 +65,11 @@ export function LoginPage() {
 
           <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
             <div className="mb-6 hidden items-center justify-between md:flex">
-              <Link to="/" className="flex items-center gap-2 text-sm font-semibold text-black/46 transition hover:text-brand">
+              <Link to="/" className="flex items-center gap-2 text-sm font-semibold text-black/45 transition hover:text-brand">
                 <ArrowLeft className="h-4 w-4" />
                 Voltar
               </Link>
-              <p className="ml-auto text-sm text-black/46">
+              <p className="ml-auto text-sm text-black/45">
                 Não tem conta?{' '}
                 <Link to="/register" className="font-semibold text-brand hover:text-brand-soft">
                   Cadastre-se
@@ -82,7 +82,7 @@ export function LoginPage() {
               <h1 className="mt-3 font-display text-4xl font-extrabold leading-[0.98] tracking-[-0.06em] text-black md:text-5xl">
                 Bem-vindo de volta
               </h1>
-              <p className="mb-8 mt-4 font-ui text-sm leading-7 text-ink/48">
+              <p className="mb-8 mt-4 font-ui text-sm leading-7 text-ink/50">
                 Entre com seu e-mail e senha para acessar a plataforma.
               </p>
 
@@ -108,7 +108,7 @@ export function LoginPage() {
                     type="checkbox"
                     className="h-4 w-4 cursor-pointer rounded border-white/20 accent-[#7132f5]"
                   />
-                  <label htmlFor="remember" className="cursor-pointer select-none font-ui text-sm text-ink/52">
+                  <label htmlFor="remember" className="cursor-pointer select-none font-ui text-sm text-ink/50">
                     Lembrar de mim
                   </label>
                 </div>

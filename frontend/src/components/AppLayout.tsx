@@ -79,7 +79,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
                   'relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors',
                   active
                     ? 'bg-brand/18 font-semibold text-white'
-                    : 'text-white/78 hover:bg-white/[0.08] hover:text-white',
+                    : 'text-white/80 hover:bg-white/[0.08] hover:text-white',
                 ].join(' ')}
               >
                 {active && (
@@ -102,12 +102,12 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate font-ui text-xs font-medium text-white">{me.full_name}</p>
-              <p className="truncate font-ui text-[10px] text-white/68">{me.course}</p>
+              <p className="truncate font-ui text-[10px] text-white/70">{me.course}</p>
             </div>
           </div>
           <button
             onClick={logout}
-            className="flex w-full items-center gap-2 font-ui text-xs text-white/72 transition-colors hover:text-red-300"
+            className="flex w-full items-center gap-2 font-ui text-xs text-white/70 transition-colors hover:text-red-300"
           >
             <LogOut className="h-3.5 w-3.5" />
             Sair
@@ -139,7 +139,7 @@ export function AppLayout() {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header className="flex h-14 flex-shrink-0 items-center justify-between border-b border-white/10 bg-ink px-4 md:hidden">
           <div className="flex items-center gap-3">
-            <button onClick={() => setOpen(true)} className="text-white/62 transition-colors hover:text-white" aria-label="Abrir menu">
+            <button onClick={() => setOpen(true)} className="text-white/60 transition-colors hover:text-white" aria-label="Abrir menu">
               <Menu className="h-5 w-5" />
             </button>
             <img src={logo} alt="Liga de TI" className="h-6 brightness-0 invert" />

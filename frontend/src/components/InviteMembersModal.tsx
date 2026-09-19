@@ -136,7 +136,7 @@ export function InviteMembersModal({ teamId, maxInvitees, meId, onClose }: Props
             {remaining > 0 ? (
               <div ref={dropdownRef} className="relative">
                 <div className="relative">
-                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/58" />
+                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-ink/60" />
                   <input
                     type="text"
                     value={searchInput}
@@ -151,7 +151,7 @@ export function InviteMembersModal({ teamId, maxInvitees, meId, onClose }: Props
                     className="h-12 w-full rounded-2xl border border-ink/16 bg-white pl-11 pr-10 text-sm font-medium text-ink placeholder:text-ink/55 shadow-sm transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
                   />
                   {isSearching && (
-                    <Loader2 className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-ink/58" />
+                    <Loader2 className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-ink/60" />
                   )}
                 </div>
 
@@ -177,7 +177,7 @@ export function InviteMembersModal({ teamId, maxInvitees, meId, onClose }: Props
                               </div>
                               <div className="min-w-0">
                                 <p className="truncate text-sm font-medium text-ink">{participant.full_name}</p>
-                                <p className="truncate text-xs text-ink/68">{participant.course} - {participant.semester} sem.</p>
+                                <p className="truncate text-xs text-ink/70">{participant.course} - {participant.semester} sem.</p>
                               </div>
                             </button>
                           </li>

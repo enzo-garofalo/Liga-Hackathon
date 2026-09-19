@@ -23,6 +23,7 @@ function caseStage(overrides: Partial<TimelineStage> = {}): TimelineStage {
     id: 'stage-1',
     name: 'Resolução do Case',
     description: '',
+    instructions: '',
     order: 2,
     start_at: null,
     end_at: null,

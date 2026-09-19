@@ -149,6 +149,8 @@ class Command(BaseCommand):
                 'registration_end': now + timedelta(days=7),
                 'published_at': now - timedelta(days=14),
                 'highlight_message': 'Inscrições abertas!',
+                # Espelha a decisão da Liga: a demo mostra o que o organizador verá.
+                'anonymous_evaluation': False,
             },
         )
         return process
@@ -167,6 +169,7 @@ class Command(BaseCommand):
                 defaults={
                     'name': data['name'],
                     'description': data['description'],
+                    'instructions': data.get('instructions', ''),
                     'start_at': now + timedelta(days=opens),
                     'end_at': now + timedelta(days=closes),
                     'weight': data['weight'],

@@ -35,6 +35,15 @@ def test_creates_the_process_with_every_stage_and_criterion():
         assert stage.criteria.count() == len(data['criteria'])
 
 
+def test_process_is_born_without_anonymous_marking():
+    """Decisão da Liga: todo organizador vê a identidade do candidato.
+
+    O mecanismo de anonimato continua no código; religar é marcar o campo.
+    """
+    run()
+    assert Process.objects.get(name=PROCESS_NAME).anonymous_evaluation is False
+
+
 def test_process_is_born_as_draft():
     """Publicar abre inscrições para gente real — não pode ser efeito de deploy."""
     run()

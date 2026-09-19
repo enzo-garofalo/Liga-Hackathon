@@ -75,6 +75,11 @@ class Stage(models.Model):
     process = models.ForeignKey(Process, on_delete=models.CASCADE, related_name='stages')
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    # Texto longo com o que o candidato precisa fazer nesta etapa: enunciado do
+    # case, formato da entrega, regras. Fica fora da linha do tempo, atrás de um
+    # botão, e o candidato só lê quando chega na etapa — ver
+    # `ApplicationTimelineStageSerializer.get_instructions`.
+    instructions = models.TextField(blank=True)
     order = models.PositiveSmallIntegerField()
     start_at = models.DateTimeField(null=True, blank=True)
     end_at = models.DateTimeField(null=True, blank=True)

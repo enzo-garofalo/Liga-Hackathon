@@ -21,6 +21,8 @@ export interface TimelineStage extends PublicStage {
   allowed_file_types: string[]
   state: StageState
   deliverables: Deliverable[]
+  /** Vem vazio enquanto o candidato não chega na etapa. */
+  instructions: string
 }
 
 export interface ApplicationSummary {

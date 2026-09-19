@@ -201,6 +201,9 @@ correção anônima seria decorativa — bastaria abrir a ficha do candidato par
 
 > **Emendado pela §19:** a parte de "só pontua quem lhe foi designado" caiu. A designação
 > continua existindo para distribuir a correção, mas não é permissão.
+>
+> **Emendado pela §23:** a correção anônima foi desligada nesta edição. O mecanismo
+> continua no código, atrás de `Process.anonymous_evaluation`.
 
 ---
 
@@ -470,3 +473,27 @@ download e na exclusão de entregável. O buraco era de cobertura, não de códi
 login de organizador recusa quem não é `is_staff`, mas nada testava isso. Se a
 validação caísse, um candidato entraria pela tela da comissão e cairia num painel
 que recusa tudo. Agora tem teste, com contraprova de que organizador continua entrando.
+
+---
+
+## 23. Correção sem anonimato nesta edição
+
+**Decisão:** o processo nasce com `anonymous_evaluation=False`. Todo organizador vê nome,
+e-mail e bio do candidato ao corrigir. **Isto emenda a §10**, que definia correção anônima
+por padrão.
+
+O mecanismo continua inteiro no código: `hide_identity`, `anonymize`, `IDENTITY_FIELDS` e
+os testes de anonimato seguem funcionando e cobertos. Religar é marcar o campo do processo
+no Django Admin — nada precisa ser reescrito.
+
+**Motivo:** decisão da Liga. A comissão é pequena e conhece boa parte dos candidatos de
+vista; o anonimato dava trabalho de operação sem resolver o que pretendia.
+
+**O que se perde:** o planejamento do processo seletivo (seção 8) pede correção anônima
+justamente para a nota não ser influenciada por quem escreveu. Sem ela, essa proteção passa
+a depender da disciplina de quem corrige. A observação fica registrada aqui porque a decisão
+contraria um documento da própria Liga, e quem reabrir o assunto merece saber disso.
+
+**Consequência prática:** `is_coordinator` perde metade da sua razão de existir. Continua
+marcando quem administra a distribuição de avaliadores, mas a diferença de enxergar a
+identidade some — todos enxergam.

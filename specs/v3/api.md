@@ -336,7 +336,7 @@ Envia comunicado manual (modal "Nova comunicação").
   "audience": "stage",
   "audience_stage": "uuid",
   "subject": "Mudança de horário",
-  "message": "Olá {nome}, a entrevista foi remarcada para..."
+  "message": "A entrevista foi remarcada para..."
 }
 ```
 
@@ -345,7 +345,7 @@ Quando `specific`, enviar `recipients: ["participant_uuid", ...]`.
 Quando `stage`, `audience_stage` é obrigatório.
 
 Efeito: resolve os destinatários, cria `Communication`, dispara e-mail + notificação para
-cada um. Placeholder `{nome}` é substituído pelo nome do candidato.
+cada um. A mensagem sai como foi escrita, sem substituição de variável.
 
 ### GET /api/v1/admin/communications/{id}/
 Detalhe do comunicado enviado (modal): tipo, data, assunto, mensagem, destinatários, status.
@@ -399,7 +399,11 @@ Validação: são necessários ao menos `per_application` avaliadores — senão
 
 ## Correção anônima
 
-Quando `process.anonymous_evaluation` é `true` (padrão), os endpoints
+**Desligada nesta edição** (decisions.md §23): `ensure_selection_process` cria o processo
+com `anonymous_evaluation=False`, e todo organizador vê a identidade. O mecanismo abaixo
+continua no código e volta a valer marcando o campo no processo.
+
+Quando `process.anonymous_evaluation` é `true`, os endpoints
 `/admin/applications/` e `/admin/processes/{id}/applications/` devolvem `null` nos campos
 de identidade (e-mail, telefone, GitHub, LinkedIn, bio) e substituem `participant_name`
 pelo `code` da candidatura (`C-0001`).

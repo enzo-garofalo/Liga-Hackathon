@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { AdminLoginPage } from '../pages/AdminLoginPage'
 import { LoginPage } from '../pages/LoginPage'
@@ -46,6 +47,18 @@ describe('telas de conta', () => {
 
     const bio = screen.getByLabelText(/bio/i)
     expect(bio.tagName).toBe('TEXTAREA')
+  })
+
+  it('a bio do cadastro tem o mesmo teto do perfil', async () => {
+    // Sem o teto, quem se cadastra com bio longa não salva mais o perfil depois:
+    // a edição recusa acima de 500 e a pessoa fica travada sem entender.
+    renderWithProviders(<RegisterPage />)
+
+    expect(screen.getByText('0/500')).toBeInTheDocument()
+
+    const bio = screen.getByLabelText(/bio/i)
+    await userEvent.type(bio, 'Curiosa por produto.')
+    expect(screen.getByText('20/500')).toBeInTheDocument()
   })
 
   it('a tela do organizador é separada da do candidato', () => {

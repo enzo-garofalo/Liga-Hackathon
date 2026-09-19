@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { AdminLoginPage } from '../pages/AdminLoginPage'
 import { LoginPage } from '../pages/LoginPage'
 import { RegisterPage } from '../pages/RegisterPage'
+import { BIO_MAX } from '../utils/perfil'
 import { renderWithProviders } from './render'
 
 vi.mock('../api/auth', () => ({
@@ -59,6 +60,22 @@ describe('telas de conta', () => {
     const bio = screen.getByLabelText(/bio/i)
     await userEvent.type(bio, 'Curiosa por produto.')
     expect(screen.getByText('20/500')).toBeInTheDocument()
+  })
+
+  it('a bio não deixa digitar além do teto', async () => {
+    // A tela prometia 500 e deixava escrever mil: o limite só aparecia ao
+    // enviar, depois do texto já escrito.
+    renderWithProviders(<RegisterPage />)
+    const bio = screen.getByLabelText(/bio/i) as HTMLTextAreaElement
+
+    expect(bio.maxLength).toBe(BIO_MAX)
+
+    // Colar, e não digitar: 520 teclas simuladas estouram o tempo do teste, e
+    // colar é como um texto longo chega num campo destes de verdade.
+    await userEvent.click(bio)
+    await userEvent.paste('x'.repeat(BIO_MAX + 20))
+    expect(bio.value).toHaveLength(BIO_MAX)
+    expect(screen.getByText(`${BIO_MAX}/${BIO_MAX}`)).toBeInTheDocument()
   })
 
   it('a tela do organizador é separada da do candidato', () => {

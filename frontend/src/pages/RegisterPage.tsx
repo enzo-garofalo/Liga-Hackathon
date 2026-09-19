@@ -9,6 +9,7 @@ import { Select } from '../components/ui/Select'
 import { useRegister } from '../hooks/useAuth'
 import type { RegisterPayload } from '../types/auth'
 import { getApiError } from '../utils/errors'
+import { BIO_MAX } from '../utils/perfil'
 
 const COURSES = [
   'Análise e Desenvolvimento de Sistemas',
@@ -29,7 +30,6 @@ const COURSES = [
 ].map((course) => ({ value: course, label: course }))
 
 /** Mesmo teto da tela de perfil: os dois formulários editam o mesmo campo. */
-const BIO_MAX = 500
 
 interface FormShape {
   email: string
@@ -314,6 +314,9 @@ export function RegisterPage() {
                       <textarea
                         id="register-bio"
                         rows={4}
+                        // Trava a digitação no teto. Sem isto dava para escrever
+                        // mil caracteres e só descobrir o limite ao enviar.
+                        maxLength={BIO_MAX}
                         {...register('bio', {
                           required: 'Conte um pouco sobre você.',
                           // Mesmo teto do perfil: sem ele, quem se cadastra com

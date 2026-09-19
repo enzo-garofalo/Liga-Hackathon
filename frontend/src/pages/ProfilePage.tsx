@@ -7,6 +7,7 @@ import { SHOW_HACKATHON } from '../featureFlags'
 import { useProfile, useUpdateProfile } from '../hooks/useProfile'
 import type { UpdateMePayload } from '../types/participant'
 import { getApiError } from '../utils/errors'
+import { BIO_MAX } from '../utils/perfil'
 
 interface FormShape {
   full_name: string
@@ -362,10 +363,11 @@ export function ProfilePage() {
                           <textarea
                             id="profile-bio"
                             rows={6}
+                            maxLength={BIO_MAX}
                             placeholder="Conte um pouco sobre você, suas habilidades e interesses…"
                             {...register('bio', {
                               required: 'Conte um pouco sobre você.',
-                              maxLength: { value: 500, message: 'Máximo 500 caracteres.' },
+                              maxLength: { value: BIO_MAX, message: `Máximo ${BIO_MAX} caracteres.` },
                             })}
                             className={[
                               'w-full px-3.5 py-2.5 pb-6 rounded-xl border font-ui text-sm text-[#101114]',
@@ -376,7 +378,7 @@ export function ProfilePage() {
                             ].join(' ')}
                           />
                           <span className="absolute bottom-2 right-3 text-xs text-[#9497a9] font-ui pointer-events-none select-none">
-                            {bioLength}/500
+                            {bioLength}/{BIO_MAX}
                           </span>
                         </div>
                         {errors.bio && (

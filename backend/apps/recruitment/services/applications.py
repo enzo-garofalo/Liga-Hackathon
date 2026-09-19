@@ -35,6 +35,69 @@ def published_processes():
     return Process.objects.filter(status=ProcessStatus.PUBLISHED)
 
 
+# ── Texto das notificações ────────────────────────────────────────
+#
+# Convenção: a primeira linha é o resumo que aparece na lista do sino; o que vem
+# depois da linha em branco é o detalhe, lido no pop-up da notificação. O campo
+# já é um TextField, então isto não pede coluna nova em `teams`.
+#
+# Sem esse detalhe, quem perdeu o e-mail ficava só com a frase curta e não tinha
+# onde ler o resto dentro da plataforma.
+
+
+def _deadline(value):
+    """Prazo no fuso da Liga.
+
+    O banco guarda em UTC: sem converter, um prazo às 23:59 aparece como o dia
+    seguinte (decisions.md §13).
+    """
+    return timezone.localtime(value).strftime('%d/%m') if value else 'a definir'
+
+
+def _confirmed_message(process, stage):
+    partes = [f'Sua inscrição no {process.name} foi confirmada.']
+    if stage:
+        partes.append(f'A primeira etapa é {stage.name}.')
+        if stage.description:
+            partes.append(stage.description)
+    partes.append(
+        'Acompanhe sua candidatura pela plataforma. Cada mudança de etapa chega '
+        'por e-mail e aqui nas notificações.'
+    )
+    return '\n\n'.join(partes)
+
+
+def _stage_advanced_message(stage):
+    partes = [f'Você avançou para a etapa {stage.name}.']
+    if stage.description:
+        partes.append(stage.description)
+    partes.append(f'Prazo desta etapa: até {_deadline(stage.end_at)}.')
+    partes.append(
+        'Esta etapa pede uma entrega pela plataforma. Abra a etapa para ler o que '
+        'é pedido e enviar o arquivo dentro do prazo.'
+        if stage.allows_file_upload
+        else 'Abra a etapa na plataforma para ler o que é pedido.'
+    )
+    return '\n\n'.join(partes)
+
+
+def _approved_message(process):
+    return (
+        f'Você foi aprovado no {process.name}!\n\n'
+        'Você agora faz parte da Liga de TI. Em breve entramos em contato com os '
+        'próximos passos.'
+    )
+
+
+def _rejected_message(process):
+    return (
+        f'Sua candidatura no {process.name} não seguiu adiante.\n\n'
+        'Agradecemos de verdade sua participação. O número de vagas é limitado, e '
+        'isso não diz respeito ao seu potencial.\n\n'
+        'Esperamos você no próximo processo seletivo.'
+    )
+
+
 @transaction.atomic
 def apply_to_process(process, participant):
     """Cria a candidatura e avisa o candidato por e-mail + notificação."""
@@ -62,7 +125,7 @@ def apply_to_process(process, participant):
     notify(
         participant,
         NotificationType.APPLICATION_CONFIRMED,
-        f'Sua inscrição no {process.name} foi confirmada.',
+        _confirmed_message(process, application.current_stage),
         link_to=f'/applications/{application.id}',
         subject_id=application.id,
     )
@@ -107,7 +170,7 @@ def move_to_stage(application, stage):
     notify(
         application.participant,
         NotificationType.STAGE_ADVANCED,
-        f'Você avançou para a etapa {stage.name}.',
+        _stage_advanced_message(stage),
         link_to=f'/applications/{application.id}',
         subject_id=application.id,
     )
@@ -130,7 +193,7 @@ def approve(application):
     notify(
         application.participant,
         NotificationType.APPLICATION_APPROVED,
-        f'Você foi aprovado no {application.process.name}!',
+        _approved_message(application.process),
         link_to=f'/applications/{application.id}',
         subject_id=application.id,
     )
@@ -146,7 +209,7 @@ def reject(application):
     notify(
         application.participant,
         NotificationType.APPLICATION_REJECTED,
-        f'Sua candidatura no {application.process.name} não seguiu adiante.',
+        _rejected_message(application.process),
         link_to=f'/applications/{application.id}',
         subject_id=application.id,
     )

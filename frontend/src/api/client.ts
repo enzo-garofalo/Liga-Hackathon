@@ -27,16 +27,29 @@ function processQueue(err: unknown, token: string | null): void {
   pendingQueue = []
 }
 
+/**
+ * Endpoints em que 401 significa credencial errada, nao sessao expirada.
+ *
+ * Nao ha sessao para renovar: a pessoa esta tentando entrar. Tratar como
+ * expirada mandava para `/login` com `window.location`, e o recarregamento
+ * apagava a mensagem de "senha incorreta" antes de dar tempo de ler.
+ */
+const AUTH_ENDPOINTS = ['/auth/token/', '/auth/admin/token/', '/auth/token/refresh/']
+
+export function isAuthEndpoint(url: string | undefined): boolean {
+  return !!url && AUTH_ENDPOINTS.some((path) => url.includes(path))
+}
+
 client.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config as typeof error.config & { _retry?: boolean }
 
-    // Skip non-401s, already-retried requests, and the refresh endpoint itself
+    // Skip non-401s, already-retried requests, and the auth endpoints themselves
     if (
       error.response?.status !== 401 ||
       original._retry ||
-      (original.url as string | undefined)?.includes('/auth/token/refresh/')
+      isAuthEndpoint(original.url as string | undefined)
     ) {
       return Promise.reject(error)
     }

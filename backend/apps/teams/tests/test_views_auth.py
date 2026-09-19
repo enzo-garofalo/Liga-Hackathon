@@ -107,3 +107,54 @@ def test_admin_login_accepts_staff(api_client, django_user_model):
     )
     assert r.status_code == 200
     assert 'access' in r.data
+
+
+def test_candidate_login_rejects_organizer_without_profile(api_client, django_user_model):
+    """Organizador entrando por `/login` caía num painel quebrado.
+
+    O token saía normalmente, mas `/me/` e `/me/applications/` respondem 404 e
+    as notificações 403, porque a conta não tem `Participant`. O erro aparecia
+    depois do login, em três telas, sem dizer o que fazer.
+    """
+    django_user_model.objects.create_user(
+        username='org@x.com', email='org@x.com', password='strongpass123', is_staff=True
+    )
+
+    r = api_client.post(
+        TOKEN_URL, {'email': 'org@x.com', 'password': 'strongpass123'}, format='json'
+    )
+    assert r.status_code == 401
+    assert 'access' not in r.data
+    assert 'organizador' in str(r.data['detail'])
+
+
+def test_candidate_login_still_works_for_participants(api_client):
+    """Contraprova: a trava não pode barrar quem tem cadastro de candidato."""
+    api_client.post(REGISTER_URL, VALID_REGISTER, format='json')
+
+    r = api_client.post(
+        TOKEN_URL,
+        {'email': 'ana@x.com', 'password': 'strongpass123'},
+        format='json',
+    )
+    assert r.status_code == 200
+    assert 'access' in r.data
+
+
+def test_organizer_who_is_also_a_candidate_gets_in(api_client, django_user_model):
+    """A checagem é por perfil, não por is_staff.
+
+    Quem for da organização e também tiver se candidatado entra pelas duas portas.
+    """
+    from apps.teams.models import Participant
+
+    api_client.post(REGISTER_URL, VALID_REGISTER, format='json')
+    user = django_user_model.objects.get(email='ana@x.com')
+    user.is_staff = True
+    user.save()
+    assert Participant.objects.filter(user=user).exists()
+
+    r = api_client.post(
+        TOKEN_URL, {'email': 'ana@x.com', 'password': 'strongpass123'}, format='json'
+    )
+    assert r.status_code == 200

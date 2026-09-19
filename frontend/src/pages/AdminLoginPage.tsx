@@ -80,7 +80,7 @@ export function AdminLoginPage() {
                 Entrada exclusiva para a organização da Liga de TI.
               </p>
 
-              <form onSubmit={onSubmit} className="space-y-4">
+              <form onSubmit={onSubmit} noValidate className="space-y-4">
                 <Input
                   label="E-mail"
                   type="email"

@@ -155,9 +155,11 @@ resolvido, seguindo a regra existente de "nunca um sem o outro".
 | is_coordinator | BooleanField | default=False — vê identidade e administra designações |
 | phone / github / linkedin | | mesmos campos do modal "Perfil organizador" |
 
-> `role_title` é informativo e não concede permissão. `is_coordinator` **concede**: o
-> coordenador enxerga a identidade dos candidatos na correção anônima e administra a
-> distribuição de avaliadores. Ver [decisions.md](decisions.md) §10.
+> `role_title` é informativo e não concede permissão. `is_coordinator` marca quem
+> administra a distribuição de avaliadores. Ver [decisions.md](decisions.md) §10.
+>
+> Com a correção anônima desligada (§23), todo organizador enxerga a identidade, então a
+> distinção perde metade do efeito. O campo continua porque o anonimato pode voltar.
 
 ### StageAssignment (designação de avaliador)
 | Campo | Tipo | Obs |

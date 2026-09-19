@@ -48,7 +48,9 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
   significa ausência de entrega, não faz parte da escala.
 - Vários organizadores avaliam o mesmo candidato; a nota do critério é a média entre eles.
 - Médias são calculadas em service, nunca persistidas em campo.
-- Correção é anônima por padrão: o avaliador vê o código da candidatura, não a pessoa.
+- **Correção não é anônima nesta edição**: todo organizador vê a identidade do candidato
+  (decisions.md §23). O mecanismo de anonimato continua no código e liga pelo campo
+  `Process.anonymous_evaluation`.
 - Qualquer organizador avalia qualquer candidato. `StageAssignment` distribui o trabalho
   entre corretores, mas **não é permissão**: designação ausente não bloqueia nota
   (decisions.md §19).

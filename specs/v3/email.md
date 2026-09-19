@@ -92,7 +92,7 @@ Corpo:
 ### custom_communication
 Assunto: o que o organizador escreveu.
 
-Corpo: a mensagem do organizador, com `{nome}` substituído pelo nome do candidato,
+Corpo: a mensagem do organizador, como foi escrita,
 dentro do layout padrão de e-mail da Liga.
 
 ---

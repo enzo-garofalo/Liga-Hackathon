@@ -33,7 +33,7 @@ function Field({
       <Icon className="mt-0.5 h-4 w-4 flex-shrink-0 text-brand" />
       <div className="min-w-0">
         <p className="kicker">{label}</p>
-        <p className="truncate font-ui text-sm text-ink/82">{value || '—'}</p>
+        <p className="truncate font-ui text-sm text-ink/80">{value || '—'}</p>
       </div>
     </div>
   )
@@ -241,7 +241,7 @@ export function CandidateProfileModal({
                   >
                     <span className="flex min-w-0 items-center gap-2">
                       <FileText className="h-4 w-4 flex-shrink-0 text-brand" />
-                      <span className="truncate font-ui text-sm text-ink/82">
+                      <span className="truncate font-ui text-sm text-ink/80">
                         {deliverable.filename}
                       </span>
                       <span className="flex-shrink-0 text-xs text-ink/50">
@@ -278,7 +278,7 @@ export function CandidateProfileModal({
                     key={criterion.id}
                     className="flex items-center justify-between gap-4"
                   >
-                    <span className="min-w-0 font-ui text-sm text-ink/82">
+                    <span className="min-w-0 font-ui text-sm text-ink/80">
                       {criterion.name}
                       {Number(criterion.weight) > 0 && (
                         <span className="ml-2 text-xs text-ink/50">
@@ -304,7 +304,7 @@ export function CandidateProfileModal({
 
               {notaDaEtapa !== null && (
                 <div className="mt-3 flex items-center justify-between gap-4 rounded-xl border border-brand/25 bg-brand/[0.06] px-4 py-2.5">
-                  <span className="min-w-0 font-ui text-sm font-medium text-ink/82">
+                  <span className="min-w-0 font-ui text-sm font-medium text-ink/80">
                     Nota desta etapa
                     <span className="ml-2 text-xs font-normal text-ink/55">
                       sua avaliação, ainda não salva

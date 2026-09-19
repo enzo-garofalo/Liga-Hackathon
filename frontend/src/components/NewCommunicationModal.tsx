@@ -78,7 +78,7 @@ export function NewCommunicationModal({
         {targeted ? (
           <div className="rounded-xl border border-brand/25 bg-brand/[0.06] px-4 py-3">
             <p className="kicker">Destinatários</p>
-            <p className="mt-1 font-ui text-sm text-ink/82">
+            <p className="mt-1 font-ui text-sm text-ink/80">
               {recipients?.length} candidato{recipients?.length === 1 ? '' : 's'} selecionado
               {recipients?.length === 1 ? '' : 's'}: {recipients?.map((r) => r.name).join(', ')}
             </p>

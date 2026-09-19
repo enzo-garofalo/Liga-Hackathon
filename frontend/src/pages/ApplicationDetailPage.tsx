@@ -88,7 +88,7 @@ export function ApplicationDetailPage() {
 
       <div className="purple-cta relative overflow-hidden rounded-[32px] p-8 text-panel">
         <div className="relative">
-          <p className="mb-2 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-white/72">
+          <p className="mb-2 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-white/70">
             Minha candidatura
           </p>
           <h1 className="font-display text-3xl font-light leading-tight text-white">
@@ -102,13 +102,13 @@ export function ApplicationDetailPage() {
               {status.label}
             </span>
             {application.current_stage_name && application.status === 'in_progress' && (
-              <span className="text-sm text-white/78">
+              <span className="text-sm text-white/80">
                 Etapa atual: <span className="font-semibold text-white">{application.current_stage_name}</span>
               </span>
             )}
           </div>
 
-          <p className="mt-3 max-w-lg text-sm font-medium leading-relaxed text-white/78">
+          <p className="mt-3 max-w-lg text-sm font-medium leading-relaxed text-white/80">
             {status.detail}
           </p>
 

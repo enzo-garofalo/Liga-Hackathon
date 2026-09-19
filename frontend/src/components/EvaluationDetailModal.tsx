@@ -58,7 +58,7 @@ export function EvaluationDetailModal({ applicationId, candidateName, onClose }:
                     <tbody className="divide-y divide-ink/[0.08]">
                       {block.criteria.map((criterion) => (
                         <tr key={criterion.name}>
-                          <td className="px-4 py-2.5 text-ink/82">{criterion.name}</td>
+                          <td className="px-4 py-2.5 text-ink/80">{criterion.name}</td>
                           {evaluators.map((evaluator) => {
                             const score = criterion.scores.find(
                               (s) => s.evaluator === evaluator,

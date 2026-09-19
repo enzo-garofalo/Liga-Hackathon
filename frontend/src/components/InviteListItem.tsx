@@ -14,7 +14,7 @@ export function InviteListItem({ invite }: InviteListItemProps) {
     <li className="py-4 flex items-center justify-between gap-4">
       <div>
         <p className="font-ui font-medium text-ink">{invite.team.name}</p>
-        <p className="text-xs text-ink/46 font-ui mt-1">
+        <p className="text-xs text-ink/45 font-ui mt-1">
           Convite de {invite.invited_by.full_name} · {invite.team.member_count}/4 membros
         </p>
       </div>

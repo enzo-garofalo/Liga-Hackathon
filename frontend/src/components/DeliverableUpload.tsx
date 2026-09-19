@@ -48,7 +48,7 @@ export function DeliverableUpload({ applicationId, stage }: DeliverableUploadPro
   return (
     <div className="mt-4 rounded-[21px] border border-ink/12 bg-ink/[0.02] p-5">
       <p className="kicker">Sua entrega</p>
-      <p className="mt-1 text-xs text-ink/68">
+      <p className="mt-1 text-xs text-ink/70">
         {stage.allowed_file_types.length > 0
           ? `Formatos aceitos: ${stage.allowed_file_types.join(', ')}`
           : 'Qualquer formato'}

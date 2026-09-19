@@ -30,19 +30,19 @@ export function CommunicationDetailModal({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <p className="kicker">Tipo</p>
-              <p className="font-ui text-sm text-ink/82">
+              <p className="font-ui text-sm text-ink/80">
                 {communication.type === 'auto' ? 'Automática' : 'Manual'}
               </p>
             </div>
             <div>
               <p className="kicker">Data</p>
-              <p className="font-ui text-sm text-ink/82">
+              <p className="font-ui text-sm text-ink/80">
                 {formatDateTime(communication.sent_at)}
               </p>
             </div>
             <div>
               <p className="kicker">Destinatários</p>
-              <p className="font-ui text-sm text-ink/82">
+              <p className="font-ui text-sm text-ink/80">
                 {communication.recipient_count} candidato
                 {communication.recipient_count === 1 ? '' : 's'}
               </p>

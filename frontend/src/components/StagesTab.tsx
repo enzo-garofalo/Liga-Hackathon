@@ -104,7 +104,7 @@ export function StagesTab({ processId }: { processId: string }) {
           <p className="font-display text-base font-semibold text-ink">
             Nenhuma etapa configurada
           </p>
-          <p className="mt-1 text-sm text-ink/68">
+          <p className="mt-1 text-sm text-ink/70">
             O processo só pode ser publicado com ao menos uma etapa.
           </p>
         </div>
@@ -130,7 +130,7 @@ export function StagesTab({ processId }: { processId: string }) {
               </div>
 
               {stage.description && (
-                <p className="mb-4 text-xs leading-relaxed text-ink/68">
+                <p className="mb-4 text-xs leading-relaxed text-ink/70">
                   {stage.description}
                 </p>
               )}
@@ -234,7 +234,7 @@ export function StagesTab({ processId }: { processId: string }) {
             {(namesByStage.get(vendoLista.id) ?? []).map((name, index) => (
               <li
                 key={`${name}-${index}`}
-                className="flex items-center gap-3 px-4 py-2.5 font-ui text-sm text-ink/82"
+                className="flex items-center gap-3 px-4 py-2.5 font-ui text-sm text-ink/80"
               >
                 <span className="w-6 flex-shrink-0 text-right text-xs tabular-nums text-ink/40">
                   {index + 1}

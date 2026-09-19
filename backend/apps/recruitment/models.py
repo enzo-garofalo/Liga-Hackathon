@@ -80,6 +80,12 @@ class Stage(models.Model):
     # botão, e o candidato só lê quando chega na etapa — ver
     # `ApplicationTimelineStageSerializer.get_instructions`.
     instructions = models.TextField(blank=True)
+    # Enunciado em arquivo, para a etapa em que o texto não basta: o case vem
+    # como PDF, com formatação e anexos. Segue a mesma trava de `instructions`:
+    # só baixa quem já chegou na etapa.
+    instructions_file = models.FileField(
+        upload_to='enunciados/%Y/%m/', blank=True
+    )
     order = models.PositiveSmallIntegerField()
     start_at = models.DateTimeField(null=True, blank=True)
     end_at = models.DateTimeField(null=True, blank=True)

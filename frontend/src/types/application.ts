@@ -23,6 +23,8 @@ export interface TimelineStage extends PublicStage {
   deliverables: Deliverable[]
   /** Vem vazio enquanto o candidato não chega na etapa. */
   instructions: string
+  /** Enunciado em PDF. Vem nulo enquanto o candidato não chega na etapa. */
+  instructions_file: { filename: string; download_url: string } | null
 }
 
 export interface ApplicationSummary {

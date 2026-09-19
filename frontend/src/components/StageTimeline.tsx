@@ -1,6 +1,9 @@
-import { BookOpen, Check, Circle, Loader2 } from 'lucide-react'
+import { BookOpen, Check, Circle, Download, Loader2 } from 'lucide-react'
 import { useState } from 'react'
+import { downloadStageInstructionsFile } from '../api/stages'
 import type { TimelineStage } from '../types/application'
+import { saveBlob } from '../utils/download'
+import { getApiError } from '../utils/errors'
 import { Modal } from './ui/Modal'
 
 function formatDate(iso: string | null) {
@@ -29,6 +32,54 @@ function StageIcon({ state }: { state: TimelineStage['state'] }) {
   return (
     <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-ink/[0.06] ring-1 ring-ink/10">
       <Circle className="h-3 w-3 text-ink/35" />
+    </div>
+  )
+}
+
+/**
+ * Enunciado em PDF da etapa.
+ *
+ * Passa pelo endpoint autenticado como qualquer arquivo da plataforma: o
+ * conteúdo é a prova, e o backend confere se o candidato já chegou na etapa
+ * antes de entregar os bytes.
+ */
+function BotaoEnunciadoPdf({ stage }: { stage: TimelineStage }) {
+  const [baixando, setBaixando] = useState(false)
+  const [erro, setErro] = useState<string | null>(null)
+  const arquivo = stage.instructions_file
+
+  if (!arquivo) return null
+
+  const baixar = async () => {
+    setErro(null)
+    setBaixando(true)
+    try {
+      saveBlob(await downloadStageInstructionsFile(stage.id), arquivo.filename)
+    } catch (e) {
+      setErro(getApiError(e))
+    } finally {
+      setBaixando(false)
+    }
+  }
+
+  return (
+    <div className="flex flex-col items-start gap-1 sm:items-end">
+      <button
+        type="button"
+        onClick={baixar}
+        disabled={baixando}
+        className="inline-flex items-center gap-2 rounded-full bg-brand px-4 py-2 font-ui text-xs font-semibold text-white transition-colors hover:bg-[#5f28d4] disabled:opacity-60"
+      >
+        {baixando ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        ) : (
+          <Download className="h-3.5 w-3.5" />
+        )}
+        Baixar o enunciado
+      </button>
+      {erro && (
+        <p className="max-w-[16rem] font-ui text-xs font-medium text-red-600">{erro}</p>
+      )}
     </div>
   )
 }
@@ -72,46 +123,58 @@ export function StageTimeline({ stages, renderStageExtra }: StageTimelineProps) 
             </div>
 
             <div className={`flex-1 ${isLast ? 'pb-0' : 'pb-6'}`}>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h3
-                  className={`font-display text-base font-semibold ${
-                    stage.state === 'upcoming' ? 'text-ink/45' : 'text-ink'
-                  }`}
-                >
-                  {stage.name}
-                </h3>
-                {stage.state === 'current' && (
-                  <span className="rounded-full border border-brand/25 bg-brand/15 px-2 py-0.5 text-xs font-medium text-brand">
-                    Etapa atual
-                  </span>
-                )}
-                {(start || end) && (
-                  <span className="text-xs text-ink/60">
-                    {start && end ? `${start} – ${end}` : start || end}
-                  </span>
+              {/* Texto à esquerda, ação à direita: o botão ficava embaixo da
+                  descrição e passava despercebido. */}
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <h3
+                      className={`font-display text-base font-semibold ${
+                        stage.state === 'upcoming' ? 'text-ink/45' : 'text-ink'
+                      }`}
+                    >
+                      {stage.name}
+                    </h3>
+                    {stage.state === 'current' && (
+                      <span className="rounded-full border border-brand/25 bg-brand/15 px-2 py-0.5 text-xs font-medium text-brand">
+                        Etapa atual
+                      </span>
+                    )}
+                    {(start || end) && (
+                      <span className="text-xs text-ink/60">
+                        {start && end ? `${start} – ${end}` : start || end}
+                      </span>
+                    )}
+                  </div>
+
+                  {stage.description && (
+                    <p
+                      className={`mt-1 text-sm leading-relaxed ${
+                        stage.state === 'upcoming' ? 'text-ink/40' : 'text-ink/70'
+                      }`}
+                    >
+                      {stage.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Com PDF anexado, o enunciado é o arquivo: é ele que o
+                    candidato precisa abrir, não o texto. */}
+                {stage.instructions_file ? (
+                  <BotaoEnunciadoPdf stage={stage} />
+                ) : (
+                  stage.instructions && (
+                    <button
+                      type="button"
+                      onClick={() => setLendo(stage)}
+                      className="inline-flex flex-shrink-0 items-center gap-2 self-start rounded-full border border-brand/30 bg-brand/10 px-4 py-2 font-ui text-xs font-semibold text-brand transition-colors hover:bg-brand/20"
+                    >
+                      <BookOpen className="h-3.5 w-3.5" />
+                      O que preciso fazer
+                    </button>
+                  )
                 )}
               </div>
-
-              {stage.description && (
-                <p
-                  className={`mt-1 text-sm leading-relaxed ${
-                    stage.state === 'upcoming' ? 'text-ink/40' : 'text-ink/70'
-                  }`}
-                >
-                  {stage.description}
-                </p>
-              )}
-
-              {stage.instructions && (
-                <button
-                  type="button"
-                  onClick={() => setLendo(stage)}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-brand/[0.06] px-3 py-1 font-ui text-xs font-medium text-brand transition-colors hover:bg-brand/10"
-                >
-                  <BookOpen className="h-3.5 w-3.5" />
-                  O que preciso fazer
-                </button>
-              )}
 
               {renderStageExtra?.(stage)}
             </div>

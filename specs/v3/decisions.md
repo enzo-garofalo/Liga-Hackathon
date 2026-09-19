@@ -519,3 +519,35 @@ O campo já é `TextField`, então a convenção resolve sem migração e sem to
 de linha única continua funcionando: o resumo é a própria linha e o pop-up fica só com ela.
 O rótulo humano do tipo vai junto no JSON, como `type_display`, para o frontend não manter
 uma segunda cópia da lista de tipos.
+
+
+## 25. O enunciado da etapa também pode ser um PDF
+
+**Decisão:** `Stage` ganha `instructions_file`. Quando a etapa tem arquivo anexado, o
+candidato vê "Baixar o enunciado" no lugar de "O que preciso fazer", e o botão passa para a
+direita da etapa na linha do tempo.
+
+**Motivo:** o enunciado do case não cabe bem em caixa de texto. Ele tem formatação, às vezes
+anexo, e muda a cada edição. O organizador escrevia num campo que não preserva nada disso.
+
+**A regra que importa:** o arquivo segue exatamente a trava do texto, e as duas passam pela
+mesma função, `services/applications.has_reached`. Antes de o candidato chegar na etapa, a
+API não devolve o texto, não devolve o arquivo e **não devolve nem o nome do arquivo** — um
+nome como `case-fintech-2026.pdf` entrega o tema, e a aba de rede do navegador daria dias de
+vantagem a quem soubesse olhar. O download é endpoint autenticado, pela mesma razão dos
+entregáveis: nada de mídia em URL pública.
+
+**Na tela do organizador, um substitui o outro.** O campo "O que o candidato precisa fazer"
+tem duas opções, Escrever e Anexar PDF, e mostra uma de cada vez — é o que o candidato vê.
+Com o PDF anexado o organizador baixa, troca e remove ali mesmo. Se sobrar texto salvo
+embaixo de um PDF, a tela avisa e oferece apagar: texto que fica no banco e some da tela é
+armadilha para a próxima edição.
+
+**Por que não no payload da etapa:** o resto da configuração é JSON e o arquivo é multipart.
+Misturar obrigaria a converter o endpoint inteiro. O arquivo entra e sai por
+`admin/stages/<id>/instructions-file/`, e a tela de configuração o trata como uma ação à
+parte, que vale na hora. Consequência: etapa nova precisa ser salva antes de receber o PDF,
+porque o upload precisa de um id.
+
+**Anexar por cima apaga o anterior.** Sem isso, cada troca de enunciado deixaria uma cópia
+órfã no volume, que ninguém alcança e ninguém apaga.

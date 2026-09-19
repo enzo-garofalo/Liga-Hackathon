@@ -22,6 +22,7 @@ function stage(overrides: Partial<TimelineStage>): TimelineStage {
     name: 'Etapa',
     description: '',
     instructions: '',
+    instructions_file: null,
     order: 1,
     start_at: null,
     end_at: null,

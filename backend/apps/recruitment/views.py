@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAdminUser
@@ -51,6 +51,11 @@ from apps.recruitment.services.assignments import (
     workload,
 )
 from apps.recruitment.services.communications import send_communication
+from apps.recruitment.services.stage_files import (
+    can_download as can_download_stage_file,
+)
+from apps.recruitment.services.stage_files import clear_file as clear_stage_file
+from apps.recruitment.services.stage_files import set_file as set_stage_file
 from apps.recruitment.services.deliverables import (
     assert_owner,
     can_download,
@@ -611,6 +616,51 @@ class DeliverableDownloadView(APIView):
             deliverable.file.open('rb'),
             as_attachment=True,
             filename=os.path.basename(deliverable.file.name),
+        )
+
+
+class AdminStageInstructionsFileView(APIView):
+    """Enunciado em PDF da etapa: anexar e remover, pelo organizador."""
+
+    permission_classes = [IsAdminUser]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request, pk):
+        stage = get_object_or_404(Stage.objects.select_related('process'), pk=pk)
+        uploaded = request.FILES.get('file')
+        if uploaded is None:
+            raise ValidationError('Envie um arquivo no campo "file".')
+
+        set_stage_file(stage, uploaded)
+        return Response(StageSerializer(stage).data)
+
+    def delete(self, request, pk):
+        stage = get_object_or_404(Stage.objects.select_related('process'), pk=pk)
+        clear_stage_file(stage)
+        return Response(StageSerializer(stage).data)
+
+
+class StageInstructionsFileDownloadView(APIView):
+    """Download do enunciado, autenticado e preso à etapa.
+
+    Mesma razão do entregável: o arquivo não fica em URL pública. Aqui pesa
+    mais, porque o conteúdo é a prova e o ganho de quem passasse na frente
+    seriam dias de vantagem.
+    """
+
+    def get(self, request, pk):
+        stage = get_object_or_404(Stage.objects.select_related('process'), pk=pk)
+        if not stage.instructions_file:
+            raise NotFound('Esta etapa não tem enunciado anexado.')
+        if not can_download_stage_file(stage, request.user):
+            raise PermissionDenied(
+                'O enunciado desta etapa abre quando você chegar nela.'
+            )
+
+        return FileResponse(
+            stage.instructions_file.open('rb'),
+            as_attachment=True,
+            filename=os.path.basename(stage.instructions_file.name),
         )
 
 

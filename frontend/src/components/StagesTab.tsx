@@ -213,6 +213,9 @@ export function StagesTab({ processId }: { processId: string }) {
           onClose={() => setEditing(null)}
           saving={update.isPending}
           error={update.error}
+          // O PDF sobe por endpoint próprio: sem recarregar, o card continuaria
+          // mostrando o estado anterior do anexo.
+          onFileChange={() => query.refetch()}
           onSave={(payload) =>
             update.mutate(
               { id: editing.id, payload },

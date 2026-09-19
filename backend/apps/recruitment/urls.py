@@ -15,6 +15,7 @@ from .views import (
     AdminStageAssignmentView,
     AdminStageAutoDistributeView,
     AdminStageDetailView,
+    AdminStageInstructionsFileView,
     AdminStageListCreateView,
     AdminStageReorderView,
     DeliverableDownloadView,
@@ -24,6 +25,7 @@ from .views import (
     MyDeliverableView,
     ProcessApplyView,
     ProcessDetailView,
+    StageInstructionsFileDownloadView,
     OpenProcessView,
     ProcessListView,
 )
@@ -95,6 +97,16 @@ urlpatterns = [
         'admin/stages/<uuid:pk>/',
         AdminStageDetailView.as_view(),
         name='admin-stage-detail',
+    ),
+    path(
+        'admin/stages/<uuid:pk>/instructions-file/',
+        AdminStageInstructionsFileView.as_view(),
+        name='admin-stage-instructions-file',
+    ),
+    path(
+        'stages/<uuid:pk>/instructions-file/download/',
+        StageInstructionsFileDownloadView.as_view(),
+        name='stage-instructions-file-download',
     ),
     path(
         'admin/processes/<uuid:pk>/applications/',

@@ -57,6 +57,15 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
 - Divergência acima do limiar do processo marca `needs_third_review`.
 - Aprovação final só é permitida para candidatos na última etapa.
 - Candidato nunca vê nota nem observação de avaliador.
+- O enunciado da etapa pode ser **texto** (`Stage.instructions`) ou **PDF anexado**
+  (`Stage.instructions_file`). Com PDF, o candidato vê "Baixar o enunciado" no lugar de
+  "O que preciso fazer": o arquivo é o enunciado. Os dois seguem a mesma trava, em
+  `services/applications.has_reached` — **nem o texto, nem o arquivo, nem o nome do
+  arquivo** saem na API antes de o candidato chegar na etapa. O nome já entrega o tema do
+  case, e a aba de rede do navegador daria dias de vantagem. O PDF sobe e sai por
+  `admin/stages/<id>/instructions-file/`, multipart, fora do payload JSON da etapa.
+  Na tela do organizador os dois formatos **se substituem**, não convivem: o campo tem as
+  opções Escrever e Anexar PDF. Com PDF, ele baixa, troca e remove ali (decisions.md §25).
 - Entregáveis não ficam em URL pública: download passa por endpoint autenticado, liberado
   ao dono da candidatura e a organizadores. **Continua liberado depois que a etapa passa e
   depois da candidatura encerrar**: o candidato precisa poder reler o que entregou. Trocar

@@ -12,10 +12,13 @@ from apps.recruitment.models import (
     ProcessStatus,
     Stage,
 )
+from apps.recruitment.services.applications import has_reached
 from apps.recruitment.services.processes import (
     assert_criteria_removable,
     next_stage_order,
 )
+from apps.recruitment.services.stage_files import download_url as stage_file_url
+from apps.recruitment.services.stage_files import filename as stage_file_name
 
 
 class EvaluationCriterionSerializer(serializers.ModelSerializer):
@@ -29,6 +32,10 @@ class EvaluationCriterionSerializer(serializers.ModelSerializer):
 class StageSerializer(serializers.ModelSerializer):
     criteria = EvaluationCriterionSerializer(many=True, required=False)
     participant_count = serializers.SerializerMethodField()
+    # O arquivo entra e sai por endpoint próprio, multipart. Aqui é só leitura,
+    # para a tela de configuração mostrar o que está anexado.
+    instructions_file_name = serializers.SerializerMethodField()
+    instructions_file_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Stage
@@ -37,6 +44,8 @@ class StageSerializer(serializers.ModelSerializer):
             'name',
             'description',
             'instructions',
+            'instructions_file_name',
+            'instructions_file_url',
             'order',
             'start_at',
             'end_at',
@@ -48,11 +57,22 @@ class StageSerializer(serializers.ModelSerializer):
             'criteria',
             'participant_count',
         ]
-        read_only_fields = ['id', 'participant_count']
+        read_only_fields = [
+            'id',
+            'participant_count',
+            'instructions_file_name',
+            'instructions_file_url',
+        ]
         extra_kwargs = {'order': {'required': False}}
 
     def get_participant_count(self, stage):
         return stage.current_applications.count()
+
+    def get_instructions_file_name(self, stage):
+        return stage_file_name(stage)
+
+    def get_instructions_file_url(self, stage):
+        return stage_file_url(stage)
 
     def validate(self, attrs):
         if attrs.get('criteria') is not None:
@@ -332,6 +352,7 @@ class ApplicationTimelineStageSerializer(PublicStageSerializer):
     state = serializers.SerializerMethodField()
     deliverables = serializers.SerializerMethodField()
     instructions = serializers.SerializerMethodField()
+    instructions_file = serializers.SerializerMethodField()
 
     class Meta(PublicStageSerializer.Meta):
         fields = PublicStageSerializer.Meta.fields + [
@@ -341,6 +362,7 @@ class ApplicationTimelineStageSerializer(PublicStageSerializer):
             'state',
             'deliverables',
             'instructions',
+            'instructions_file',
         ]
         read_only_fields = fields
 
@@ -351,9 +373,25 @@ class ApplicationTimelineStageSerializer(PublicStageSerializer):
         deixaria o enunciado legível na API antes da etapa abrir — bastaria
         abrir a aba de rede do navegador para começar dias antes dos outros.
         """
-        if self.get_state(stage) == 'upcoming':
+        if not self._alcancou(stage):
             return ''
         return stage.instructions
+
+    def get_instructions_file(self, stage):
+        """O PDF do enunciado, pela mesma regra do texto.
+
+        Nem o nome do arquivo sai antes da hora: o nome já costuma entregar o
+        tema do case.
+        """
+        if not self._alcancou(stage) or not stage.instructions_file:
+            return None
+        return {
+            'filename': stage_file_name(stage),
+            'download_url': stage_file_url(stage),
+        }
+
+    def _alcancou(self, stage):
+        return has_reached(self.context['application'], stage)
 
     def get_state(self, stage):
         application = self.context['application']

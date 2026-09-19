@@ -35,6 +35,17 @@ def published_processes():
     return Process.objects.filter(status=ProcessStatus.PUBLISHED)
 
 
+def has_reached(application, stage):
+    """Se o candidato já chegou nesta etapa.
+
+    Uma regra só, usada pelo enunciado em texto e pelo enunciado em PDF. Nenhum
+    dos dois pode ser lido antes da etapa abrir: bastaria a aba de rede do
+    navegador para começar dias antes dos outros.
+    """
+    current = application.current_stage
+    return current is not None and stage.order <= current.order
+
+
 # ── Texto das notificações ────────────────────────────────────────
 #
 # Convenção: a primeira linha é o resumo que aparece na lista do sino; o que vem

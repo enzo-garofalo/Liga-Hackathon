@@ -1,8 +1,16 @@
-import { render, screen, within } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { downloadStageInstructionsFile } from '../api/stages'
 import { StageTimeline } from '../components/StageTimeline'
 import type { TimelineStage } from '../types/application'
+import { saveBlob } from '../utils/download'
+import { httpError } from './http'
+
+vi.mock('../api/stages', () => ({
+  downloadStageInstructionsFile: vi.fn(),
+}))
+vi.mock('../utils/download', () => ({ saveBlob: vi.fn() }))
 
 function stage(overrides: Partial<TimelineStage>): TimelineStage {
   return {
@@ -10,6 +18,7 @@ function stage(overrides: Partial<TimelineStage>): TimelineStage {
     name: 'Etapa',
     description: '',
     instructions: '',
+    instructions_file: null,
     order: 1,
     start_at: null,
     end_at: null,
@@ -106,5 +115,80 @@ describe('instruções da etapa', () => {
     expect(
       screen.queryByRole('button', { name: /o que preciso fazer/i }),
     ).not.toBeInTheDocument()
+  })
+})
+
+// ── Enunciado em PDF ──────────────────────────────────────────────
+//
+// Quando a etapa tem arquivo anexado, é ele que o candidato precisa abrir: o
+// botão de baixar toma o lugar do "O que preciso fazer".
+
+const comPdf = (overrides: Partial<TimelineStage> = {}) =>
+  stage({
+    name: 'Resolução do Case',
+    state: 'current',
+    instructions: 'Texto antigo que ficou na etapa.',
+    instructions_file: {
+      filename: 'case-2026-2.pdf',
+      download_url: '/api/v1/stages/x/instructions-file/download/',
+    },
+    ...overrides,
+  })
+
+describe('StageTimeline com enunciado em PDF', () => {
+  beforeEach(() => {
+    vi.mocked(downloadStageInstructionsFile).mockResolvedValue(new Blob(['pdf']))
+  })
+
+  it('mostra o botão de baixar no lugar do "O que preciso fazer"', () => {
+    render(<StageTimeline stages={[comPdf()]} />)
+
+    expect(
+      screen.getByRole('button', { name: /baixar o enunciado/i }),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: /o que preciso fazer/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('baixa o arquivo com o nome que o organizador subiu', async () => {
+    render(<StageTimeline stages={[comPdf()]} />)
+
+    await userEvent.click(screen.getByRole('button', { name: /baixar o enunciado/i }))
+
+    await waitFor(() =>
+      expect(saveBlob).toHaveBeenCalledWith(expect.any(Blob), 'case-2026-2.pdf'),
+    )
+  })
+
+  it('diz o motivo quando o download é recusado', async () => {
+    vi.mocked(downloadStageInstructionsFile).mockRejectedValue(
+      httpError(403, { detail: 'O enunciado abre quando você chegar nela.' }),
+    )
+    render(<StageTimeline stages={[comPdf()]} />)
+
+    await userEvent.click(screen.getByRole('button', { name: /baixar o enunciado/i }))
+
+    expect(
+      await screen.findByText('O enunciado abre quando você chegar nela.'),
+    ).toBeInTheDocument()
+  })
+
+  it('etapa futura não mostra botão de baixar', () => {
+    // O backend manda instructions_file nulo para etapa que a pessoa não
+    // alcançou: nem o nome do arquivo sai, porque o nome entrega o tema.
+    render(<StageTimeline stages={[comPdf({ state: 'upcoming', instructions_file: null })]} />)
+
+    expect(
+      screen.queryByRole('button', { name: /baixar o enunciado/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('sem PDF, o botão de texto continua aparecendo', () => {
+    render(<StageTimeline stages={[comPdf({ instructions_file: null })]} />)
+
+    expect(
+      screen.getByRole('button', { name: /o que preciso fazer/i }),
+    ).toBeInTheDocument()
   })
 })

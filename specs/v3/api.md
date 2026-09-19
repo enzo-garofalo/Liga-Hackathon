@@ -105,6 +105,16 @@ Baixa o arquivo. Permitido ao dono da candidatura e a qualquer organizador
 Os arquivos **não são servidos por URL pública**: são material de candidatura e o caminho
 em `/media/` seria adivinhável. Todo acesso passa por este endpoint.
 
+## POST/DELETE /api/v1/admin/stages/{id}/instructions-file/
+Anexa (multipart, campo `file`) ou remove o enunciado em PDF da etapa. Só organizador.
+Devolve a etapa, com `instructions_file_name` e `instructions_file_url`. Anexar por cima
+apaga o arquivo anterior do disco.
+
+## GET /api/v1/stages/{id}/instructions-file/download/
+Baixa o enunciado. Organizador sempre; candidato só depois de chegar na etapa. Na linha do
+tempo, `instructions_file` vem nulo enquanto a etapa é futura — nem o nome do arquivo sai
+antes da hora (decisions.md §25).
+
 ## GET /api/v1/me/notifications/
 Reaproveita o endpoint da v2. Ganha os tipos novos listados em [email.md](email.md).
 

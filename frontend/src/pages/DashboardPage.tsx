@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { CalendarDays, Clock, Layers, ListChecks, Mail, MessageCircle, User, Users } from 'lucide-react'
+import { AlertCircle, ArrowRight, CalendarDays, Clock, Layers, ListChecks, Mail, MessageCircle, User, Users } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getInfo } from '../api/info'
@@ -19,6 +19,9 @@ import type { ApplicationStatus } from '../types/application'
 
 const WHATSAPP_LINK = (import.meta as unknown as { env: Record<string, string> }).env.VITE_WHATSAPP_LINK || '#'
 const EVENT_DATE = new Date('2026-06-20T10:00:00')
+
+const botaoInscrever =
+  'inline-flex flex-shrink-0 items-center justify-center gap-2 rounded-2xl bg-brand px-6 py-3 font-ui text-sm font-semibold text-white transition-colors hover:bg-[#5f28d4]'
 
 function daysUntil(date: Date) {
   return Math.max(0, Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
@@ -149,7 +152,13 @@ export function DashboardPage() {
                 {statusLabel[activeApplication.status]}
               </span>
             ) : (
-              <span className="rounded-full bg-ink/[0.06] px-2 py-0.5 font-ui text-base font-medium text-ink/60">
+              <span
+                className={`rounded-full px-2 py-0.5 font-ui text-base font-medium ${
+                  openProcesses.length > 0
+                    ? 'bg-amber-400/20 text-amber-700'
+                    : 'bg-ink/[0.06] text-ink/60'
+                }`}
+              >
                 Sem inscrição
               </span>
             )
@@ -176,6 +185,50 @@ export function DashboardPage() {
         />
       </div>
 
+      {/* Criar conta não é se inscrever, e é fácil achar que sim: a pessoa
+          preencheu um formulário, recebeu e-mail e chegou aqui. Sem este aviso,
+          o único sinal era a pílula cinza "Sem inscrição".
+
+          Só aparece com inscrição aberta de verdade: avisar que falta se
+          inscrever sem ter onde clicar é só aflição. E nunca enquanto carrega,
+          para não acusar de "não inscrito" quem está inscrito. */}
+      {!statsUnknown && myApplications.length === 0 && openProcesses.length > 0 && (
+        <section className="mt-6 rounded-[32px] border-2 border-amber-400/50 bg-amber-400/10 p-6 md:p-8">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div className="flex gap-4">
+              <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-amber-400/25">
+                <AlertCircle className="h-5 w-5 text-amber-700" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="font-display text-xl font-semibold text-ink">
+                  Você ainda não se inscreveu
+                </h2>
+                <p className="mt-1 max-w-xl text-sm font-medium leading-relaxed text-ink/75">
+                  Criar a conta não inscreve ninguém no processo seletivo. Para concorrer a
+                  uma vaga na Liga, falta enviar sua inscrição.
+                  {nextDeadline && ` As inscrições vão até ${formatShortDate(nextDeadline)}.`}
+                </p>
+              </div>
+            </div>
+
+            {/* Com um processo aberto, o botão leva direto a ele. Com mais de
+                um, não dá para escolher pela pessoa: desce para a lista, e aí
+                é âncora na própria página, não troca de rota. */}
+            {openProcesses.length === 1 ? (
+              <Link to={`/processes/${openProcesses[0].id}`} className={botaoInscrever}>
+                Quero me inscrever
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            ) : (
+              <a href="#processos-disponiveis" className={botaoInscrever}>
+                Quero me inscrever
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            )}
+          </div>
+        </section>
+      )}
+
       {myApplications.length > 0 && (
         <section className="mt-8">
           <h2 className="font-display text-2xl font-semibold text-ink">Meus processos</h2>
@@ -200,7 +253,7 @@ export function DashboardPage() {
       )}
 
       {availableProcesses.length > 0 && (
-        <section className="mt-8">
+        <section id="processos-disponiveis" className="mt-8">
           <h2 className="font-display text-2xl font-semibold text-ink">
             Processos disponíveis
           </h2>

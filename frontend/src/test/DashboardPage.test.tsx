@@ -178,3 +178,98 @@ describe('DashboardPage', () => {
     })
   })
 })
+
+// ── Quem criou conta mas não se inscreveu ─────────────────────────
+//
+// Criar conta não é se inscrever, e é fácil achar que sim: a pessoa preencheu
+// um formulário, recebeu e-mail e caiu aqui. Antes, o único sinal era uma
+// pílula cinza dizendo "Sem inscrição".
+
+describe('DashboardPage: ainda não se inscreveu', () => {
+  beforeEach(() => {
+    vi.mocked(getMe).mockResolvedValue(me)
+    vi.mocked(getMyApplications).mockResolvedValue([])
+    vi.mocked(getProcesses).mockResolvedValue([openProcess])
+  })
+
+  it('avisa em destaque que falta se inscrever', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    expect(await screen.findByText('Você ainda não se inscreveu')).toBeInTheDocument()
+    expect(
+      screen.getByText(/Criar a conta não inscreve ninguém no processo seletivo/),
+    ).toBeInTheDocument()
+  })
+
+  it('diz até quando dá para se inscrever', async () => {
+    renderWithProviders(<DashboardPage />)
+    expect(await screen.findByText(/As inscrições vão até 30\/09/)).toBeInTheDocument()
+  })
+
+  it('leva direto ao processo quando só há um aberto', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    expect(await screen.findByRole('link', { name: /quero me inscrever/i })).toHaveAttribute(
+      'href',
+      '/processes/proc-2',
+    )
+  })
+
+  it('com mais de um processo aberto, leva à lista', async () => {
+    vi.mocked(getProcesses).mockResolvedValue([
+      openProcess,
+      { ...openProcess, id: 'proc-3', name: 'PS Liga 2027.2' },
+    ])
+    renderWithProviders(<DashboardPage />)
+
+    expect(await screen.findByRole('link', { name: /quero me inscrever/i })).toHaveAttribute(
+      'href',
+      '#processos-disponiveis',
+    )
+  })
+
+  it('quem já se inscreveu não vê o aviso', async () => {
+    vi.mocked(getMyApplications).mockResolvedValue([application])
+    renderWithProviders(<DashboardPage />)
+
+    await screen.findByText('Meus processos')
+    expect(screen.queryByText('Você ainda não se inscreveu')).not.toBeInTheDocument()
+  })
+
+  it('sem inscrição aberta, não cobra o que não dá para fazer', async () => {
+    vi.mocked(getProcesses).mockResolvedValue([
+      { ...openProcess, registration_open: false },
+    ])
+    renderWithProviders(<DashboardPage />)
+
+    await screen.findByText('Processos disponíveis')
+    expect(screen.queryByText('Você ainda não se inscreveu')).not.toBeInTheDocument()
+  })
+
+  it('não acusa "não inscrito" enquanto ainda está carregando', async () => {
+    // Um flash de "você não se inscreveu" para quem está inscrito é pior que
+    // não avisar nada.
+    let liberar: (v: ApplicationSummary[]) => void = () => {}
+    vi.mocked(getMyApplications).mockReturnValue(
+      new Promise((resolve) => {
+        liberar = resolve
+      }),
+    )
+    renderWithProviders(<DashboardPage />)
+
+    expect(screen.queryByText('Você ainda não se inscreveu')).not.toBeInTheDocument()
+
+    liberar([application])
+    await screen.findByText('Meus processos')
+    expect(screen.queryByText('Você ainda não se inscreveu')).not.toBeInTheDocument()
+  })
+
+  it('com falha na API, não afirma que a pessoa não se inscreveu', async () => {
+    vi.mocked(getMyApplications).mockRejectedValue(httpError(500))
+    renderWithProviders(<DashboardPage />)
+
+    await waitFor(() =>
+      expect(screen.queryByText('Você ainda não se inscreveu')).not.toBeInTheDocument(),
+    )
+  })
+})

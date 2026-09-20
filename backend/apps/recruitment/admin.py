@@ -8,6 +8,7 @@ from .models import (
     EvaluationCriterion,
     OrganizerProfile,
     Process,
+    ProcessOrganizer,
     Stage,
     StageAssignment,
 )
@@ -102,6 +103,16 @@ class OrganizerProfileAdmin(admin.ModelAdmin):
     list_editable = ['is_coordinator']
     search_fields = ['full_name', 'user__email', 'role_title']
     readonly_fields = ['id', 'created_at', 'updated_at']
+
+
+@admin.register(ProcessOrganizer)
+class ProcessOrganizerAdmin(admin.ModelAdmin):
+    # Quem foi chamado para cada processo. Coordenador não entra por aqui:
+    # coordenação é `OrganizerProfile.is_coordinator`, marcado a mão.
+    list_display = ['user', 'process', 'invited_by', 'created_at']
+    list_filter = ['process']
+    search_fields = ['user__email', 'user__username']
+    readonly_fields = ['id', 'created_at']
 
 
 @admin.register(StageAssignment)

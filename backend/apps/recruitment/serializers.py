@@ -9,6 +9,7 @@ from apps.recruitment.models import (
     EvaluationCriterion,
     OrganizerProfile,
     Process,
+    ProcessOrganizer,
     ProcessStatus,
     Stage,
 )
@@ -50,6 +51,7 @@ class StageSerializer(serializers.ModelSerializer):
             'start_at',
             'end_at',
             'weight',
+            'anonymous_evaluation',
             'accepts_late_submission',
             'allows_file_upload',
             'max_files',
@@ -149,7 +151,6 @@ class ProcessSerializer(serializers.ModelSerializer):
             'score_min',
             'score_max',
             'divergence_threshold',
-            'anonymous_evaluation',
             'application_count',
             'stage_count',
             'created_at',
@@ -482,9 +483,11 @@ class DeliverableSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_filename(self, deliverable):
-        import os
+        from apps.recruitment.services.deliverables import display_name
 
-        return os.path.basename(deliverable.file.name)
+        return display_name(
+            deliverable, hide_identity(self, deliverable.application)
+        )
 
     def get_size(self, deliverable):
         try:
@@ -499,6 +502,10 @@ class DeliverableSerializer(serializers.ModelSerializer):
 
 class AdminApplicationDetailSerializer(serializers.ModelSerializer):
     """Ficha completa do candidato, como o modal de perfil exibe."""
+
+    # `anonymous` existe para a tela **dizer** que está anônima em vez de
+    # desenhar uma fileira de campos vazios: quem corrige precisa saber que a
+    # identidade foi escondida de propósito, e não que faltou dado.
 
     participant_name = serializers.CharField(source='participant.full_name')
     email = serializers.EmailField(source='participant.user.email')
@@ -515,11 +522,13 @@ class AdminApplicationDetailSerializer(serializers.ModelSerializer):
     criteria = serializers.SerializerMethodField()
     my_scores = serializers.SerializerMethodField()
     final_score = serializers.SerializerMethodField()
+    anonymous = serializers.SerializerMethodField()
 
     class Meta:
         model = Application
         fields = [
             'id',
+            'anonymous',
             'participant_name',
             'email',
             'course',
@@ -578,6 +587,9 @@ class AdminApplicationDetailSerializer(serializers.ModelSerializer):
     def get_final_score(self, application):
         score = application.final_score
         return round(float(score), 2) if score is not None else None
+
+    def get_anonymous(self, application):
+        return hide_identity(self, application)
 
 
 class EvaluationInputSerializer(serializers.Serializer):
@@ -656,23 +668,40 @@ class CommunicationInputSerializer(serializers.Serializer):
 def hide_identity(serializer, application):
     """True quando este leitor não pode ver quem é o candidato.
 
-    A correção anônima do planejamento existe para a nota não ser influenciada
-    por quem escreveu. O coordenador enxerga a identidade porque é quem
-    distribui as correções e revisa divergências.
-    """
-    from apps.recruitment.services.evaluations import is_coordinator
+    A correção anônima existe para a nota não ser influenciada por quem
+    escreveu. O coordenador enxerga a identidade porque é quem distribui as
+    correções, revisa divergências e decide resultado.
 
-    if not application.process.anonymous_evaluation:
+    Quem manda é a etapa em que o candidato está, não o processo: o anonimato
+    é do case, onde só o que foi entregue deveria pesar. No pitch e na
+    entrevista o avaliador está olhando para a pessoa de qualquer maneira, e
+    esconder o nome ali seria teatro (decisions.md §29).
+    """
+    from apps.recruitment.services.roles import is_coordinator
+
+    stage = application.current_stage
+    if stage is None or not stage.anonymous_evaluation:
         return False
 
     request = serializer.context.get('request')
     if request is None:
         return False
+    # O anonimato é uma regra entre organizadores. O candidato lendo a própria
+    # candidatura não é alcançado por ela: esconder dele o nome do arquivo que
+    # ele mesmo enviou seria só confusão.
+    if not getattr(request.user, 'is_staff', False):
+        return False
     return not is_coordinator(request.user)
 
 
-# Campos que revelam quem é o candidato. Nem todo serializer tem todos — o
+# Campos que revelam quem é o candidato. Nem todo serializer tem todos: o
 # anonimizador limpa só os que existirem no payload.
+#
+# Curso e semestre entram na lista porque a comissão é pequena e conhece boa
+# parte dos candidatos: "Ciência da Computação, 8º período" aponta para pouca
+# gente. Anonimato que deixa três pistas cruzáveis não é anonimato. O
+# coordenador continua vendo tudo, e o filtro por curso continua funcionando
+# para ele, porque filtra na consulta e não no que sai no payload.
 IDENTITY_FIELDS = (
     'participant_name',
     'participant_email',
@@ -681,6 +710,8 @@ IDENTITY_FIELDS = (
     'github',
     'linkedin',
     'bio',
+    'course',
+    'semester',
 )
 
 
@@ -711,6 +742,33 @@ def validate_weights(items, label):
         )
 
 
+class ProcessOrganizerSerializer(serializers.Serializer):
+    """Uma linha da aba Organizadores.
+
+    Serializer simples e não de modelo: a lista mistura quem foi chamado para o
+    processo (`ProcessOrganizer`) com a coordenação, que não é chamada porque já
+    coordena todos. `services.organizers.members` monta as duas.
+    """
+
+    id = serializers.CharField(read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
+    email = serializers.CharField(read_only=True)
+    full_name = serializers.CharField(read_only=True)
+    role_title = serializers.CharField(read_only=True)
+    is_coordinator = serializers.BooleanField(read_only=True)
+    pending = serializers.BooleanField(read_only=True)
+    workload = serializers.IntegerField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True, allow_null=True)
+
+
+class OrganizerInviteSerializer(serializers.Serializer):
+    """Payload de "Adicionar organizador"."""
+
+    email = serializers.EmailField()
+    full_name = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    role_title = serializers.CharField(max_length=255, required=False, allow_blank=True)
+
+
 # ── Perfil do organizador ─────────────────────────────────────────
 
 
@@ -735,6 +793,6 @@ class OrganizerProfileSerializer(serializers.ModelSerializer):
 
     def get_is_coordinator(self, profile):
         """Superusuário também é coordenador — ver decisions.md §12."""
-        from apps.recruitment.services.evaluations import is_coordinator
+        from apps.recruitment.services.roles import is_coordinator
 
         return is_coordinator(profile.user)

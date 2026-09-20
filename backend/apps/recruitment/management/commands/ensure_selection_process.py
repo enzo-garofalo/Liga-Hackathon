@@ -82,10 +82,6 @@ class Command(BaseCommand):
             status=ProcessStatus.DRAFT,
             registration_start=now,
             registration_end=now + timedelta(days=registration_days),
-            # Decisão da Liga: todo organizador vê a identidade do candidato.
-            # O mecanismo continua no código — religar é marcar este campo no
-            # Django Admin, sem mexer em nada (decisions.md §23).
-            anonymous_evaluation=False,
         )
 
     def _create_stages(self, process):
@@ -104,6 +100,7 @@ class Command(BaseCommand):
                 start_at=cursor,
                 end_at=end,
                 weight=data['weight'],
+                anonymous_evaluation=data.get('anonymous_evaluation', False),
                 allows_file_upload=data.get('allows_file_upload', False),
                 max_files=data.get('max_files'),
                 allowed_file_types=data.get('allowed_file_types', []),

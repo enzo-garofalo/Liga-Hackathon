@@ -88,12 +88,37 @@ def delete(deliverable):
 
 
 def can_download(deliverable, user):
-    """Dono do arquivo ou organizador.
+    """Dono do arquivo, coordenador, ou avaliador que pegou esta candidatura.
 
     Os arquivos não ficam em URL pública: são material de candidatura e o
     caminho seria adivinhável. Todo acesso passa por esta checagem.
+
+    Ser organizador não basta: o avaliador baixa o que lhe foi distribuído, e
+    mais nada. Deixar todo `is_staff` baixar tudo tornaria a fila decorativa,
+    já que o arquivo é justamente o que se quer ver (decisions.md §29).
     """
-    if user.is_staff:
+    from apps.recruitment.models import StageAssignment
+    from apps.recruitment.services.roles import is_coordinator
+
+    if is_coordinator(user):
         return True
+    if getattr(user, 'is_staff', False):
+        return StageAssignment.objects.filter(
+            application_id=deliverable.application_id, evaluator=user
+        ).exists()
     participant = getattr(user, 'participant', None)
     return bool(participant and deliverable.application.participant_id == participant.id)
+
+
+def display_name(deliverable, hidden):
+    """Nome do arquivo como este leitor pode vê-lo.
+
+    Numa etapa anônima o nome original entrega a pessoa: "case-pedro-xavier.pdf"
+    derruba o anonimato sem que ninguém perceba, porque ninguém pensa no nome
+    do arquivo como dado de identificação. Sobra o código e a extensão.
+    """
+    nome = os.path.basename(deliverable.file.name)
+    if not hidden:
+        return nome
+    extensao = os.path.splitext(nome)[1]
+    return (deliverable.application.code or 'Candidato') + extensao

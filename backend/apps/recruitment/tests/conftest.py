@@ -65,9 +65,15 @@ def candidate_client(db):
 
 
 @pytest.fixture
-def evaluator_user(db):
-    """Avaliador comum: sem acesso à identidade e limitado às designações."""
-    from apps.recruitment.models import OrganizerProfile
+def evaluator_user(db, process):
+    """Avaliador comum: sem acesso à identidade e limitado às designações.
+
+    Já entra como membro do processo do teste, porque é assim que avaliador
+    existe no sistema: alguém que o coordenador chamou para um processo. Fora
+    de um processo ele não enxerga nada, e é isso que `test_organizer_roles`
+    verifica, usando um segundo processo ao qual ele não foi chamado.
+    """
+    from apps.recruitment.models import OrganizerProfile, ProcessOrganizer
     from apps.teams.tests.factories import UserFactory
 
     user = UserFactory()
@@ -76,6 +82,7 @@ def evaluator_user(db):
     OrganizerProfile.objects.create(
         user=user, full_name='Avaliador', is_coordinator=False
     )
+    ProcessOrganizer.objects.create(process=process, user=user)
     return user
 
 

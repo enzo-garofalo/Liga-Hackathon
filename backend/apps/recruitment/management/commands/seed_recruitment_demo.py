@@ -150,7 +150,6 @@ class Command(BaseCommand):
                 'published_at': now - timedelta(days=14),
                 'highlight_message': 'Inscrições abertas!',
                 # Espelha a decisão da Liga: a demo mostra o que o organizador verá.
-                'anonymous_evaluation': False,
             },
         )
         return process

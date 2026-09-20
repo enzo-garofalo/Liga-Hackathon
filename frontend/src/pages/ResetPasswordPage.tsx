@@ -40,6 +40,10 @@ export function ResetPasswordPage() {
   // não ser devolvido do lado errado. Depois de trocar a senha vale o que a
   // API respondeu, que é a fonte de verdade.
   const loginPath = params.get('area') === 'organizador' ? '/admin/login' : '/login'
+  // Convite de organizador: a operação é a mesma, escrever uma senha na conta,
+  // mas quem abre este link nunca teve senha. "Trocar a senha" faria a pessoa
+  // procurar uma senha antiga que não existe.
+  const doConvite = params.get('convite') === '1'
 
   const { register, handleSubmit, getValues, formState: { errors } } = useForm<FormShape>({
     defaultValues: { password: '', confirmacao: '' },
@@ -57,15 +61,23 @@ export function ResetPasswordPage() {
   return (
     <AuthShell
       eyebrow="Recuperar acesso"
-      showcaseLight="Escolha"
-      showcaseBold="uma senha nova"
-      showcaseText="Só falta definir a senha que você vai usar para entrar na plataforma da Liga."
+      showcaseLight={doConvite ? 'Bem-vindo' : 'Escolha'}
+      showcaseBold={doConvite ? 'à organização' : 'uma senha nova'}
+      showcaseText={
+        doConvite
+          ? 'Você foi chamado para ajudar na correção. Escolha uma senha e sua conta está pronta.'
+          : 'Só falta definir a senha que você vai usar para entrar na plataforma da Liga.'
+      }
       showcaseBadge="Processo Seletivo"
       backTo={loginPath}
-      title="Trocar a senha"
-      description="Escolha uma senha nova para sua conta. Ela precisa ter pelo menos 8 caracteres."
+      title={doConvite ? 'Criar sua senha' : 'Trocar a senha'}
+      description={
+        doConvite
+          ? 'Escolha a senha que você vai usar para entrar na área do organizador. Ela precisa ter pelo menos 8 caracteres.'
+          : 'Escolha uma senha nova para sua conta. Ela precisa ter pelo menos 8 caracteres.'
+      }
       footer={
-        mutation.isSuccess ? undefined : (
+        mutation.isSuccess || doConvite ? undefined : (
           <>
             Não pediu esta troca?{' '}
             <Link to={loginPath} className="font-semibold text-brand hover:text-brand-soft">
@@ -87,13 +99,13 @@ export function ResetPasswordPage() {
             to={mutation.data.area === 'organizador' ? '/admin/login' : '/login'}
             className="flex h-12 w-full items-center justify-center rounded-full bg-black font-ui text-base font-semibold text-white transition hover:bg-brand"
           >
-            Entrar com a senha nova
+            {doConvite ? 'Entrar na plataforma' : 'Entrar com a senha nova'}
           </Link>
         </div>
       ) : (
         <form onSubmit={onSubmit} noValidate className="space-y-4">
           <PasswordInput
-            label="Nova senha"
+            label={doConvite ? 'Senha' : 'Nova senha'}
             autoComplete="new-password"
             className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
             {...register('password', {
@@ -103,7 +115,7 @@ export function ResetPasswordPage() {
             error={errors.password?.message}
           />
           <PasswordInput
-            label="Repita a nova senha"
+            label={doConvite ? 'Repita a senha' : 'Repita a nova senha'}
             autoComplete="new-password"
             className="auth-field h-12 focus:border-[#7132f5] focus:ring-2 focus:ring-[#7132f5]/20"
             {...register('confirmacao', {

@@ -8,8 +8,9 @@ export interface ApplicationRow {
   participant: string
   participant_name: string
   participant_email: string | null
-  course: string
-  semester: number
+  /** Nulos na correção anônima: curso e semestre apontariam para a pessoa. */
+  course: string | null
+  semester: number | null
   current_stage: string | null
   current_stage_name: string | null
   status: ApplicationStatus
@@ -27,10 +28,12 @@ export interface Paginated<T> {
 /** Ficha completa do candidato. Campos de identidade vêm nulos na correção anônima. */
 export interface AdminApplicationDetail {
   id: string
+  /** A identidade foi escondida: esta etapa tem correção anônima. */
+  anonymous: boolean
   participant_name: string
   email: string | null
-  course: string
-  semester: number
+  course: string | null
+  semester: number | null
   phone: string | null
   github: string | null
   linkedin: string | null

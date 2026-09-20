@@ -46,8 +46,6 @@ class Process(models.Model):
     divergence_threshold = models.DecimalField(
         max_digits=4, decimal_places=2, default=Decimal('1.5')
     )
-    # Correção anônima: avaliador vê só o código do candidato.
-    anonymous_evaluation = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -92,6 +90,11 @@ class Stage(models.Model):
     # Peso da etapa na nota final, em porcentagem (ex.: 35 para 35%).
     # Zero em todas as etapas significa peso igual entre elas.
     weight = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    # Correção anônima desta etapa: o organizador que não for coordenador vê
+    # o código do candidato, não a pessoa. Fica na etapa, e não no processo,
+    # porque só o case precisa disso: no pitch e na entrevista o avaliador está
+    # olhando para a pessoa de qualquer jeito (decisions.md §29).
+    anonymous_evaluation = models.BooleanField(default=False)
     accepts_late_submission = models.BooleanField(default=False)
     allows_file_upload = models.BooleanField(default=False)
     max_files = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -396,6 +399,52 @@ class OrganizerProfile(models.Model):
 
     def __str__(self):
         return self.full_name or self.user.get_username()
+
+
+class ProcessOrganizer(models.Model):
+    """Organizador que o coordenador chamou para ajudar num processo.
+
+    Ser `is_staff` deixa a pessoa entrar na área do organizador; ser membro
+    daqui é o que diz em qual processo ela trabalha. Quem não é coordenador só
+    enxerga os processos em que foi posto, e dentro deles só o que lhe foi
+    distribuído para corrigir (decisions.md §29).
+
+    Não há campo de "convite aceito": quem ainda não criou a senha é quem está
+    com `has_usable_password()` falso. Um campo separado diria a mesma coisa e
+    poderia discordar da realidade.
+    """
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    process = models.ForeignKey(
+        Process, on_delete=models.CASCADE, related_name='organizers'
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='recruitment_memberships',
+    )
+    invited_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='recruitment_invites_sent',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Organizador do processo'
+        verbose_name_plural = 'Organizadores do processo'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['process', 'user'],
+                name='unique_organizer_per_process',
+            ),
+        ]
+
+    def __str__(self):
+        return f'{self.user} @ {self.process.name}'
 
 
 class StageAssignment(models.Model):

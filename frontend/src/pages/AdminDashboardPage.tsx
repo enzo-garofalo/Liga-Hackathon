@@ -9,6 +9,7 @@ import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { SHOW_HACKATHON } from '../featureFlags'
 import { useAdminProcesses } from '../hooks/useAdminProcesses'
+import { useOrganizerProfile } from '../hooks/useOrganizerProfile'
 import {
   useAdminParticipants,
   useAdminTeams,
@@ -617,6 +618,11 @@ export function AdminDashboardPage() {
   const [statusFilter, setStatusFilter] = useState<TeamStatus>('submitted')
   const [selectedParticipant, setSelectedParticipant] = useState<AdminParticipant | null>(null)
 
+  // Criar processo é do coordenador. O avaliador entra aqui para ver os
+  // processos em que foi posto, e mais nada (decisions.md §29).
+  const { query: profileQuery } = useOrganizerProfile()
+  const coordena = profileQuery.data?.is_coordinator ?? false
+
   // Hackathon: consultas desligadas junto com a interface dele.
   const approvedQuery = useAdminTeams('approved', SHOW_HACKATHON)
   const participantsQuery = useAdminParticipants(SHOW_HACKATHON)
@@ -644,10 +650,12 @@ export function AdminDashboardPage() {
               <UserRound className="h-4 w-4" />
               Meu perfil
             </Button>
-            <Button onClick={() => setNewProcessOpen(true)}>
-              <Plus className="h-4 w-4" />
-              Novo processo
-            </Button>
+            {coordena && (
+              <Button onClick={() => setNewProcessOpen(true)}>
+                <Plus className="h-4 w-4" />
+                Novo processo
+              </Button>
+            )}
           </div>
         </div>
 

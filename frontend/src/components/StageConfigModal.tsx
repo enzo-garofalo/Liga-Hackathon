@@ -214,6 +214,7 @@ export function StageConfigModal({
   const [weight, setWeight] = useState(String(stage?.weight ?? 0))
   const [acceptsLate, setAcceptsLate] = useState(stage?.accepts_late_submission ?? false)
   const [allowsUpload, setAllowsUpload] = useState(stage?.allows_file_upload ?? false)
+  const [anonima, setAnonima] = useState(stage?.anonymous_evaluation ?? false)
   const [maxFiles, setMaxFiles] = useState(String(stage?.max_files ?? 1))
   const [fileTypes, setFileTypes] = useState<string[]>(stage?.allowed_file_types ?? ['pdf'])
   const [criteria, setCriteria] = useState<EvaluationCriterion[]>(
@@ -237,6 +238,7 @@ export function StageConfigModal({
       start_at: toIso(startAt),
       end_at: toIso(endAt),
       weight: Number(weight || 0),
+      anonymous_evaluation: anonima,
       accepts_late_submission: acceptsLate,
       allows_file_upload: allowsUpload,
       max_files: allowsUpload ? Number(maxFiles || 1) : null,
@@ -364,6 +366,24 @@ export function StageConfigModal({
           />
           Aceitar entrega após a data de término
         </label>
+
+        <div>
+          <label className="flex items-center gap-2 font-ui text-sm text-ink/80">
+            <input
+              type="checkbox"
+              checked={anonima}
+              onChange={(event) => setAnonima(event.target.checked)}
+              className="accent-brand"
+            />
+            Correção anônima nesta etapa
+          </label>
+          <p className="mt-1 pl-6 font-ui text-xs text-ink/55">
+            Enquanto o candidato estiver aqui, quem não coordena vê o código dele
+            (C-0007) no lugar do nome, e o arquivo entregue chega sem o nome
+            original. Faz sentido na correção do case, onde só a proposta deveria
+            pesar, e não no pitch nem na entrevista.
+          </p>
+        </div>
 
         <Input
           label="Peso da etapa na nota final (%)"

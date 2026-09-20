@@ -37,13 +37,15 @@ def stage_with_candidates(process):
     return stage, applications
 
 
-def test_evaluator_grades_without_assignment(
+def test_evaluator_cannot_grade_without_assignment(
     evaluator_client, process, stage_with_candidates
 ):
-    """Designação distribui trabalho, não é permissão.
+    """A designação voltou a ser trava, agora que existe tela para distribuir.
 
-    A trava anterior deixava todo avaliador que não fosse coordenador sem
-    conseguir salvar nota nenhuma, porque nunca houve tela para designar.
+    A §19 tinha tirado a trava porque não havia como designar ninguém pela
+    interface, e o avaliador ficava sem conseguir salvar nota nenhuma. Com a
+    aba de distribuição, a garantia de dois pareceres independentes volta a
+    valer (decisions.md §29).
     """
     stage, applications = stage_with_candidates
     criterion = stage.criteria.first()
@@ -56,7 +58,31 @@ def test_evaluator_grades_without_assignment(
         },
         format='json',
     )
-    assert r.status_code == 200
+    assert r.status_code == 404
+
+
+def test_the_service_refuses_an_undistributed_correction(
+    evaluator_user, stage_with_candidates
+):
+    """A mesma regra, cobrada no service.
+
+    A view devolve 404 antes de chegar aqui, mas quem chamar o service por
+    outro caminho (um command, um script) precisa esbarrar na mesma trava.
+    """
+    from rest_framework.exceptions import PermissionDenied
+
+    from apps.recruitment.services.evaluations import save_evaluation
+
+    stage, applications = stage_with_candidates
+    criterion = stage.criteria.first()
+
+    with pytest.raises(PermissionDenied):
+        save_evaluation(
+            applications[0],
+            stage,
+            evaluator_user,
+            [{'criterion': str(criterion.id), 'score': 4}],
+        )
 
 
 def test_coordinator_grades_without_assignment(

@@ -58,12 +58,33 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
   significa ausência de entrega, não faz parte da escala.
 - Vários organizadores avaliam o mesmo candidato; a nota do critério é a média entre eles.
 - Médias são calculadas em service, nunca persistidas em campo.
-- **Correção não é anônima nesta edição**: todo organizador vê a identidade do candidato
-  (decisions.md §23). O mecanismo de anonimato continua no código e liga pelo campo
-  `Process.anonymous_evaluation`.
-- Qualquer organizador avalia qualquer candidato. `StageAssignment` distribui o trabalho
-  entre corretores, mas **não é permissão**: designação ausente não bloqueia nota
-  (decisions.md §19).
+- **Dois cargos de organizador, com poderes diferentes** (decisions.md §29):
+  **coordenador** (`OrganizerProfile.is_coordinator`, ou superusuário) monta o processo,
+  chama quem ajuda, distribui as correções e decide resultado; **avaliador** entra a convite
+  e só dá nota no que lhe foi distribuído. Aprovar, reprovar, mover de etapa, descartar,
+  comunicar, criar ou editar processo e etapa, publicar e encerrar são do coordenador.
+  A regra: tudo que dispara e-mail para candidato ou muda o rumo de alguém é dele.
+- **A entrada no processo é por `ProcessOrganizer`, não global.** `is_staff` deixa entrar na
+  área do organizador; ser membro é o que mostra um processo. O avaliador vê só os processos
+  em que foi posto, e dentro deles **só a própria fila**: a lista, a ficha e as notas
+  devolvem 404 para candidatura que não lhe foi distribuída. Fechar só a lista não adianta,
+  bastaria trocar o id na barra de endereços.
+- **`StageAssignment` voltou a ser permissão** para quem não coordena, agora que existe a
+  aba de distribuição. Isto emenda a §19, pelo caminho que ela mesma apontava. Distribuir
+  cobre só os candidatos que estão **naquela** etapa, e redistribuir substitui a
+  distribuição sem apagar nota nenhuma.
+- **Correção anônima é marca da etapa, não do processo** (`Stage.anonymous_evaluation`,
+  decisions.md §29). Só o case nasce marcado. Quem manda é a etapa em que o candidato
+  **está**: passada a etapa anônima, o avaliador volta a ver quem é, e a correção já acabou.
+  Numa etapa anônima o **nome do arquivo entregue** também é escondido (`C-0042.pdf`): o
+  original entregaria a pessoa antes de o PDF abrir. O candidato lendo a própria entrega
+  não é alcançado pela regra, que existe entre organizadores.
+- **Convidar organizador não cria tabela de convite.** A conta nasce sem senha utilizável e
+  a pessoa recebe o link do esqueci minha senha com `convite=1`, que muda só o texto da
+  tela. "Convite pendente" é `has_usable_password()` falso, não um campo. Quem entra por
+  convite nunca vira coordenador: isso continua sendo marcado à mão no Django Admin.
+  Candidato do processo não pode ser convidado para corrigi-lo. Tirar alguém do processo
+  apaga as designações dela e **mantém** as notas que ela já deu.
 - Divergência acima do limiar do processo marca `needs_third_review`.
 - Aprovação final só é permitida para candidatos na última etapa.
 - Candidato nunca vê nota nem observação de avaliador.
@@ -90,10 +111,12 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
   recado extra. Cada aviso diz o que aconteceu ("Você avançou para a etapa X", "não seguiu
   adiante"), nunca só "Resultado do processo" — e o texto guardado no histórico repete o que
   o candidato recebeu. Descarte é a única ação que não comunica.
-- Todo organizador (`is_staff=True`) cria processo, move etapa e envia comunicado.
-  `role_title` é informativo. A única distinção de papel é `is_coordinator`: coordenador
-  vê a identidade na correção anônima e administra a distribuição de avaliadores.
-  **Superusuário conta como coordenador** (decisions.md §12).
+- `role_title` é informativo, não concede permissão. Quem concede é `is_coordinator`.
+  **Superusuário conta como coordenador** (decisions.md §12). As checagens de cargo moram
+  em `services/roles.py`: `is_coordinator`, `can_open_process`, `visible_processes`,
+  `assigned_application_ids`, `can_evaluate` e a permissão `IsCoordinator`. Endpoint novo
+  do organizador escolhe entre `IsCoordinator` (escrita) e a leitura de quem participa; a
+  varredura em `tests/test_permissions.py` pega rota nova sozinha.
 - O processo seletivo da Liga **já nasce criado** em ambiente novo: `ensure_selection_process`
   roda no `entrypoint.sh` e cria as 4 etapas com o barema de `apps/recruitment/blueprint.py`.
   É idempotente e **não altera processo existente** — roda a cada deploy, e sobrescrever

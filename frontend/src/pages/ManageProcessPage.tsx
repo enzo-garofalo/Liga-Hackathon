@@ -8,19 +8,27 @@ import { OpenApplicationsModal } from '../components/OpenApplicationsModal'
 import { ProcessFormModal } from '../components/ProcessFormModal'
 import { ProcessStats } from '../components/ProcessStats'
 import { QueryError } from '../components/QueryError'
+import { OrganizersTab } from '../components/OrganizersTab'
 import { StagesTab } from '../components/StagesTab'
 import { Button } from '../components/ui/Button'
 import { useAdminProcess } from '../hooks/useAdminProcess'
 import { useCloseProcess } from '../hooks/useAdminProcesses'
+import { useOrganizerProfile } from '../hooks/useOrganizerProfile'
 import { isNotFound } from '../utils/errors'
 
 const TABS = [
   { key: 'candidates', label: 'Candidatos' },
   { key: 'stages', label: 'Etapas' },
   { key: 'communications', label: 'Comunicações' },
+  { key: 'organizers', label: 'Organizadores' },
 ] as const
 
 type TabKey = (typeof TABS)[number]['key']
+
+// O avaliador corrige, e só. Etapas, comunicados e organizadores são de quem
+// conduz o processo, e a API recusa essas rotas para ele: mostrar a aba seria
+// oferecer uma porta trancada.
+const ABAS_DO_COORDENADOR: TabKey[] = ['stages', 'communications', 'organizers']
 
 function formatDate(iso: string | null) {
   return iso
@@ -36,8 +44,15 @@ export function ManageProcessPage() {
   const [editing, setEditing] = useState(false)
   const [publishing, setPublishing] = useState(false)
 
+  const { query: profileQuery } = useOrganizerProfile()
+  const coordena = profileQuery.data?.is_coordinator ?? false
+
   const process = processQuery.data
-  const tab = (searchParams.get('tab') as TabKey) ?? 'candidates'
+  const abas = TABS.filter(
+    (item) => coordena || !ABAS_DO_COORDENADOR.includes(item.key),
+  )
+  const pedida = (searchParams.get('tab') as TabKey) ?? 'candidates'
+  const tab = abas.some((item) => item.key === pedida) ? pedida : 'candidates'
   const setTab = (key: TabKey) => setSearchParams({ tab: key }, { replace: true })
 
   if (processQuery.isLoading) {
@@ -116,21 +131,21 @@ export function ManageProcessPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {process.status !== 'closed' && (
+            {coordena && process.status !== 'closed' && (
               <Button variant="outlined" onClick={() => setEditing(true)}>
                 <Pencil className="h-4 w-4" />
                 Editar processo
               </Button>
             )}
 
-            {process.status === 'draft' && (
+            {coordena && process.status === 'draft' && (
               <Button onClick={() => setPublishing(true)}>
                 <Send className="h-4 w-4" />
                 Abrir inscrições
               </Button>
             )}
 
-            {process.status === 'published' && (
+            {coordena && process.status === 'published' && (
               <Button
                 variant="outlined"
                 onClick={() => closeProcess.mutate(process.id)}
@@ -149,10 +164,17 @@ export function ManageProcessPage() {
           </p>
         )}
 
-        <ProcessStats stats={process.stats} />
+        {coordena ? (
+          <ProcessStats stats={process.stats} />
+        ) : (
+          <p className="rounded-xl border border-ink/10 bg-ink/[0.04] px-4 py-2.5 font-ui text-sm text-ink/70">
+            Você está aqui como avaliador: a lista abaixo traz os candidatos que a
+            coordenação distribuiu para você corrigir.
+          </p>
+        )}
 
         <div className="mb-6 mt-8 flex gap-8 border-b border-ink/10">
-          {TABS.map((item) => (
+          {abas.map((item) => (
             <button
               key={item.key}
               onClick={() => setTab(item.key)}
@@ -167,18 +189,21 @@ export function ManageProcessPage() {
           ))}
         </div>
 
-        {process.status === 'draft' && process.stages.length === 0 && (
+        {coordena && process.status === 'draft' && process.stages.length === 0 && (
           <p className="mb-6 rounded-xl border border-amber-400/40 bg-amber-500/10 px-4 py-2.5 text-sm text-amber-800">
             Este processo é um rascunho sem etapas. Configure ao menos uma etapa na aba
             "Etapas" para poder abrir as inscrições.
           </p>
         )}
 
-        {tab === 'candidates' && <CandidatesTab process={process} />}
+        {tab === 'candidates' && (
+          <CandidatesTab process={process} canDecide={coordena} />
+        )}
         {tab === 'stages' && <StagesTab processId={process.id} processStatus={process.status} />}
         {tab === 'communications' && (
           <CommunicationsTab processId={process.id} stages={process.stages} />
         )}
+        {tab === 'organizers' && <OrganizersTab process={process} />}
       </main>
 
       {editing && (

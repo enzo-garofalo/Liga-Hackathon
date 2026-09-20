@@ -36,11 +36,18 @@ function formatUpdated(iso: string) {
 interface Props {
   rows: ApplicationRow[]
   selected: string[]
-  onToggle: (id: string) => void
-  onToggleAll: () => void
+  /** Ausente para quem não decide nada em massa: a coluna some junto. */
+  onToggle?: (id: string) => void
+  onToggleAll?: () => void
   onOpenProfile: (row: ApplicationRow) => void
   onOpenEvaluation: (row: ApplicationRow) => void
   loading?: boolean
+  /**
+   * Estado vazio próprio. Sem isto, lista vazia é sempre "ajuste o filtro", o
+   * que faz o avaliador recém-chamado procurar um filtro que ele nem mexeu.
+   */
+  emptyTitle?: string
+  emptyHint?: string
 }
 
 export function CandidatesTable({
@@ -51,7 +58,12 @@ export function CandidatesTable({
   onOpenProfile,
   onOpenEvaluation,
   loading = false,
+  emptyTitle,
+  emptyHint,
 }: Props) {
+  // Caixa de seleção sem ação em massa é um controle que não leva a lugar
+  // nenhum: o avaliador marcaria candidatos e não teria o que fazer com eles.
+  const selecionavel = Boolean(onToggle && onToggleAll)
   const allSelected = rows.length > 0 && selected.length === rows.length
 
   if (loading) {
@@ -62,10 +74,10 @@ export function CandidatesTable({
     return (
       <div className="dark-card rounded-[21px] p-8 text-center">
         <p className="font-display text-base font-semibold text-ink">
-          Nenhum candidato neste filtro
+          {emptyTitle ?? 'Nenhum candidato neste filtro'}
         </p>
         <p className="mt-1 text-sm text-ink/68">
-          Ajuste a busca ou os filtros para ver outros candidatos.
+          {emptyHint ?? 'Ajuste a busca ou os filtros para ver outros candidatos.'}
         </p>
       </div>
     )
@@ -76,15 +88,17 @@ export function CandidatesTable({
       <table className="w-full min-w-[46rem] text-left">
         <thead>
           <tr className="border-b border-ink/10 text-xs uppercase tracking-wide text-ink/55">
-            <th className="w-10 px-4 py-3">
-              <input
-                type="checkbox"
-                checked={allSelected}
-                onChange={onToggleAll}
-                className="accent-brand"
-                aria-label="Selecionar todos"
-              />
-            </th>
+            {selecionavel && (
+              <th className="w-10 px-4 py-3">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={onToggleAll}
+                  className="accent-brand"
+                  aria-label="Selecionar todos"
+                />
+              </th>
+            )}
             <th className="px-3 py-3 font-medium">Nome</th>
             <th className="px-3 py-3 font-medium">Curso</th>
             <th className="px-3 py-3 font-medium">Etapa</th>
@@ -97,17 +111,19 @@ export function CandidatesTable({
         <tbody className="divide-y divide-ink/[0.08]">
           {rows.map((row) => (
             <tr key={row.id} className="text-sm transition-colors hover:bg-brand/[0.03]">
-              <td className="px-4 py-3">
-                <input
-                  type="checkbox"
-                  checked={selected.includes(row.id)}
-                  onChange={() => onToggle(row.id)}
-                  className="accent-brand"
-                  aria-label={`Selecionar ${row.participant_name}`}
-                />
-              </td>
+              {selecionavel && (
+                <td className="px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={selected.includes(row.id)}
+                    onChange={() => onToggle?.(row.id)}
+                    className="accent-brand"
+                    aria-label={`Selecionar ${row.participant_name}`}
+                  />
+                </td>
+              )}
               <td className="px-3 py-3 font-medium text-ink">{row.participant_name}</td>
-              <td className="px-3 py-3 text-ink/70">{row.course}</td>
+              <td className="px-3 py-3 text-ink/70">{row.course ?? '—'}</td>
               <td className="px-3 py-3 text-ink/70">{row.current_stage_name ?? '—'}</td>
               <td className="px-3 py-3">
                 {row.final_score === null ? (

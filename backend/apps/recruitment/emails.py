@@ -3,9 +3,19 @@
 O layout vem de core/email_layout.py, o mesmo usado pelo hackathon.
 """
 
+from django.conf import settings
 from django.utils import timezone
 
-from core.email_layout import badge, base_html, em, footnote, info_rows, p, send
+from core.email_layout import (
+    badge,
+    base_html,
+    button,
+    em,
+    footnote,
+    info_rows,
+    p,
+    send,
+)
 
 _FOOTER = (
     'Liga de TI &mdash; Processo Seletivo &nbsp;&bull;&nbsp; '
@@ -197,3 +207,84 @@ def send_custom_communication(participant, communication):
         footer_text=_FOOTER,
     )
     send(subject, text, html, [participant.user.email])
+
+
+def _nome_curto(user):
+    profile = getattr(user, 'organizer_profile', None)
+    nome = (profile.full_name if profile else '') or ''
+    return nome.split(' ')[0] if nome else ''
+
+
+def send_organizer_invite(user, process, url=''):
+    """Convite para ajudar na correção de um processo.
+
+    Com `url`, a conta é nova e o link leva a pessoa a criar a própria senha.
+    Sem `url`, ela já tinha conta: o e-mail só avisa que agora ela tem trabalho
+    neste processo, e mandar link de senha ali assustaria sem motivo.
+    """
+    entrada = settings.FRONTEND_URL.rstrip('/') + '/admin/login'
+    nome = _nome_curto(user)
+    saudacao = f'Olá, {nome}.' if nome else 'Olá.'
+    subject = f'[Liga de TI] Você entrou na organização do {process.name}'
+
+    if url:
+        acao_text = (
+            f'Para começar, crie a sua senha neste endereço:\n{url}\n\n'
+            f'O link vale por algumas horas e só pode ser usado uma vez. '
+            f'Depois disso, sua entrada é sempre por {entrada}.\n\n'
+        )
+        acao_html = (
+            p(
+                'Para começar, crie a sua senha. É só clicar no botão abaixo e '
+                'escolher uma senha só sua.'
+            )
+            + button('Criar minha senha', url)
+            + p(
+                'Se o botão não funcionar, copie e cole este endereço no navegador:'
+                f'<br><span style="font-size:13px;color:{_PURPLE};'
+                f'word-break:break-all;">{url}</span>'
+            )
+            + info_rows([
+                ('Validade do link', 'Algumas horas'),
+                ('Uso', 'Uma vez só'),
+                ('Entrada depois disso', entrada),
+            ])
+        )
+    else:
+        acao_text = f'Sua entrada continua sendo por {entrada}.\n\n'
+        acao_html = (
+            p('Você entra com a mesma conta e a mesma senha de sempre.')
+            + button('Abrir a área do organizador', entrada)
+        )
+
+    text = (
+        f'{saudacao}\n\n'
+        f'Você foi incluído na organização do {process.name}, '
+        f'na plataforma da Liga de TI.\n\n'
+        f'{acao_text}'
+        f'O que você vai encontrar lá: os candidatos que a coordenação '
+        f'distribuir para você corrigir, e o espaço para dar as notas.\n\n'
+        f'Liga de TI'
+    )
+    body = (
+        badge('Organização', '#f3f0ff', _PURPLE)
+        + p(f'Olá, {em(nome)}.' if nome else 'Olá.')
+        + p(
+            f'Você foi incluído na organização do {em(process.name)}, '
+            f'na plataforma da Liga de TI.'
+        )
+        + acao_html
+        + footnote(
+            'Lá você encontra os candidatos que a coordenação distribuir para '
+            'você corrigir, e o espaço para dar as notas. Se você não esperava '
+            'este e-mail, fale com a coordenação da Liga antes de continuar.'
+        )
+    )
+    html = base_html(
+        subject,
+        f'Você entrou na organização do {process.name}.',
+        'Bem-vindo à organização',
+        body,
+        footer_text=_FOOTER,
+    )
+    send(subject, text, html, [user.email])

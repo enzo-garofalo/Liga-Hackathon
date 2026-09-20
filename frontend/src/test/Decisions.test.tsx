@@ -58,7 +58,7 @@ describe('Decisão sobre o candidato', () => {
   })
 
   it('a ficha oferece aprovar e reprovar', async () => {
-    renderWithProviders(<CandidatesTab process={process} />)
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
     await screen.findByText('Ana Lima')
     const dialog = await openProfile('Ana Lima')
 
@@ -67,7 +67,7 @@ describe('Decisão sobre o candidato', () => {
   })
 
   it('aprovar pede confirmação antes de agir', async () => {
-    renderWithProviders(<CandidatesTab process={process} />)
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
     await screen.findByText('Ana Lima')
     const dialog = await openProfile('Ana Lima')
 
@@ -80,7 +80,7 @@ describe('Decisão sobre o candidato', () => {
   })
 
   it('cancelar a confirmação não muda nada', async () => {
-    renderWithProviders(<CandidatesTab process={process} />)
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
     await screen.findByText('Ana Lima')
     const dialog = await openProfile('Ana Lima')
     await userEvent.click(within(dialog).getByRole('button', { name: /reprovar/i }))
@@ -97,7 +97,7 @@ describe('Decisão sobre o candidato', () => {
   })
 
   it('aprovar fora da última etapa avança para a próxima', async () => {
-    renderWithProviders(<CandidatesTab process={process} />)
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
     await screen.findByText('Ana Lima')
     const dialog = await openProfile('Ana Lima')
 
@@ -124,7 +124,7 @@ describe('Decisão sobre o candidato', () => {
         current_stage_name: 'Entrevista',
       }),
     )
-    renderWithProviders(<CandidatesTab process={process} />)
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
     await screen.findByText('Bruno Reitano')
     const dialog = await openProfile('Bruno Reitano')
 
@@ -141,7 +141,7 @@ describe('Decisão sobre o candidato', () => {
   })
 
   it('reprovar pela ficha encerra a candidatura', async () => {
-    renderWithProviders(<CandidatesTab process={process} />)
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
     await screen.findByText('Ana Lima')
     const dialog = await openProfile('Ana Lima')
 
@@ -157,7 +157,7 @@ describe('Decisão sobre o candidato', () => {
   })
 
   it('ação em massa de reprovar também confirma', async () => {
-    renderWithProviders(<CandidatesTab process={process} />)
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
     await screen.findByText('Ana Lima')
 
     await userEvent.click(screen.getByLabelText('Selecionar Ana Lima'))
@@ -174,7 +174,7 @@ describe('Decisão sobre o candidato', () => {
     vi.mocked(getApplication).mockResolvedValue(
       makeApplicationDetail({ status: 'approved' }),
     )
-    renderWithProviders(<CandidatesTab process={process} />)
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
     await screen.findByText('Ana Lima')
     const dialog = await openProfile('Ana Lima')
 

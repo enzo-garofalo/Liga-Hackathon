@@ -18,6 +18,8 @@ export interface Stage {
   start_at: string | null
   end_at: string | null
   weight: number
+  /** Correção anônima desta etapa: o avaliador vê o código, não a pessoa. */
+  anonymous_evaluation: boolean
   accepts_late_submission: boolean
   allows_file_upload: boolean
   max_files: number | null
@@ -33,6 +35,7 @@ export interface StagePayload {
   start_at?: string | null
   end_at?: string | null
   weight?: number
+  anonymous_evaluation?: boolean
   accepts_late_submission?: boolean
   allows_file_upload?: boolean
   max_files?: number | null

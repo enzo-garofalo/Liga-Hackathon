@@ -186,21 +186,38 @@ export function CandidateProfileModal({
         <div className="h-64 animate-pulse rounded-xl bg-ink/[0.06]" />
       ) : (
         <div className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field icon={Mail} label="E-mail" value={application.email} />
-            <Field icon={Phone} label="Telefone" value={application.phone} />
-            <Field icon={GitBranch} label="GitHub" value={application.github} />
-            <Field icon={Link2} label="LinkedIn" value={application.linkedin} />
-          </div>
+          {/* Na correção anônima a tela diz o que está acontecendo, em vez de
+              desenhar uma fileira de campos vazios: quem corrige precisa saber
+              que a identidade foi escondida de propósito, e não que faltou
+              dado no cadastro. */}
+          {application.anonymous ? (
+            <p className="rounded-xl border border-brand/25 bg-brand/[0.06] px-4 py-3 font-ui text-sm text-ink/75">
+              Correção anônima nesta etapa. Você vê o código do candidato e o que
+              ele entregou; nome, contato, curso e bio ficam com a coordenação,
+              para a nota sair do trabalho e não de quem o escreveu.
+            </p>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field icon={Mail} label="E-mail" value={application.email} />
+              <Field icon={Phone} label="Telefone" value={application.phone} />
+              <Field icon={GitBranch} label="GitHub" value={application.github} />
+              <Field icon={Link2} label="LinkedIn" value={application.linkedin} />
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-ink/70">
-            <span>
-              Curso: <span className="font-medium text-ink/85">{application.course}</span>
-            </span>
-            <span>
-              Semestre:{' '}
-              <span className="font-medium text-ink/85">{application.semester}</span>
-            </span>
+            {!application.anonymous && (
+              <>
+                <span>
+                  Curso:{' '}
+                  <span className="font-medium text-ink/85">{application.course}</span>
+                </span>
+                <span>
+                  Semestre:{' '}
+                  <span className="font-medium text-ink/85">{application.semester}</span>
+                </span>
+              </>
+            )}
             {application.final_score !== null && (
               <span>
                 Média final:{' '}

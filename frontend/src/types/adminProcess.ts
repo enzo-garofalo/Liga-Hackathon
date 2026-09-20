@@ -24,7 +24,6 @@ export interface AdminProcess {
   score_min: number
   score_max: number
   divergence_threshold: string
-  anonymous_evaluation: boolean
   application_count: number
   stage_count: number
   created_at: string

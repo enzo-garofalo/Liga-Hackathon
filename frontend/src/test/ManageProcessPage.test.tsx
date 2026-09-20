@@ -3,11 +3,16 @@ import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { listApplications } from '../api/adminApplications'
-import { getProcess, publishProcess, updateProcess } from '../api/adminProcesses'
+import {
+  getOrganizerProfile,
+  getProcess,
+  publishProcess,
+  updateProcess,
+} from '../api/adminProcesses'
 import { listCommunications } from '../api/communications'
 import { listStages } from '../api/stages'
 import { ManageProcessPage } from '../pages/ManageProcessPage'
-import { makeProcessDetail } from './fixtures'
+import { makeOrganizerProfile, makeProcessDetail } from './fixtures'
 import { renderWithProviders } from './render'
 
 vi.mock('../api/adminProcesses', () => ({
@@ -67,6 +72,7 @@ function render(id = 'proc-1') {
 
 describe('ManageProcessPage', () => {
   beforeEach(() => {
+    vi.mocked(getOrganizerProfile).mockResolvedValue(makeOrganizerProfile())
     vi.mocked(getProcess).mockResolvedValue(published)
     vi.mocked(listStages).mockResolvedValue(published.stages)
     vi.mocked(listCommunications).mockResolvedValue([])

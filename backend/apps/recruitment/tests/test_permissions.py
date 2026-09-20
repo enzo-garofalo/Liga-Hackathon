@@ -8,6 +8,7 @@ Dois riscos diferentes, testados separadamente:
   mesmo que autorizado, e é aqui que vaza material de candidatura.
 """
 
+import re
 import uuid
 
 import pytest
@@ -29,10 +30,11 @@ def admin_urls():
         template = str(pattern.pattern)
         if not template.startswith('admin/'):
             continue
-        url = '/api/v1/' + template
-        url = url.replace('<uuid:pk>', str(uuid.uuid4()))
-        url = url.replace('<uuid:deliverable_id>', str(uuid.uuid4()))
-        url = url.replace('<int:pk>', '1')
+        # Preenche por tipo, e não pelo nome do parâmetro: rota nova com um
+        # nome que ninguém previu entra na varredura sozinha, que é o motivo
+        # de a varredura existir.
+        url = re.sub(r'<uuid:[^>]+>', lambda _: str(uuid.uuid4()), '/api/v1/' + template)
+        url = re.sub(r'<int:[^>]+>', '1', url)
         rotas.append(url)
     return rotas
 

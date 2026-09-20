@@ -62,8 +62,9 @@ permanece intocada no domínio do hackathon.
 
 ## 4. Sem RBAC entre organizadores no MVP
 
-> **Emendada pela decisão §10:** existe uma distinção de papel (`is_coordinator`) para
-> correção anônima e designação de avaliadores. O resto desta decisão continua valendo.
+> **Superada pela decisão §29:** existem dois cargos com poderes diferentes, coordenador e
+> avaliador, e a distinção vale em todos os endpoints. O registro fica pelo histórico: a
+> evolução prevista no último parágrafo é exatamente a que aconteceu.
 
 **Decisão:** qualquer usuário com `is_staff=True` pode criar processo, configurar etapas,
 avaliar candidatos, mover entre etapas e enviar comunicados. `OrganizerProfile.role_title`
@@ -377,6 +378,9 @@ de agora). Conferir em "Editar processo" antes de abrir as inscrições.
 
 ## 19. Designação distribui trabalho, não concede permissão
 
+> **Superada pela decisão §29:** a tela de designação foi construída e a trava voltou, que é
+> a saída que o último parágrafo desta decisão já apontava.
+
 **Decisão:** qualquer organizador (`is_staff`) salva nota de qualquer candidato.
 `StageAssignment`, o modelo e os endpoints de distribuição continuam de pé, mas deixaram
 de ser pré-requisito para avaliar. **Isto emenda a §10.**
@@ -477,6 +481,9 @@ que recusa tudo. Agora tem teste, com contraprova de que organizador continua en
 ---
 
 ## 23. Correção sem anonimato nesta edição
+
+> **Superada pela decisão §29:** o anonimato voltou, agora marcado na etapa (só o case) em
+> vez de no processo inteiro.
 
 **Decisão:** o processo nasce com `anonymous_evaluation=False`. Todo organizador vê nome,
 e-mail e bio do candidato ao corrigir. **Isto emenda a §10**, que definia correção anônima
@@ -662,3 +669,96 @@ passam pela mesma confirmação, e quem diz se o botão aparece é o `can_withdr
 a plataforma decide sobre a candidatura, e aqui quem decidiu foi a própria pessoa, que está
 olhando a tela e acabou de confirmar num diálogo. O histórico de comunicações também não
 registra: ele guarda o que foi dito ao candidato, e nada foi dito.
+
+---
+
+## 29. Dois cargos de organizador, e o anonimato volta na etapa do case
+
+**Decisão:** o organizador tem dois cargos de verdade, com poderes diferentes. Isto emenda a
+§4 (sem RBAC), a §19 (designação não é permissão) e a §23 (sem anonimato nesta edição).
+
+- **Coordenador** (`OrganizerProfile.is_coordinator`, ou superusuário): monta o processo,
+  chama quem vai ajudar, distribui as correções, decide resultado. É o cargo do Bruno, e
+  nada muda para ele.
+- **Avaliador**: entra num processo a convite do coordenador e faz uma coisa só, dar nota
+  no que lhe foi distribuído. Não aprova, não reprova, não move de etapa, não descarta, não
+  escreve comunicado, não cria nem edita processo ou etapa, não publica e não encerra.
+
+**Por que a linha de corte é essa.** Tudo que dispara e-mail para candidato ou muda o rumo
+de uma pessoa é do coordenador. O avaliador opina; quem decide é quem organiza o processo e
+responde por ele. Não é desconfiança de quem foi chamado, é que a Liga precisa saber de
+quem partiu cada decisão, e "qualquer um podia ter feito" não responde isso.
+
+**A entrada é por processo, não global.** `ProcessOrganizer` diz em qual processo cada
+pessoa trabalha. Ser `is_staff` deixa entrar na área do organizador; ser membro daqui é o
+que mostra um processo. Sem isso, quem fosse chamado para corrigir um case enxergaria a
+edição inteira de outro ano, com nome e nota de gente que não tem nada com ele.
+
+**O avaliador vê só a própria fila.** A lista de candidatos do processo devolve, para quem
+não coordena, apenas as candidaturas distribuídas a ele; a ficha e as notas seguem a mesma
+regra, e a resposta é 404, não 403: a candidatura dos outros não existe para ele. Fechar só
+a lista não adiantaria nada, bastava trocar o id na barra de endereços.
+
+**A designação volta a ser trava.** A §19 tirou a trava porque não havia tela para designar
+ninguém, e o avaliador ficava preso: preenchia a nota, clicava em salvar e levava 403 sem
+caminho nenhum para resolver. A §19 já dizia qual era a saída, "construir a tela de
+designação e reintroduzir a trava", e é o que esta decisão faz. A garantia de dois pareceres
+independentes por case volta a valer.
+
+**A distribuição cobre só quem está naquela etapa.** Distribuir o case é repartir quem tem
+case para corrigir; quem já passou para o pitch não tem o que ser corrigido ali, e quem
+ficou pelo caminho muito menos. Redistribuir substitui a distribuição da etapa e **nunca**
+apaga nota: as notas ficam no banco e voltam a valer se a pessoa cair no mesmo candidato.
+
+**O anonimato volta, mas na etapa, não no processo.** `Stage.anonymous_evaluation` substitui
+o campo que estava no processo. Só o case nasce marcado: é onde a proposta deveria pesar
+sozinha. No pitch e na entrevista o avaliador está diante da pessoa, e esconder o nome ali
+seria teatro. Quem manda é a etapa em que o candidato **está**: passada a etapa anônima, o
+avaliador volta a ver quem é, e a correção do case já acabou.
+
+Dois switches que podem discordar são um convite a perder uma tarde, então o campo do
+processo foi removido em vez de virar chave-mestra. Uma migração de dados liga a marca no
+case dos processos que já existiam, porque `ensure_selection_process` não altera processo
+existente e a caixa ficaria desmarcada sem ninguém saber que precisava marcá-la.
+
+**O nome do arquivo entregue também é identidade.** Numa etapa anônima, `case-pedro-xavier.pdf`
+derruba o anonimato antes de o avaliador abrir o PDF, e ninguém pensa no nome do arquivo
+como dado de identificação. O avaliador recebe `C-0042.pdf`, e só baixa o que lhe coube. O
+candidato lendo a própria entrega continua vendo o nome que ele escolheu: o anonimato é
+regra entre organizadores.
+
+**O convite não cria tabela de convite.** A conta nasce sem senha utilizável e a pessoa
+recebe o link do "esqueci minha senha" com `convite=1`, que muda só o texto da tela. O
+coordenador nunca inventa nem enxerga senha de ninguém, não sobra estado pendente para
+alguém limpar, e "convite pendente" é lido de `has_usable_password()` em vez de um campo que
+poderia discordar da realidade. Quem é convidado nunca vira coordenador: coordenação
+continua sendo marcada à mão no Django Admin, porque não se delega por formulário.
+
+**Distribuir começa mostrando gente, não formulário.** A primeira versão da tela pedia
+etapa e quantos avaliadores por candidato antes de exibir um nome, e o coordenador
+distribuía no escuro. Agora os candidatos aparecem agrupados por fase, cada um com quem o
+corrige, e há dois caminhos porque são duas perguntas diferentes: repartir uma fase inteira
+entre a comissão (automático, em rodízio) e decidir quem pega uma pessoa específica
+(manual, candidato a candidato). O manual escolhe também **em quais etapas** aquilo vale,
+com "Todas as etapas" ou uma a uma: designar numa etapa em que o candidato ainda não chegou
+é adiantar trabalho. Salvar **substitui** o que havia naquelas etapas, senão não haveria
+como tirar ninguém.
+
+**A coordenação aparece na lista sem estar em `ProcessOrganizer`.** Ela não é chamada
+para um processo, já coordena todos. Aparece ali porque a aba é também a lista de quem entra
+no rodízio da correção, e sem isso o coordenador não conseguiria se incluir na própria
+distribuição, que é exatamente como a Liga corrige hoje. Foi a verificação contra o servidor
+que encontrou isso: nos testes, a distribuição sempre recebia os ids na mão.
+
+**Candidato do processo não é convidado para corrigi-lo.** Ninguém corrige o próprio case. A
+trava é só no processo em questão: ter se candidatado numa edição passada não impede de
+ajudar nesta.
+
+**Tirar alguém do processo leva as designações, não as notas.** As designações caem, senão a
+pessoa continuaria na carga de trabalho da etapa e voltaria a enxergar candidatos se fosse
+readmitida. As notas que ela deu ficam: foram trabalho feito e entram na média. Apagá-las
+mudaria a nota de candidatos sem ninguém ter pedido.
+
+**O que se perde:** o coordenador vira gargalo. Nada avança sem ele, e se o Bruno sumir numa
+semana de correção o processo trava. O caminho, se isso doer, é marcar um segundo
+coordenador no Django Admin, e não afrouxar a regra.

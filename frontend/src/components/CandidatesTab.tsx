@@ -21,6 +21,7 @@ const STATUSES: { value: ApplicationStatus | ''; label: string }[] = [
   { value: 'approved', label: 'Aprovados' },
   { value: 'rejected', label: 'Reprovados' },
   { value: 'discarded', label: 'Descartados' },
+  { value: 'withdrawn', label: 'Desistiram' },
 ]
 
 const ORDERINGS = [

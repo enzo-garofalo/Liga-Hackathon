@@ -75,11 +75,14 @@ Encerra processo (closed)
 - `published` — visível para candidatos. Inscrições abertas dentro do período configurado.
 - `closed` — encerrado. Nenhuma inscrição nova, nenhuma avaliação nova.
 
-**Candidatura:** `in_progress` -> `approved` | `rejected` | `discarded`
+**Candidatura:** `in_progress` -> `approved` | `rejected` | `discarded` | `withdrawn`
 - `in_progress` — participando; `current_stage` indica onde está.
 - `approved` — aprovado na última etapa; entra na Liga.
 - `rejected` — reprovado em alguma etapa pelo organizador.
-- `discarded` — desistência ou descarte administrativo.
+- `discarded` — descarte administrativo, decidido pela organização.
+- `withdrawn` — o próprio candidato cancelou a inscrição, dentro do prazo de
+  inscrição. É o único estado do qual se volta: inscrever de novo devolve a
+  candidatura para `in_progress` (decisions.md §28).
 
 ## Stack
 

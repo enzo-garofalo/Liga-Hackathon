@@ -55,7 +55,14 @@ export function makeProcessDetail(
 ): AdminProcessDetail {
   return {
     ...makeProcess(),
-    stats: { total: 7, in_progress: 5, approved: 1, rejected: 1, discarded: 0 },
+    stats: {
+      total: 7,
+      in_progress: 5,
+      approved: 1,
+      rejected: 1,
+      discarded: 0,
+      withdrawn: 0,
+    },
     stages: [
       makeStage(),
       makeStage({ id: 'stage-2', name: 'Entrevista', order: 2, criteria: [] }),

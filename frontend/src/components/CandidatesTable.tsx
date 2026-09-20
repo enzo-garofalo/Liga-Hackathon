@@ -7,6 +7,7 @@ const statusLabel: Record<ApplicationStatus, string> = {
   approved: 'Aprovado',
   rejected: 'Reprovado',
   discarded: 'Descartado',
+  withdrawn: 'Desistiu',
 }
 
 const statusClass: Record<ApplicationStatus, string> = {
@@ -14,6 +15,9 @@ const statusClass: Record<ApplicationStatus, string> = {
   approved: 'bg-brand-green/10 text-brand-green',
   rejected: 'bg-red-500/10 text-red-600',
   discarded: 'bg-ink/[0.06] text-ink/60',
+  // Âmbar, e não o cinza do descarte: quem saiu foi o candidato, e o
+  // organizador precisa ver a diferença na lista sem abrir o perfil.
+  withdrawn: 'bg-amber-500/10 text-amber-700',
 }
 
 function formatUpdated(iso: string) {

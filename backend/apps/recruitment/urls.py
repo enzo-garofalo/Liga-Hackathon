@@ -28,6 +28,7 @@ from .views import (
     StageInstructionsFileDownloadView,
     OpenProcessView,
     ProcessListView,
+    ProcessWithdrawView,
 )
 
 urlpatterns = [
@@ -40,6 +41,11 @@ urlpatterns = [
         'processes/<uuid:pk>/apply/',
         ProcessApplyView.as_view(),
         name='process-apply',
+    ),
+    path(
+        'processes/<uuid:pk>/withdraw/',
+        ProcessWithdrawView.as_view(),
+        name='process-withdraw',
     ),
     path('me/applications/', MyApplicationListView.as_view(), name='my-applications'),
     path(

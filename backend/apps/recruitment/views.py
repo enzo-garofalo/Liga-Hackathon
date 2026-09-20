@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 
 from apps.recruitment.models import (
     Application,
+    ApplicationStatus,
     Communication,
     Deliverable,
     OrganizerProfile,
@@ -43,6 +44,7 @@ from apps.recruitment.services.applications import (
     apply_to_process,
     published_processes,
     run_bulk_action,
+    withdraw_from_process,
 )
 from apps.recruitment.services.assignments import (
     assign,
@@ -280,6 +282,22 @@ class OpenProcessView(APIView):
         return Response(OpenProcessSerializer(process).data)
 
 
+def _applied_process_ids(participant):
+    """Processos em que o candidato está inscrito agora.
+
+    Quem desistiu fica de fora: a candidatura continua no banco, mas a tela
+    precisa voltar a oferecer "Inscrever-se". Sem esta exclusão, cancelar era
+    uma porta só de ida, porque o processo seguia marcado como já inscrito.
+    """
+    if participant is None:
+        return set()
+    return set(
+        Application.objects.filter(participant=participant)
+        .exclude(status=ApplicationStatus.WITHDRAWN)
+        .values_list('process_id', flat=True)
+    )
+
+
 class ProcessListView(generics.ListAPIView):
     """Processos publicados, para a seção 'Processos disponíveis'."""
 
@@ -291,15 +309,7 @@ class ProcessListView(generics.ListAPIView):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         participant = getattr(self.request.user, 'participant', None)
-        context['applied_process_ids'] = (
-            set(
-                Application.objects.filter(
-                    participant=participant
-                ).values_list('process_id', flat=True)
-            )
-            if participant
-            else set()
-        )
+        context['applied_process_ids'] = _applied_process_ids(participant)
         return context
 
 
@@ -314,15 +324,7 @@ class ProcessDetailView(generics.RetrieveAPIView):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         participant = getattr(self.request.user, 'participant', None)
-        context['applied_process_ids'] = (
-            set(
-                Application.objects.filter(
-                    participant=participant
-                ).values_list('process_id', flat=True)
-            )
-            if participant
-            else set()
-        )
+        context['applied_process_ids'] = _applied_process_ids(participant)
         return context
 
 
@@ -335,6 +337,16 @@ class ProcessApplyView(APIView):
             MyApplicationDetailSerializer(application).data,
             status=status.HTTP_201_CREATED,
         )
+
+
+class ProcessWithdrawView(APIView):
+    """Cancelamento da própria inscrição, espelhando `apply/`."""
+
+    def post(self, request, pk):
+        process = get_object_or_404(Process, pk=pk)
+        participant = _participant_or_404(request)
+        application = withdraw_from_process(process, participant)
+        return Response(MyApplicationDetailSerializer(application).data)
 
 
 class MyApplicationListView(generics.ListAPIView):

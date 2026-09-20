@@ -237,6 +237,19 @@ describe('DashboardPage: ainda não se inscreveu', () => {
     expect(screen.queryByText('Você ainda não se inscreveu')).not.toBeInTheDocument()
   })
 
+  it('quem cancelou a inscrição volta a ver o aviso', async () => {
+    // Cancelar devolve a pessoa à condição de quem não se inscreveu, e é
+    // justamente quando ela pode achar que ainda está no processo. A
+    // candidatura cancelada continua na lista, então sem tratar o status o
+    // aviso ficaria escondido por ela.
+    vi.mocked(getMyApplications).mockResolvedValue([
+      { ...application, status: 'withdrawn' },
+    ])
+    renderWithProviders(<DashboardPage />)
+
+    expect(await screen.findByText('Você ainda não se inscreveu')).toBeInTheDocument()
+  })
+
   it('sem inscrição aberta, não cobra o que não dá para fazer', async () => {
     vi.mocked(getProcesses).mockResolvedValue([
       { ...openProcess, registration_open: false },

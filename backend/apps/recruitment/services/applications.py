@@ -121,17 +121,33 @@ def apply_to_process(process, participant):
     if now > process.registration_end:
         raise ValidationError('As inscrições para este processo já encerraram.')
 
-    if Application.objects.filter(process=process, participant=participant).exists():
+    existente = Application.objects.filter(
+        process=process, participant=participant
+    ).first()
+    if existente and existente.status != ApplicationStatus.WITHDRAWN:
         raise ValidationError('Você já está inscrito neste processo seletivo.')
 
-    application = Application.objects.create(
-        process=process,
-        participant=participant,
-        current_stage=process.first_stage,
-        code=next_application_code(process),
-        status=ApplicationStatus.IN_PROGRESS,
-        submitted_at=now,
-    )
+    if existente:
+        # Quem desistiu e mudou de ideia volta na mesma candidatura, e não numa
+        # nova: a linha guarda o código do candidato, e um código novo a cada
+        # ida e volta bagunçaria a correção anônima. Voltar também devolve a
+        # pessoa à primeira etapa, que é onde ela estava ao desistir.
+        application = existente
+        application.status = ApplicationStatus.IN_PROGRESS
+        application.current_stage = process.first_stage
+        application.submitted_at = now
+        application.save(
+            update_fields=['status', 'current_stage', 'submitted_at', 'updated_at']
+        )
+    else:
+        application = Application.objects.create(
+            process=process,
+            participant=participant,
+            current_stage=process.first_stage,
+            code=next_application_code(process),
+            status=ApplicationStatus.IN_PROGRESS,
+            submitted_at=now,
+        )
 
     notify(
         participant,
@@ -147,6 +163,44 @@ def apply_to_process(process, participant):
         [participant],
         aggregate=True,
     )
+    return application
+
+
+@transaction.atomic
+def withdraw_from_process(process, participant):
+    """Desistência do próprio candidato, enquanto as inscrições estão abertas.
+
+    O prazo é o mesmo da inscrição, e é o ponto da regra: até ele fechar, a
+    pessoa entra e sai à vontade; depois, o processo já contou com ela para
+    montar as etapas e a correção, e sair vira assunto com a organização.
+
+    A candidatura não é apagada. Some da lista de inscritos, mas a linha fica:
+    apagar levaria junto o código do candidato e qualquer entrega já feita, e
+    abriria espaço para o próximo inscrito receber um código que já foi de
+    outra pessoa.
+    """
+    application = Application.objects.filter(
+        process=process, participant=participant
+    ).first()
+
+    if application is None or application.status == ApplicationStatus.WITHDRAWN:
+        raise ValidationError('Você não está inscrito neste processo seletivo.')
+
+    if application.status != ApplicationStatus.IN_PROGRESS:
+        raise ValidationError(
+            'Esta candidatura já foi finalizada pela organização e não pode '
+            'ser cancelada por aqui.'
+        )
+
+    if not registration_is_open(process):
+        raise ValidationError(
+            'O período de inscrição deste processo já encerrou, então a '
+            'inscrição não pode mais ser cancelada pela plataforma. '
+            'Fale com a organização da Liga.'
+        )
+
+    application.status = ApplicationStatus.WITHDRAWN
+    application.save(update_fields=['status', 'updated_at'])
     return application
 
 

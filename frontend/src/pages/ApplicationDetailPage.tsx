@@ -26,6 +26,12 @@ const statusCopy: Record<ApplicationStatus, { label: string; detail: string }> =
     label: 'Encerrada',
     detail: 'Esta candidatura foi encerrada.',
   },
+  withdrawn: {
+    label: 'Inscrição cancelada',
+    detail:
+      'Você cancelou sua inscrição. Enquanto as inscrições estiverem abertas, '
+      + 'dá para se inscrever de novo pela página do processo.',
+  },
 }
 
 const statusClass: Record<ApplicationStatus, string> = {
@@ -33,6 +39,7 @@ const statusClass: Record<ApplicationStatus, string> = {
   approved: 'border-brand-green/40 bg-brand-green/20 text-white',
   rejected: 'border-red-400/40 bg-red-500/20 text-white',
   discarded: 'border-white/10 bg-white/[0.06] text-white/70',
+  withdrawn: 'border-white/10 bg-white/[0.06] text-white/70',
 }
 
 export function ApplicationDetailPage() {

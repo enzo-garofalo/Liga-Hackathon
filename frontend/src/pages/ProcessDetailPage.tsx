@@ -1,8 +1,10 @@
 import { ArrowLeft, CalendarDays, CheckCircle2, Layers } from 'lucide-react'
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { QueryError } from '../components/QueryError'
 import { Button } from '../components/ui/Button'
-import { useApplyToProcess, useProcess } from '../hooks/useProcess'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
+import { useApplyToProcess, useProcess, useWithdrawFromProcess } from '../hooks/useProcess'
 import { getApiError, isNotFound } from '../utils/errors'
 
 function formatDate(iso: string) {
@@ -18,6 +20,8 @@ export function ProcessDetailPage() {
   const navigate = useNavigate()
   const processQuery = useProcess(id)
   const apply = useApplyToProcess(id)
+  const withdraw = useWithdrawFromProcess(id)
+  const [confirmandoSaida, setConfirmandoSaida] = useState(false)
 
   const process = processQuery.data
 
@@ -140,16 +144,32 @@ export function ProcessDetailPage() {
 
       <div className="mt-6 flex flex-col items-center gap-3">
         {process.already_applied ? (
-          <div className="inline-flex items-center gap-2 rounded-2xl border border-brand-green/25 bg-brand-green/10 px-5 py-3 font-ui text-sm font-medium text-brand-green">
-            <CheckCircle2 className="h-4 w-4" />
-            Você já está inscrito neste processo
-          </div>
+          <>
+            <div className="inline-flex items-center gap-2 rounded-2xl border border-brand-green/25 bg-brand-green/10 px-5 py-3 font-ui text-sm font-medium text-brand-green">
+              <CheckCircle2 className="h-4 w-4" />
+              Você já está inscrito neste processo
+            </div>
+            {/* Só enquanto o prazo está aberto. Fechado, cancelar deixa de ser
+                assunto da plataforma e a opção some em vez de aparecer
+                desabilitada: botão morto na tela só gera tentativa e dúvida. */}
+            {process.registration_open && (
+              <button
+                type="button"
+                onClick={() => setConfirmandoSaida(true)}
+                className="font-ui text-sm font-medium text-ink/60 underline underline-offset-4 transition-colors hover:text-red-600"
+              >
+                Cancelar minha inscrição
+              </button>
+            )}
+          </>
         ) : (
           <Button
             onClick={() => apply.mutate()}
             loading={apply.isPending}
             disabled={!process.registration_open}
-            className="px-10 py-3 text-base"
+            // Grande de propósito: é a ação que a pessoa veio fazer nesta tela,
+            // e antes ela se perdia no rodapé com o tamanho de um botão comum.
+            className="h-16 w-full max-w-md rounded-full px-12 font-display text-lg font-semibold shadow-[0_18px_40px_rgba(113,50,245,0.28)]"
           >
             {process.registration_open ? 'Inscrever-se' : 'Inscrições encerradas'}
           </Button>
@@ -160,7 +180,28 @@ export function ProcessDetailPage() {
             {getApiError(apply.error)}
           </p>
         )}
+
+        {withdraw.isError && (
+          <p className="rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-2 text-sm font-medium text-red-600">
+            {getApiError(withdraw.error)}
+          </p>
+        )}
       </div>
+
+      {confirmandoSaida && (
+        <ConfirmDialog
+          title="Cancelar inscrição"
+          question={`Tem certeza que quer cancelar sua inscrição no ${process.name}?`}
+          detail={`Você sai da lista de inscritos. Dá para se inscrever de novo até ${formatDate(process.registration_end)}, quando as inscrições encerram. Depois disso não é mais possível.`}
+          confirmLabel="Cancelar inscrição"
+          tone="danger"
+          loading={withdraw.isPending}
+          onConfirm={() =>
+            withdraw.mutate(undefined, { onSuccess: () => setConfirmandoSaida(false) })
+          }
+          onCancel={() => setConfirmandoSaida(false)}
+        />
+      )}
 
       <div className="h-8" />
     </main>

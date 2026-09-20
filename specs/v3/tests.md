@@ -386,6 +386,14 @@ código para confirmar que algum teste acusa:
 | organizador mandado para a entrada do candidato | "o organizador vai para a entrada da organização" |
 | `ui/PasswordInput` sem aplicar o `id` no campo | "o campo de senha de %s é associado ao rótulo" |
 | link do e-mail sem dizer de qual porta é a conta | backend: `test_link_do_organizador_diz_que_a_porta_e_a_da_organizacao` |
+| cancelar inscrição valendo depois do prazo | backend: `test_candidate_cannot_withdraw_after_registration_closes` |
+| quem desistiu sem conseguir se inscrever de novo | backend: `test_candidate_can_apply_again_after_withdrawing` |
+| tela seguindo "já inscrito" depois de cancelar | backend: `test_the_process_offers_to_apply_again` |
+| quem desistiu contando como inscrito nos tiles | backend: `test_withdrawn_does_not_count_as_enrolled` |
+| organizador movendo de etapa quem desistiu | backend: `test_organizer_cannot_move_someone_who_withdrew` |
+| cancelar inscrição sem pedir confirmação | "não pergunta nada antes de abrir a confirmação" |
+| opção de cancelar aparecendo fora do prazo | "fora do prazo a opção some" |
+| alerta de "não se inscreveu" escondido por candidatura cancelada | "quem cancelou a inscrição volta a ver o aviso" |
 | caminho de volta fixo em `/login` nas telas de senha | "quem veio como organizador volta para a entrada dele", "na tela de trocar a senha, o organizador volta pela porta que veio no link" |
 | aprovar liberado em qualquer etapa | "aprovar fica desabilitado fora da última etapa" |
 | religar `SHOW_HACKATHON` no painel do organizador | "hackathon desativado: sem abas de equipe" |

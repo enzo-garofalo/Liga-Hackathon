@@ -72,10 +72,25 @@ Cria a candidatura do participante autenticado. Sem body. Resposta 201 com a can
 Validações:
 - `process.status == published` — senão 400.
 - Agora dentro de `registration_start`..`registration_end` — senão 400 "inscrições encerradas".
-- Participante ainda não tem candidatura neste processo — senão 400.
+- Participante ainda não tem candidatura neste processo — senão 400. Candidatura
+  `withdrawn` é exceção: nela a inscrição é refeita, e não duplicada.
 
 Efeitos: `status=in_progress`, `current_stage` = etapa de menor `order`,
 `submitted_at=now`. Dispara e-mail + notificação `application_confirmed`.
+
+## POST /api/v1/processes/{id}/withdraw/
+Cancela a inscrição do participante autenticado. Sem body. Resposta 200 com a candidatura.
+
+Validações:
+- Existe candidatura ativa do participante neste processo — senão 400.
+- `status == in_progress` — candidatura já finalizada pela organização não vira
+  desistência.
+- Inscrições abertas agora — senão 400. **É a regra principal**: passado o prazo,
+  não se cancela mais pela plataforma.
+
+Efeitos: `status=withdrawn`. A linha **não é apagada**: guarda o código do candidato e
+o que ele já entregou. O processo volta a responder `already_applied: false`, e
+`stats.total` deixa de contar essa pessoa (decisions.md §28).
 
 ## GET /api/v1/me/applications/
 Lista as candidaturas do participante autenticado ("Meus processos").

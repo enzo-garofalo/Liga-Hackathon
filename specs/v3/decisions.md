@@ -620,3 +620,40 @@ topo, "Lembrou a senha? Entrar") devolvia o organizador no login de candidato, q
 conta dele por não ter `Participant`: a pessoa saía de uma tela de recuperar acesso para uma
 mensagem de erro. Quem chega ao fim da troca não depende disso, porque aí vale o `area` da
 resposta da API.
+
+
+## 28. Desistir da inscrição, enquanto ela está aberta
+
+**Decisão:** o candidato cancela a própria inscrição em `processes/{id}/withdraw/`, com
+confirmação na tela, e pode se inscrever de novo depois. As duas coisas valem **até o fim do
+período de inscrição**. Fechado o prazo, nem uma nem outra: sair vira assunto com a
+organização.
+
+**Por que o prazo é o limite:** dentro dele, entrar e sair não custa nada a ninguém, e
+desistir é informação boa (a vaga volta para a lista). Depois dele, o processo já contou com
+aquela pessoa para montar etapas, distribuir correção e planejar entrevista. Sumir no meio
+disso não é uma caixa de diálogo, é uma conversa.
+
+**A candidatura não é apagada, vira `withdrawn`.** Apagar levaria junto o código do
+candidato (`C-0007`) e as entregas já feitas, e o gerador de código, que conta as
+candidaturas do processo, passaria a repetir códigos de gente que saiu. `withdrawn` entra em
+`FINISHED`: o organizador não move, não avalia e não aprova quem desistiu.
+
+**Separado de `discarded` de propósito.** Descarte é decisão da organização, desistência é do
+candidato. O mesmo estado para as duas faria o histórico mentir sobre quem decidiu, e é
+justamente o que o organizador precisa distinguir na lista.
+
+**Voltar atrás reaproveita a mesma linha.** Inscrever de novo devolve `status=in_progress` e
+a primeira etapa, mantendo o código. Código novo a cada ida e volta bagunçaria a correção
+anônima, e uma segunda candidatura esbarraria na regra de uma por processo.
+
+**Quem desistiu some de onde "inscrito" é o que importa:** `already_applied` volta a ser
+`false` (senão cancelar seria porta só de ida, com a tela recusando nova inscrição), o tile
+"Inscritos" não conta essa pessoa, e o alerta "você ainda não se inscreveu" volta a aparecer
+no dashboard. Descartado continua contando como inscrito: essa pessoa se inscreveu, quem a
+tirou foi a organização.
+
+**Sem e-mail e sem notificação.** A regra de "notificação junto com e-mail" existe para o que
+a plataforma decide sobre a candidatura, e aqui quem decidiu foi a própria pessoa, que está
+olhando a tela e acabou de confirmar num diálogo. O histórico de comunicações também não
+registra: ele guarda o que foi dito ao candidato, e nada foi dito.

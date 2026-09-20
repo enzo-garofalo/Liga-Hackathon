@@ -75,7 +75,7 @@ Constraint: `unique_together(process, order)`.
 | process | FK → Process | |
 | participant | FK → Participant | |
 | current_stage | FK → Stage | null=True (null antes da 1ª etapa iniciar) |
-| status | CharField | `in_progress / approved / rejected / discarded` |
+| status | CharField | `in_progress / approved / rejected / discarded / withdrawn` |
 | code | CharField | identificador anônimo sequencial (C-0001) mostrado ao avaliador |
 | submitted_at | DateTimeField | |
 | created_at / updated_at | | |

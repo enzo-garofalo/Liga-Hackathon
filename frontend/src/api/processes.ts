@@ -9,3 +9,6 @@ export const getProcess = (id: string) =>
 
 export const applyToProcess = (id: string) =>
   client.post<{ id: string }>(`/processes/${id}/apply/`).then((r) => r.data)
+
+export const withdrawFromProcess = (id: string) =>
+  client.post<{ id: string }>(`/processes/${id}/withdraw/`).then((r) => r.data)

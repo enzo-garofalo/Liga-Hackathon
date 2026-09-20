@@ -15,6 +15,7 @@ const statusLabel: Record<ApplicationStatus, string> = {
   approved: 'Aprovado',
   rejected: 'Não aprovado',
   discarded: 'Encerrada',
+  withdrawn: 'Cancelada',
 }
 
 const statusClass: Record<ApplicationStatus, string> = {
@@ -22,6 +23,7 @@ const statusClass: Record<ApplicationStatus, string> = {
   approved: 'border-brand-green/25 bg-brand-green/10 text-brand-green',
   rejected: 'border-red-400/25 bg-red-500/10 text-red-600',
   discarded: 'border-ink/10 bg-ink/[0.06] text-ink/60',
+  withdrawn: 'border-ink/10 bg-ink/[0.06] text-ink/60',
 }
 
 const processStatusLabel: Record<ProcessStatus, string> = {

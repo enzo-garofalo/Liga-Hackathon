@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { applyToProcess, getProcess } from '../api/processes'
+import { applyToProcess, getProcess, withdrawFromProcess } from '../api/processes'
 import { ProcessDetailPage } from '../pages/ProcessDetailPage'
 import type { ProcessDetail } from '../types/process'
 import { httpError } from './http'
@@ -12,6 +12,7 @@ vi.mock('../api/processes', () => ({
   getProcesses: vi.fn(),
   getProcess: vi.fn(),
   applyToProcess: vi.fn(),
+  withdrawFromProcess: vi.fn(),
 }))
 
 const process: ProcessDetail = {
@@ -113,5 +114,84 @@ describe('ProcessDetailPage', () => {
     renderPage()
     await screen.findByText('Processo não encontrado')
     expect(getProcess).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('cancelar a inscrição', () => {
+  const inscrito = { ...process, already_applied: true }
+
+  beforeEach(() => {
+    vi.mocked(getProcess).mockResolvedValue(inscrito)
+    vi.mocked(withdrawFromProcess).mockResolvedValue({ id: 'app-9' })
+  })
+
+  it('quem está inscrito e no prazo pode cancelar', async () => {
+    renderPage()
+
+    expect(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    ).toBeInTheDocument()
+  })
+
+  it('não pergunta nada antes de abrir a confirmação', async () => {
+    // Sair do processo não pode acontecer por um clique só.
+    renderPage()
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    )
+
+    expect(await screen.findByText(/tem certeza que quer cancelar/i)).toBeInTheDocument()
+    expect(withdrawFromProcess).not.toHaveBeenCalled()
+  })
+
+  it('confirmar chama a API', async () => {
+    renderPage()
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar inscrição' }))
+
+    expect(withdrawFromProcess).toHaveBeenCalledWith('proc-1')
+  })
+
+  it('desistir da confirmação não cancela nada', async () => {
+    renderPage()
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+    expect(withdrawFromProcess).not.toHaveBeenCalled()
+    expect(screen.queryByText(/tem certeza que quer cancelar/i)).not.toBeInTheDocument()
+  })
+
+  it('fora do prazo a opção some', async () => {
+    // Depois das inscrições, cancelar deixa de ser assunto da plataforma.
+    vi.mocked(getProcess).mockResolvedValue({ ...inscrito, registration_open: false })
+    renderPage()
+
+    await screen.findByText(/já está inscrito/i)
+    expect(
+      screen.queryByRole('button', { name: /cancelar minha inscrição/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('o motivo da recusa aparece na tela', async () => {
+    vi.mocked(withdrawFromProcess).mockRejectedValue(
+      httpError(400, ['O período de inscrição deste processo já encerrou.']),
+    )
+    renderPage()
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar inscrição' }))
+
+    expect(
+      await screen.findByText(/o período de inscrição deste processo já encerrou/i),
+    ).toBeInTheDocument()
   })
 })

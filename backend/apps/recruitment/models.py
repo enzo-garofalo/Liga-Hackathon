@@ -143,14 +143,21 @@ class ApplicationStatus:
     APPROVED = 'approved'
     REJECTED = 'rejected'
     DISCARDED = 'discarded'
+    # Desistência do próprio candidato, durante o período de inscrição.
+    # Separado de DISCARDED de propósito: descarte é ação do organizador, e o
+    # histórico ficaria mentindo sobre quem tomou a decisão.
+    WITHDRAWN = 'withdrawn'
     CHOICES = [
         (IN_PROGRESS, 'Em andamento'),
         (APPROVED, 'Aprovado'),
         (REJECTED, 'Reprovado'),
         (DISCARDED, 'Descartado'),
+        (WITHDRAWN, 'Desistiu'),
     ]
 
-    FINISHED = {APPROVED, REJECTED, DISCARDED}
+    # Finalizada: o organizador não move, não avalia e não aprova, e o
+    # candidato não entrega mais arquivo.
+    FINISHED = {APPROVED, REJECTED, DISCARDED, WITHDRAWN}
 
 
 class Application(models.Model):

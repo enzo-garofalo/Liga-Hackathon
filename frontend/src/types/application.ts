@@ -5,6 +5,8 @@ export type ApplicationStatus =
   | 'approved'
   | 'rejected'
   | 'discarded'
+  /** Desistência do próprio candidato, durante o período de inscrição. */
+  | 'withdrawn'
 
 export type StageState = 'done' | 'current' | 'upcoming'
 

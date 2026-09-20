@@ -45,6 +45,7 @@ const statusLabel: Record<ApplicationStatus, string> = {
   approved: 'Aprovado',
   rejected: 'Não aprovado',
   discarded: 'Encerrada',
+  withdrawn: 'Cancelada',
 }
 
 const statusClass: Record<ApplicationStatus, string> = {
@@ -52,6 +53,7 @@ const statusClass: Record<ApplicationStatus, string> = {
   approved: 'bg-brand-green/10 text-brand-green',
   rejected: 'bg-red-500/10 text-red-600',
   discarded: 'bg-ink/[0.06] text-ink/60',
+  withdrawn: 'bg-ink/[0.06] text-ink/60',
 }
 
 function StatCard({
@@ -90,13 +92,19 @@ export function DashboardPage() {
   const [createModalOpen, setCreateModalOpen] = useState(false)
 
   const myApplications = applicationsQuery.data ?? []
+  // Quem cancelou a inscrição volta a ser alguém sem inscrição: o alerta que
+  // avisa "você criou conta mas não se inscreveu" tem que aparecer de novo, e
+  // a candidatura cancelada não pode segurá-lo escondido.
+  const inscricoesVivas = myApplications.filter((a) => a.status !== 'withdrawn')
   const allProcesses = processesQuery.data ?? []
   const availableProcesses = allProcesses.filter((p) => !p.already_applied)
   const openProcesses = availableProcesses.filter((p) => p.registration_open)
 
   // A candidatura em andamento e a que interessa no topo; se nao houver, a mais recente.
   const activeApplication =
-    myApplications.find((a) => a.status === 'in_progress') ?? myApplications[0]
+    myApplications.find((a) => a.status === 'in_progress') ??
+    inscricoesVivas[0] ??
+    myApplications[0]
 
   const nextDeadline = openProcesses
     .map((p) => p.registration_end)
@@ -205,7 +213,7 @@ export function DashboardPage() {
           Só aparece com inscrição aberta de verdade: avisar que falta se
           inscrever sem ter onde clicar é só aflição. E nunca enquanto carrega,
           para não acusar de "não inscrito" quem está inscrito. */}
-      {!statsUnknown && myApplications.length === 0 && openProcesses.length > 0 && (
+      {!statsUnknown && inscricoesVivas.length === 0 && openProcesses.length > 0 && (
         <section className="mt-6 rounded-[32px] border-2 border-amber-400/50 bg-amber-400/10 p-6 md:p-8">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
             <div className="flex gap-4">
@@ -291,7 +299,7 @@ export function DashboardPage() {
       )}
 
       {/* Sem candidatura e sem processo aberto: a tela ficaria vazia. */}
-      {!loadingProcesses && !processError && myApplications.length === 0 && availableProcesses.length === 0 && (
+      {!loadingProcesses && !processError && inscricoesVivas.length === 0 && availableProcesses.length === 0 && (
         <section className="purple-cta relative mt-8 overflow-hidden rounded-[32px] p-8 text-white">
           <div className="relative">
             <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-white/10">

@@ -7,6 +7,8 @@ export interface ProcessStats {
   approved: number
   rejected: number
   discarded: number
+  /** Fora de `total`: quem cancelou a própria inscrição não é inscrito. */
+  withdrawn: number
 }
 
 export interface AdminProcess {

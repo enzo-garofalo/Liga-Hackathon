@@ -76,12 +76,18 @@ def process_stats(process):
         .annotate(total=Count('id'))
     )
     counts = {row['status']: row['total'] for row in rows}
+    desistiram = counts.get(ApplicationStatus.WITHDRAWN, 0)
     return {
-        'total': sum(counts.values()),
+        # Fora do total de propósito: quem cancelou a própria inscrição não é
+        # inscrito, e o tile "Inscritos" contaria gente que desistiu no mesmo
+        # dia. Descartado continua contando: essa pessoa se inscreveu, quem
+        # tirou foi a organização.
+        'total': sum(counts.values()) - desistiram,
         'in_progress': counts.get(ApplicationStatus.IN_PROGRESS, 0),
         'approved': counts.get(ApplicationStatus.APPROVED, 0),
         'rejected': counts.get(ApplicationStatus.REJECTED, 0),
         'discarded': counts.get(ApplicationStatus.DISCARDED, 0),
+        'withdrawn': desistiram,
     }
 
 

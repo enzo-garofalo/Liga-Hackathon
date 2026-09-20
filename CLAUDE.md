@@ -37,6 +37,12 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
 ## Regras de negócio — Processo Seletivo (v3)
 - Candidatura é individual. Não há equipes no seletivo.
 - Um candidato tem no máximo uma candidatura por processo.
+- **O candidato cancela a própria inscrição enquanto o prazo de inscrição está aberto**, com
+  confirmação na tela, e pode se inscrever de novo. Passado o prazo, nem uma coisa nem outra.
+  A candidatura não é apagada: vira `withdrawn`, que conta como finalizada, mantém o código
+  do candidato e sai de `already_applied` e do total de inscritos. É estado diferente de
+  `discarded` porque quem decidiu foi o candidato, não a organização. Inscrever de novo
+  reaproveita a mesma linha (decisions.md §28).
 - Processo segue `draft` → `published` → `closed`. Só `published` aparece ao candidato.
 - Processo só pode ser publicado se tiver pelo menos uma etapa.
 - Processo só pode ser excluído enquanto estiver em `draft`.

@@ -44,6 +44,13 @@ describe('telas de conta', () => {
     expect(screen.getByRole('button', { name: /criar conta/i })).toBeInTheDocument()
   })
 
+  it('o teto da bio é o mesmo número que o backend recusa', () => {
+    // O par deste teste vive em test_views_auth.py, preso no mesmo número.
+    // Sem um dos dois lados, mudar o teto aqui deixaria a tela prometendo
+    // 1500 e a API recusando em outro ponto, sem nada falhar.
+    expect(BIO_MAX).toBe(1500)
+  })
+
   it('a bio tem rótulo associado ao campo', () => {
     // decisions.md §15: textarea escrito à mão precisa do par htmlFor/id na mão.
     renderWithProviders(<RegisterPage />)
@@ -54,19 +61,19 @@ describe('telas de conta', () => {
 
   it('a bio do cadastro tem o mesmo teto do perfil', async () => {
     // Sem o teto, quem se cadastra com bio longa não salva mais o perfil depois:
-    // a edição recusa acima de 500 e a pessoa fica travada sem entender.
+    // a edição recusa acima do limite e a pessoa fica travada sem entender.
     renderWithProviders(<RegisterPage />)
 
-    expect(screen.getByText('0/500')).toBeInTheDocument()
+    expect(screen.getByText(`0/${BIO_MAX}`)).toBeInTheDocument()
 
     const bio = screen.getByLabelText(/bio/i)
     await userEvent.type(bio, 'Curiosa por produto.')
-    expect(screen.getByText('20/500')).toBeInTheDocument()
+    expect(screen.getByText(`20/${BIO_MAX}`)).toBeInTheDocument()
   })
 
   it('a bio não deixa digitar além do teto', async () => {
-    // A tela prometia 500 e deixava escrever mil: o limite só aparecia ao
-    // enviar, depois do texto já escrito.
+    // A tela prometia um teto e deixava escrever além dele: o limite só
+    // aparecia ao enviar, depois do texto já escrito.
     renderWithProviders(<RegisterPage />)
     const bio = screen.getByLabelText(/bio/i) as HTMLTextAreaElement
 

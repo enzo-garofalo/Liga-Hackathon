@@ -28,7 +28,7 @@ User = get_user_model()
 # Vive aqui e não no modelo porque `apps.teams` está em produção com o
 # hackathon e a fronteira entre os domínios proíbe mexer na estrutura desses
 # modelos. O contrato da API é o serializer, e é o que o cliente encontra.
-BIO_MAX_LENGTH = 500
+BIO_MAX_LENGTH = 1500
 
 
 class ParticipantPublicSerializer(serializers.ModelSerializer):

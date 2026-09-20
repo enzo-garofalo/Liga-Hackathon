@@ -204,5 +204,10 @@ def test_profile_update_accepts_bio_at_the_limit(auth_client):
 
 
 def test_the_limit_is_the_number_the_screens_promise():
-    """Se o número mudar aqui, tem que mudar em utils/perfil.ts junto."""
-    assert BIO_MAX_LENGTH == 500
+    """Se o número mudar aqui, tem que mudar em utils/perfil.ts junto.
+
+    O par deste teste está em AuthPages.test.tsx, preso no mesmo número: assim
+    nenhum dos dois lados muda sozinho e sai prometendo um teto que o outro não
+    aplica.
+    """
+    assert BIO_MAX_LENGTH == 1500

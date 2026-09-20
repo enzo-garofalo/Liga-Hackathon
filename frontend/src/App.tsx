@@ -5,6 +5,7 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { AdminLoginPage } from './pages/AdminLoginPage'
 import { ApplicationDetailPage } from './pages/ApplicationDetailPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { ManageProcessPage } from './pages/ManageProcessPage'
 import { SHOW_HACKATHON } from './featureFlags'
 import { LandingPage } from './pages/LandingPage'
@@ -13,6 +14,7 @@ import { LoginPage } from './pages/LoginPage'
 import { ProcessDetailPage } from './pages/ProcessDetailPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { RegisterPage } from './pages/RegisterPage'
+import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { TeamDetailPage } from './pages/TeamDetailPage'
 import { TeamsPage } from './pages/TeamsPage'
 
@@ -25,6 +27,10 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/admin/login" element={<AdminLoginPage />} />
+      {/* Senha esquecida: as duas telas valem para candidato e organizador,
+          porque a conta e a mesma. O link do e-mail cai em /reset-password. */}
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
       {/* Participant — protected + shared layout */}
       <Route element={<ProtectedRoute />}>

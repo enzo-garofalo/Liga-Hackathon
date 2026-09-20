@@ -14,6 +14,14 @@ Reaproveitada da v2 sem mudanças:
 - `POST /api/v1/auth/token/` — login do candidato
 - `POST /api/v1/auth/token/refresh/` — renova access token
 - `POST /api/v1/auth/admin/token/` — login do organizador (valida `is_staff=True`)
+- `POST /api/v1/auth/password-reset/` — pede o link de troca de senha por e-mail.
+  Responde sempre 200 com o mesmo texto, exista ou não conta com aquele endereço.
+  Tem teto de pedidos por IP (`password_reset`, padrão 20/hora).
+- `POST /api/v1/auth/password-reset/confirm/` — grava a senha nova.
+  Corpo: `uid`, `token` (os dois vêm no link do e-mail) e `password`.
+  Devolve `area`, que diz se a conta entra como `candidato` ou `organizador`.
+  O link do e-mail também carrega `area`, para a tela saber a porta de quem abre
+  e desiste antes de trocar a senha.
 
 Candidato usa os endpoints em `/processes/` e `/me/`; organizador usa `/admin/`.
 Todo endpoint sob `/admin/` exige `is_staff=True`.

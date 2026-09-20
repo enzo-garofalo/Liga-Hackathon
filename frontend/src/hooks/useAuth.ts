@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { adminLogin, login, register } from '../api/auth'
+import {
+  adminLogin,
+  confirmPasswordReset,
+  login,
+  register,
+  requestPasswordReset,
+} from '../api/auth'
 import { getMe } from '../api/me'
 import {
   clearTokens,
@@ -8,7 +14,12 @@ import {
   getSessionKind,
   setTokens,
 } from '../auth/storage'
-import type { LoginPayload, RegisterPayload } from '../types/auth'
+import type {
+  LoginPayload,
+  PasswordResetConfirmPayload,
+  PasswordResetRequestPayload,
+  RegisterPayload,
+} from '../types/auth'
 
 export function useMe() {
   return useQuery({
@@ -58,6 +69,25 @@ export function useAdminLogin() {
     onSuccess: () => {
       navigate('/admin/dashboard')
     },
+  })
+}
+
+/**
+ * Pede o link de redefinição.
+ *
+ * Sem navegação no sucesso: a pessoa precisa ficar na tela para ler que o
+ * e-mail saiu, e o próximo passo dela é na caixa de entrada, não aqui.
+ */
+export function usePasswordResetRequest() {
+  return useMutation({
+    mutationFn: (payload: PasswordResetRequestPayload) => requestPasswordReset(payload),
+  })
+}
+
+/** Usa o link do e-mail para gravar a senha nova. */
+export function usePasswordResetConfirm() {
+  return useMutation({
+    mutationFn: (payload: PasswordResetConfirmPayload) => confirmPasswordReset(payload),
   })
 }
 

@@ -102,15 +102,23 @@ export function LoginPage() {
                   {...register('password', { required: 'Informe sua senha.' })}
                   error={errors.password?.message}
                 />
-                <div className="flex items-center gap-2">
-                  <input
-                    id="remember"
-                    type="checkbox"
-                    className="h-4 w-4 cursor-pointer rounded border-white/20 accent-[#7132f5]"
-                  />
-                  <label htmlFor="remember" className="cursor-pointer select-none font-ui text-sm text-ink/52">
-                    Lembrar de mim
-                  </label>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="remember"
+                      type="checkbox"
+                      className="h-4 w-4 cursor-pointer rounded border-white/20 accent-[#7132f5]"
+                    />
+                    <label htmlFor="remember" className="cursor-pointer select-none font-ui text-sm text-ink/52">
+                      Lembrar de mim
+                    </label>
+                  </div>
+                  <Link
+                    to="/forgot-password"
+                    className="font-ui text-sm font-semibold text-brand underline underline-offset-4 hover:text-brand-soft"
+                  >
+                    Esqueci minha senha
+                  </Link>
                 </div>
                 {mutation.error && (
                   <p className="font-ui text-sm text-red-500">{getApiError(mutation.error)}</p>

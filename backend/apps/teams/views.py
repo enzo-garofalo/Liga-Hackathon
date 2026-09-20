@@ -5,6 +5,7 @@ from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -29,6 +30,8 @@ from .serializers import (
     NotificationSerializer,
     ParticipantListSerializer,
     ParticipantPublicSerializer,
+    PasswordResetConfirmSerializer,
+    PasswordResetRequestSerializer,
     RegisterSerializer,
     TeamCreateSerializer,
     TeamInviteCreateSerializer,
@@ -36,6 +39,7 @@ from .serializers import (
     TeamSerializer,
     TeamUpdateSerializer,
 )
+from .services import password_reset
 from .services.notifications import notify
 from .services.teams import (
     accept_invite,
@@ -343,3 +347,50 @@ class HackathonInfoView(APIView):
     def get(self, request):
         info = HackathonInfo.load()
         return Response(HackathonInfoSerializer(info).data)
+
+
+# ── Redefinição de senha ──────────────────────────────────────────
+#
+# Sem notificação no sino de propósito: quem esqueceu a senha não consegue
+# entrar para ver o sino. O aviso tem que chegar por fora, e chega por e-mail.
+
+RESPOSTA_DO_PEDIDO = (
+    'Se existir uma conta com este e-mail, o link para trocar a senha já está '
+    'a caminho. Confira também a caixa de spam.'
+)
+
+
+class PasswordResetRequestView(APIView):
+    """Pede o link. Responde igual para endereço que existe e que não existe."""
+
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'password_reset'
+
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        password_reset.enviar_link(serializer.validated_data['email'])
+        return Response({'detail': RESPOSTA_DO_PEDIDO})
+
+
+class PasswordResetConfirmView(APIView):
+    """Usa o link. O token é a credencial: ninguém precisa estar logado aqui."""
+
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = password_reset.trocar_senha(
+            serializer.validated_data['user'],
+            serializer.validated_data['password'],
+        )
+        return Response({
+            'detail': 'Senha alterada. Agora é só entrar com a senha nova.',
+            # Diz de qual porta a conta é, para a tela oferecer a entrada certa:
+            # candidato e organizador entram por telas diferentes.
+            'area': password_reset.area_de(user),
+        })

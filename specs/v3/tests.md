@@ -375,6 +375,18 @@ código para confirmar que algum teste acusa:
 | pílulas afirmando "Sem inscrição" durante erro | "erro da API mostra aviso" |
 | enviar assim que o arquivo é escolhido | "escolher o arquivo não envia nada", "o × troca o arquivo" |
 | tratar qualquer erro como "não encontrado" | "erro de servidor NÃO diz não encontrado" |
+| pedido de senha revelando quais e-mails têm conta | backend: `test_pedido_de_email_desconhecido_responde_igual_e_nao_envia` |
+| endpoint aberto de senha sem teto de pedidos | backend: `test_pedido_em_excesso_e_barrado` |
+| senha nova sem as regras do Django | backend: `test_senha_fraca_e_recusada_e_a_antiga_continua` |
+| token do link de senha não conferido | backend: `test_token_adulterado_e_recusado` |
+| conta desativada recebendo link de senha | backend: `test_conta_desativada_nao_recebe_link` |
+| link do e-mail apontando para o backend, não para o site | backend: `test_link_usa_o_endereco_do_frontend` |
+| tela de login sem o link de senha esquecida | "a tela de entrar do candidato oferece Esqueci minha senha" |
+| tela de senha sem conferir se as duas batem | "senhas diferentes nem chegam a gastar o link" |
+| organizador mandado para a entrada do candidato | "o organizador vai para a entrada da organização" |
+| `ui/PasswordInput` sem aplicar o `id` no campo | "o campo de senha de %s é associado ao rótulo" |
+| link do e-mail sem dizer de qual porta é a conta | backend: `test_link_do_organizador_diz_que_a_porta_e_a_da_organizacao` |
+| caminho de volta fixo em `/login` nas telas de senha | "quem veio como organizador volta para a entrada dele", "na tela de trocar a senha, o organizador volta pela porta que veio no link" |
 | aprovar liberado em qualquer etapa | "aprovar fica desabilitado fora da última etapa" |
 | religar `SHOW_HACKATHON` no painel do organizador | "hackathon desativado: sem abas de equipe" |
 | comunicado dirigido perdendo os destinatários | "Enviar comunicado endereça os selecionados" |

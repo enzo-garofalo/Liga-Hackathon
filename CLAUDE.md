@@ -93,6 +93,15 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
   É idempotente e **não altera processo existente** — roda a cada deploy, e sobrescrever
   desfaria o ajuste do organizador. Nasce em `draft`: publicar é decisão de gente
   (decisions.md §18). Alterar o barema é editar o blueprint, nunca duplicá-lo no seed.
+- **Esqueci minha senha vale para as duas portas.** A conta é a mesma `User`: candidato e
+  organizador pedem o link em `/forgot-password` e trocam em `/reset-password`. O token é o
+  `default_token_generator` do Django, sem tabela nova, e por isso serve **uma vez só**:
+  ele é assinado com o hash da senha atual. O pedido responde **igual** para e-mail com conta
+  e sem conta, senão a tela contaria a qualquer um quem é da Liga. A senha nova passa pelo
+  mesmo `validate_password` do cadastro, e a resposta traz `area` para a tela oferecer a
+  entrada certa. **A porta acompanha o caminho inteiro**: o link da tela do organizador leva
+  `?area=organizador` e o link do e-mail sai com `&area=...`, senão todo "voltar" devolvia o
+  organizador no login de candidato, que recusa a conta dele (decisions.md §27).
 - Datas formatadas no backend para leitura humana (mensagens, e-mails) passam por
   `timezone.localtime()`. O banco guarda em UTC; sem converter, um prazo às 23:59 aparece
   como o dia seguinte (decisions.md §13).
@@ -114,6 +123,13 @@ Existentes (v2):
 - `VITE_WHATSAPP_LINK=https://chat.whatsapp.com/...` — convite do grupo. **Opcional**:
   `frontend/src/links.ts` já traz o convite atual como padrão. Antes o valor caía para
   `'#'` sem a variável e o botão sumia da tela sem erro nenhum.
+- `FRONTEND_URL` — endereço público do site, usado no link de redefinição de senha que sai
+  por e-mail. **Opcional**: sem ela, cai no primeiro `CORS_ALLOWED_ORIGINS`, que em produção
+  já é o endereço do site. Só precisa ser definida se o site tiver um domínio diferente do
+  que está no CORS.
+- `PASSWORD_RESET_TIMEOUT` — validade do link em segundos (padrão 7200, duas horas). O
+  e-mail anuncia esse mesmo valor, lido do settings.
+- `PASSWORD_RESET_RATE` — teto de pedidos de redefinição por IP (padrão `20/hour`).
 
 Para a v3 (entregáveis):
 - `MEDIA_ROOT` — em produção, caminho do volume do Railway montado no backend.
@@ -153,7 +169,10 @@ processo seletivo.
 - Modal novo usa `components/ui/Modal.tsx` (decisions.md §16).
 - Todo campo de formulário precisa de rótulo associado (`htmlFor`/`id`). `ui/Input`,
   `ui/PasswordInput` e `ui/Select` já fazem isso sozinhos; `textarea` e `select` escritos à mão
-  precisam do par manualmente (decisions.md §15).
+  precisam do par manualmente (decisions.md §15). Ao testar isso, **não** usar
+  `getByLabelText(/senha/i)`: o botão de revelar tem `aria-label="Revelar senha"` e casa com a
+  busca mesmo com o campo solto do rótulo. Foi assim que o `id` faltando no `ui/PasswordInput`
+  passou despercebido. Usar `/^senha/i`.
 - Ao escrever teste de "X não aparece", confirmar que sem a regra X apareceria — um teste
   assim já passou despercebido (tests.md, "Verificação por sabotagem").
 - **Opacidade de classe Tailwind só em múltiplo de 5.** `bg-brand/12` não existe na escala

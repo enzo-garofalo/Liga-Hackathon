@@ -17,6 +17,7 @@ from .models import (
     TeamInvite,
     TeamMembership,
 )
+from .services import password_reset
 from .services.teams import assert_deadline_not_passed
 
 User = get_user_model()
@@ -419,3 +420,32 @@ class AdminTokenObtainPairSerializer(EmailTokenObtainPairSerializer):
         if not self.user.is_staff:
             raise AuthenticationFailed('Acesso restrito a administradores.')
         return data
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    """Pedido do link. Só o endereço, e a resposta é sempre a mesma.
+
+    Nada de validar se a conta existe: a mensagem de erro diria a qualquer um,
+    sem login, quem tem conta na Liga.
+    """
+
+    email = serializers.EmailField()
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    """O link em uso: identidade vem do token, não de quem está chamando.
+
+    `min_length` repete o cadastro; `validate_password` aplica as mesmas regras
+    do Django que valem na criação da conta, para a redefinição não virar a
+    porta dos fundos para uma senha fraca.
+    """
+
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    password = serializers.CharField(write_only=True, min_length=8, max_length=128)
+
+    def validate(self, attrs):
+        user = password_reset.conta_do_link(attrs['uid'], attrs['token'])
+        validate_password(attrs['password'], user=user)
+        attrs['user'] = user
+        return attrs

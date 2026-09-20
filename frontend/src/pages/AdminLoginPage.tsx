@@ -96,6 +96,17 @@ export function AdminLoginPage() {
                   {...register('password', { required: 'Informe a senha.' })}
                   error={errors.password?.message}
                 />
+                <div className="flex justify-end">
+                  <Link
+                    // A marca diz de qual porta a pessoa saiu: sem ela, a tela
+                    // de senha esquecida devolvia o organizador no login de
+                    // candidato, que recusa a conta dele.
+                    to="/forgot-password?area=organizador"
+                    className="font-ui text-sm font-semibold text-brand underline underline-offset-4 hover:text-brand-soft"
+                  >
+                    Esqueci minha senha
+                  </Link>
+                </div>
                 {mutation.error && (
                   <p className="font-ui text-sm text-red-500">{getApiError(mutation.error)}</p>
                 )}

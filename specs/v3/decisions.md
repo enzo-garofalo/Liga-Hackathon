@@ -574,3 +574,49 @@ outra coisa.
 **O que se perde:** errar uma etapa a mais no rascunho agora custa republicar o processo.
 É de propósito: publicar é o momento em que o desenho vira promessa.
 
+
+## 27. Esqueci minha senha
+
+**Decisão:** quem perde a senha pede um link por e-mail e escolhe outra em
+`/reset-password`. Vale para as duas portas de entrada, candidato e organizador: a conta é a
+mesma `User`, só muda a tela em que a pessoa entra depois. O link aparece sublinhado nas duas
+telas de login.
+
+**O token é o `default_token_generator` do Django, sem tabela nova.** Ele é assinado com o
+hash da senha atual e o `last_login`, então deixa de valer sozinho no instante em que a senha
+muda: o link serve uma vez e não sobra registro para limpar depois. Tabela nova em
+`apps.teams` também esbarraria na fronteira entre os domínios, que está em produção com o
+hackathon.
+
+**O pedido responde igual para e-mail com conta e sem conta.** Um "não encontrei este
+e-mail" transformaria a tela num consultor de quem é da Liga, aberto, sem login. Quem digitou
+errado descobre pela caixa de entrada vazia, e a tela avisa que é para conferir o endereço.
+
+**Teto de pedidos por IP.** É o único endpoint aberto que dispara e-mail para um endereço
+escolhido por quem chama: sem teto dá para encher a caixa de qualquer pessoa e torrar a cota
+do Resend de fora. O teto é generoso (20/hora) porque o campus sai todo pelo mesmo IP.
+
+**A senha nova passa pelas mesmas regras do cadastro** (`validate_password`), senão a
+redefinição viraria a porta dos fundos para uma senha fraca.
+
+**`FRONTEND_URL` é o endereço que vai dentro do link.** O backend não tem como adivinhar em
+que domínio o site está, e quem recebe o e-mail abre o navegador, não a API. Sem a variável,
+cai no primeiro `CORS_ALLOWED_ORIGINS`, que em produção já é o endereço do site: é uma
+herança de propósito, para o link não sair quebrado por causa de mais uma variável esquecida
+no Railway.
+
+**Sem notificação no sino.** A regra de "notificação junto com e-mail" vale para o que
+acontece com a candidatura. Aqui quem esqueceu a senha não consegue entrar para ver o sino,
+e o aviso tem que chegar por fora.
+
+**A resposta diz por qual porta entrar.** Candidato e organizador têm telas de entrada
+diferentes; mandar o organizador para `/login` o deixaria com a senha nova e sem conseguir
+usar. A escolha é pelo perfil, não por `is_staff`, igual ao login.
+
+**A porta acompanha a pessoa o caminho inteiro**, e não só no fim. O link da tela do
+organizador vai com `?area=organizador`, e o link do e-mail sai com `&area=...` montado a
+partir do mesmo `area_de`. Sem isso, todo caminho de volta ("Voltar para o login", a seta do
+topo, "Lembrou a senha? Entrar") devolvia o organizador no login de candidato, que recusa a
+conta dele por não ter `Participant`: a pessoa saía de uma tela de recuperar acesso para uma
+mensagem de erro. Quem chega ao fim da troca não depende disso, porque aí vale o `area` da
+resposta da API.

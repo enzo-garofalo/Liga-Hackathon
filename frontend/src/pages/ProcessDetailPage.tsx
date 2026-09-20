@@ -169,7 +169,11 @@ export function ProcessDetailPage() {
             disabled={!process.registration_open}
             // Grande de propósito: é a ação que a pessoa veio fazer nesta tela,
             // e antes ela se perdia no rodapé com o tamanho de um botão comum.
-            className="h-16 w-full max-w-md rounded-full px-12 font-display text-lg font-semibold shadow-[0_18px_40px_rgba(113,50,245,0.28)]"
+            //
+            // A fonte cresce junto com a tela, e não só com o botão: no celular
+            // o botão é estreito e o texto mais longo daqui ("Inscrições
+            // encerradas") quebraria em duas linhas dentro de uma pílula.
+            className="h-16 w-full max-w-md rounded-full px-8 font-display text-xl font-semibold shadow-[0_18px_40px_rgba(113,50,245,0.28)] md:px-12 md:text-2xl"
           >
             {process.registration_open ? 'Inscrever-se' : 'Inscrições encerradas'}
           </Button>

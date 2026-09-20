@@ -159,6 +159,11 @@ comunica, de propósito.
   loga um warning e não manda e-mail. O `recruitment` tem o dispatch dele.
 - **O `vitest.config` reseta mocks entre testes.** `mockResolvedValue` na factory do
   `vi.mock` some; defina no `beforeEach`.
+- **`getByLabelText(/senha/i)` casa com o botão de revelar.** O `ui/PasswordInput` tem um
+  botão com `aria-label="Revelar senha"`, e a busca por rótulo acha botão também. Por isso o
+  `id` faltando no campo passou despercebido: o rótulo apontava para um id que nunca era
+  aplicado, e todo campo de senha do site (login, cadastro, organizador) estava solto do
+  rótulo. Corrigido; nos testes, usar `/^senha/i`.
 - **Teste de "X não aparece" pode ser vazio.** Um já passou despercebido aqui. Sempre
   quebrar a regra de propósito e confirmar que o teste acusa — a tabela de sabotagens está
   em [specs/v3/tests.md](specs/v3/tests.md).

@@ -36,7 +36,9 @@ describe('telas de conta', () => {
   it('o formulário de cadastro continua pedindo o perfil do candidato', () => {
     renderWithProviders(<RegisterPage />)
 
-    for (const campo of [/e-mail/i, /senha/i, /nome completo/i, /curso/i, /semestre/i]) {
+    // `/^senha/i` e nao `/senha/i`: o botao de revelar tem aria-label
+    // "Revelar senha" e casaria junto com o campo.
+    for (const campo of [/e-mail/i, /^senha/i, /nome completo/i, /curso/i, /semestre/i]) {
       expect(screen.getByLabelText(campo)).toBeInTheDocument()
     }
     expect(screen.getByRole('button', { name: /criar conta/i })).toBeInTheDocument()
@@ -76,6 +78,19 @@ describe('telas de conta', () => {
     await userEvent.paste('x'.repeat(BIO_MAX + 20))
     expect(bio.value).toHaveLength(BIO_MAX)
     expect(screen.getByText(`${BIO_MAX}/${BIO_MAX}`)).toBeInTheDocument()
+  })
+
+  it.each(telas)('o campo de senha de %s é associado ao rótulo', (_nome, tela) => {
+    // decisions.md §15. O `getByLabelText(/senha/i)` que existia aqui casava
+    // com o aria-label do botão de revelar e passava mesmo com o campo solto
+    // do rótulo: o `id` não estava sendo aplicado ao input.
+    renderWithProviders(tela)
+
+    // Ancorado no inicio: o rotulo do cadastro traz um asterisco de
+    // obrigatorio ("Senha*"), e "Revelar senha" nao pode entrar na conta.
+    const senha = screen.getByLabelText(/^senha/i)
+    expect(senha.tagName).toBe('INPUT')
+    expect(senha).toHaveAttribute('type', 'password')
   })
 
   it('a tela do organizador é separada da do candidato', () => {

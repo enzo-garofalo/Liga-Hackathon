@@ -188,6 +188,55 @@ def test_withdrawing_touches_only_your_own_application(candidate_client, aberto)
     assert vizinha.status == ApplicationStatus.IN_PROGRESS
 
 
+# ── O que a tela precisa saber antes de oferecer o botão ──────────
+
+
+def minhas(client):
+    return client.get('/api/v1/me/applications/').data
+
+
+def test_can_withdraw_is_true_while_registration_is_open(candidate_client, aberto):
+    candidate_client.post(apply_url(aberto))
+
+    assert minhas(candidate_client)[0]['can_withdraw'] is True
+
+
+def test_can_withdraw_is_false_after_registration_closes(candidate_client, aberto):
+    candidate_client.post(apply_url(aberto))
+    fecha_inscricoes(aberto)
+
+    assert minhas(candidate_client)[0]['can_withdraw'] is False
+
+
+def test_can_withdraw_is_false_for_a_finished_application(candidate_client, aberto):
+    candidate_client.post(apply_url(aberto))
+    application = Application.objects.get(process=aberto)
+    application.status = ApplicationStatus.APPROVED
+    application.save(update_fields=['status'])
+
+    assert minhas(candidate_client)[0]['can_withdraw'] is False
+
+
+def test_can_withdraw_matches_what_the_endpoint_does(candidate_client, aberto):
+    """A pergunta e a ação não podem discordar.
+
+    Se `can_withdraw` disser sim e o endpoint recusar, a pessoa clica num botão
+    que só devolve erro; ao contrário, o botão some sem motivo.
+    """
+    candidate_client.post(apply_url(aberto))
+
+    for preparar in (
+        lambda: None,
+        lambda: fecha_inscricoes(aberto),
+    ):
+        preparar()
+        prometido = minhas(candidate_client)[0]['can_withdraw']
+        aconteceu = candidate_client.post(withdraw_url(aberto)).status_code == 200
+        assert prometido is aconteceu
+        if aconteceu:
+            candidate_client.post(apply_url(aberto))
+
+
 # ── O que o organizador vê ────────────────────────────────────────
 
 

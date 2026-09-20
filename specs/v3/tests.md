@@ -393,6 +393,8 @@ código para confirmar que algum teste acusa:
 | organizador movendo de etapa quem desistiu | backend: `test_organizer_cannot_move_someone_who_withdrew` |
 | cancelar inscrição sem pedir confirmação | "não pergunta nada antes de abrir a confirmação" |
 | opção de cancelar aparecendo fora do prazo | "fora do prazo a opção some" |
+| cartão do dashboard sem a opção de cancelar | "o cartão oferece cancelar embaixo de Ver candidatura" |
+| `can_withdraw` prometendo o que o endpoint recusa | backend: `test_can_withdraw_matches_what_the_endpoint_does` |
 | alerta de "não se inscreveu" escondido por candidatura cancelada | "quem cancelou a inscrição volta a ver o aviso" |
 | caminho de volta fixo em `/login` nas telas de senha | "quem veio como organizador volta para a entrada dele", "na tela de trocar a senha, o organizador volta pela porta que veio no link" |
 | aprovar liberado em qualquer etapa | "aprovar fica desabilitado fora da última etapa" |

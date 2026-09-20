@@ -166,6 +166,21 @@ def apply_to_process(process, participant):
     return application
 
 
+def can_withdraw(application):
+    """Se dá para cancelar esta inscrição agora.
+
+    A tela precisa saber disso antes de oferecer o botão, e a resposta tem que
+    ser a mesma que `withdraw_from_process` vai dar. Lá as condições aparecem
+    uma a uma porque cada recusa tem o seu motivo escrito; aqui é só o sim ou
+    não. `test_can_withdraw_matches_what_the_endpoint_does` prende as duas
+    juntas, para uma não passar a mentir sobre a outra.
+    """
+    return (
+        application.status == ApplicationStatus.IN_PROGRESS
+        and registration_is_open(application.process)
+    )
+
+
 @transaction.atomic
 def withdraw_from_process(process, participant):
     """Desistência do próprio candidato, enquanto as inscrições estão abertas.

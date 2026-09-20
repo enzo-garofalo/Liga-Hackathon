@@ -653,6 +653,11 @@ anônima, e uma segunda candidatura esbarraria na regra de uma por processo.
 no dashboard. Descartado continua contando como inscrito: essa pessoa se inscreveu, quem a
 tirou foi a organização.
 
+**A ação mora nos dois lugares em que a pessoa procura:** o cartão do processo no
+dashboard, logo abaixo de "Ver candidatura", e a página do processo. O dashboard é onde ela
+cai ao entrar; para achar a página do processo é preciso saber que ela existe. Os dois
+passam pela mesma confirmação, e quem diz se o botão aparece é o `can_withdraw` da API.
+
 **Sem e-mail e sem notificação.** A regra de "notificação junto com e-mail" existe para o que
 a plataforma decide sobre a candidatura, e aqui quem decidiu foi a própria pessoa, que está
 olhando a tela e acabou de confirmar num diálogo. O histórico de comunicações também não

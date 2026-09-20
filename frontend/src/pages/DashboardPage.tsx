@@ -10,14 +10,16 @@ import { ProcessCard } from '../components/ProcessCard'
 import { QueryError } from '../components/QueryError'
 import { StatusBanner } from '../components/StatusBanner'
 import { Button } from '../components/ui/Button'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { SHOW_HACKATHON } from '../featureFlags'
 import { WHATSAPP_LINK } from '../links'
 import { useMyInvites } from '../hooks/useInvites'
 import { useMyApplications } from '../hooks/useMyApplications'
 import { useProcesses } from '../hooks/useProcesses'
 import { useProfile } from '../hooks/useProfile'
+import { useWithdrawFromProcess } from '../hooks/useProcess'
 import { useOpenTeams } from '../hooks/useTeams'
-import type { ApplicationStatus } from '../types/application'
+import type { ApplicationStatus, ApplicationSummary } from '../types/application'
 
 const EVENT_DATE = new Date('2026-06-20T10:00:00')
 
@@ -90,6 +92,9 @@ export function DashboardPage() {
 
   const me = profileQuery.data
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  // A candidatura que a pessoa pediu para cancelar, enquanto ela confirma.
+  const [cancelando, setCancelando] = useState<ApplicationSummary | null>(null)
+  const withdraw = useWithdrawFromProcess(cancelando?.process_id)
 
   const myApplications = applicationsQuery.data ?? []
   // Quem cancelou a inscrição volta a ser alguém sem inscrição: o alerta que
@@ -267,6 +272,14 @@ export function DashboardPage() {
                 currentStageName={application.current_stage_name}
                 to={`/applications/${application.id}`}
                 actionLabel="Ver candidatura"
+                // Quem responde se dá para cancelar é a API: a regra é o prazo
+                // de inscrição do processo, que este cartão não conhece. Sem
+                // rótulo o cartão não desenha a ação, então a decisão fica
+                // num lugar só, e não numa guarda repetida no handler.
+                secondaryLabel={
+                  application.can_withdraw ? 'Cancelar minha inscrição' : undefined
+                }
+                onSecondaryAction={() => setCancelando(application)}
               />
             ))}
           </div>
@@ -455,6 +468,21 @@ export function DashboardPage() {
 
           {createModalOpen && <CreateTeamModal onClose={() => setCreateModalOpen(false)} />}
         </>
+      )}
+
+      {cancelando && (
+        <ConfirmDialog
+          title="Cancelar inscrição"
+          question={`Tem certeza que quer cancelar sua inscrição no ${cancelando.process_name}?`}
+          detail="Você sai da lista de inscritos. Enquanto as inscrições estiverem abertas, dá para se inscrever de novo pela página do processo. Depois que elas encerrarem, não."
+          confirmLabel="Cancelar inscrição"
+          tone="danger"
+          loading={withdraw.isPending}
+          onConfirm={() =>
+            withdraw.mutate(undefined, { onSuccess: () => setCancelando(null) })
+          }
+          onCancel={() => setCancelando(null)}
+        />
       )}
 
       <div className="h-8" />

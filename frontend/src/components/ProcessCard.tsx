@@ -39,7 +39,7 @@ const processStatusClass: Record<ProcessStatus, string> = {
 }
 
 const actionClass =
-  'mt-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-ink/20 px-5 py-2.5 font-ui text-sm font-medium text-ink transition-colors hover:border-brand hover:bg-brand/5 hover:text-brand'
+  'inline-flex items-center justify-center gap-2 rounded-2xl border border-ink/20 px-5 py-2.5 font-ui text-sm font-medium text-ink transition-colors hover:border-brand hover:bg-brand/5 hover:text-brand'
 
 interface ProcessCardProps {
   name: string
@@ -59,6 +59,13 @@ interface ProcessCardProps {
   to?: string
   onAction?: () => void
   actionLabel: string
+  /**
+   * Ação discreta logo abaixo da principal, como cancelar a inscrição.
+   * Fica no cartão porque é aqui que a pessoa chega primeiro; na página do
+   * processo ela também existe, mas lá é preciso saber que a página existe.
+   */
+  secondaryLabel?: string
+  onSecondaryAction?: () => void
 }
 
 export function ProcessCard({
@@ -75,6 +82,8 @@ export function ProcessCard({
   to,
   onAction,
   actionLabel,
+  secondaryLabel,
+  onSecondaryAction,
 }: ProcessCardProps) {
   return (
     <div className="dark-card flex h-full flex-col rounded-[21px] p-6 transition-all hover:-translate-y-0.5 hover:border-brand/40">
@@ -140,17 +149,29 @@ export function ProcessCard({
         )}
       </div>
 
-      {onAction ? (
-        <button type="button" onClick={onAction} className={actionClass}>
-          {actionLabel}
-          <ArrowRight className="h-4 w-4" />
-        </button>
-      ) : (
-        <Link to={to as string} className={actionClass}>
-          {actionLabel}
-          <ArrowRight className="h-4 w-4" />
-        </Link>
-      )}
+      <div className="mt-auto flex flex-col gap-2">
+        {onAction ? (
+          <button type="button" onClick={onAction} className={actionClass}>
+            {actionLabel}
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        ) : (
+          <Link to={to as string} className={actionClass}>
+            {actionLabel}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        )}
+
+        {secondaryLabel && onSecondaryAction && (
+          <button
+            type="button"
+            onClick={onSecondaryAction}
+            className="font-ui text-sm font-medium text-ink/60 underline underline-offset-4 transition-colors hover:text-red-600"
+          >
+            {secondaryLabel}
+          </button>
+        )}
+      </div>
     </div>
   )
 }

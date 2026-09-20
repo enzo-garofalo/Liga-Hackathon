@@ -94,7 +94,10 @@ o que ele já entregou. O processo volta a responder `already_applied: false`, e
 
 ## GET /api/v1/me/applications/
 Lista as candidaturas do participante autenticado ("Meus processos").
-Campos: processo (nome, datas), `status`, `current_stage`, `updated_at`.
+Campos: processo (nome, datas), `status`, `current_stage`, `updated_at` e
+`can_withdraw` — se dá para cancelar a inscrição agora. Quem decide é o backend, pela
+mesma regra de `withdraw/`: a tela não tem o prazo do processo nesta lista, e não pode
+oferecer um botão que a API vai recusar.
 
 ## GET /api/v1/me/applications/{id}/
 Detalhe da candidatura ("Ver candidatura"). Inclui a linha do tempo das etapas, marcando

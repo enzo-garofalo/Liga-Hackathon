@@ -45,6 +45,7 @@ const application: ApplicationDetail = {
   stage_count: 2,
   submitted_at: '2026-09-02T12:00:00Z',
   updated_at: '2026-09-10T12:00:00Z',
+  can_withdraw: false,
   highlight_message: '',
   stages: [
     stage({ id: 's1', name: 'Inscrição', order: 1, state: 'done' }),

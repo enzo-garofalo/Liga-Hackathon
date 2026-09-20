@@ -5,7 +5,7 @@ import { getMyApplications } from '../api/applications'
 import { getInfo } from '../api/info'
 import { listMyInvites } from '../api/invites'
 import { getMe } from '../api/me'
-import { getProcesses } from '../api/processes'
+import { getProcesses, withdrawFromProcess } from '../api/processes'
 import { getOpenTeams } from '../api/teams'
 import { DashboardPage } from '../pages/DashboardPage'
 import type { ApplicationSummary } from '../types/application'
@@ -20,6 +20,7 @@ vi.mock('../api/processes', () => ({
   getProcesses: vi.fn(),
   getProcess: vi.fn(),
   applyToProcess: vi.fn(),
+  withdrawFromProcess: vi.fn(),
 }))
 vi.mock('../api/applications', () => ({
   getMyApplications: vi.fn(),
@@ -64,6 +65,7 @@ const application: ApplicationSummary = {
   stage_count: 4,
   submitted_at: '2026-08-02T12:00:00Z',
   updated_at: '2026-08-10T12:00:00Z',
+  can_withdraw: true,
 }
 
 const openProcess: ProcessSummary = {
@@ -313,5 +315,74 @@ describe('DashboardPage: grupo no WhatsApp', () => {
     expect(
       await screen.findByRole('link', { name: /acesse o grupo da liga/i }),
     ).toBeInTheDocument()
+  })
+})
+
+// ── Cancelar a inscrição pelo cartão ──────────────────────────────
+//
+// A ação já existia na página do processo, mas para chegar lá é preciso saber
+// que a página existe. O dashboard é onde a pessoa cai.
+
+describe('DashboardPage: cancelar a inscrição', () => {
+  beforeEach(() => {
+    vi.mocked(getMe).mockResolvedValue(me)
+    vi.mocked(getMyApplications).mockResolvedValue([application])
+    vi.mocked(getProcesses).mockResolvedValue([])
+    vi.mocked(withdrawFromProcess).mockResolvedValue({ id: 'app-1' })
+  })
+
+  it('o cartão oferece cancelar embaixo de "Ver candidatura"', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    expect(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    ).toBeInTheDocument()
+  })
+
+  it('cancelar pergunta antes de fazer', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    )
+
+    expect(await screen.findByText(/tem certeza que quer cancelar/i)).toBeInTheDocument()
+    expect(withdrawFromProcess).not.toHaveBeenCalled()
+  })
+
+  it('confirmar cancela a inscrição daquele processo', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar inscrição' }))
+
+    expect(withdrawFromProcess).toHaveBeenCalledWith('proc-1')
+  })
+
+  it('desistir da confirmação não cancela nada', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+    expect(withdrawFromProcess).not.toHaveBeenCalled()
+  })
+
+  it('sem permissão da API, o cartão não oferece cancelar', async () => {
+    // Quem decide é o backend: fora do prazo, ou com a candidatura já
+    // finalizada, `can_withdraw` vem falso e o botão não aparece.
+    vi.mocked(getMyApplications).mockResolvedValue([
+      { ...application, can_withdraw: false },
+    ])
+    renderWithProviders(<DashboardPage />)
+
+    await screen.findByText('Meus processos')
+    expect(
+      screen.queryByRole('button', { name: /cancelar minha inscrição/i }),
+    ).not.toBeInTheDocument()
   })
 })

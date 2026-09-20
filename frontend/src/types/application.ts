@@ -39,6 +39,11 @@ export interface ApplicationSummary {
   stage_count: number
   submitted_at: string | null
   updated_at: string
+  /**
+   * Se dá para cancelar a inscrição agora. Quem decide é o backend: a regra
+   * depende do prazo do processo, que esta lista não traz.
+   */
+  can_withdraw: boolean
 }
 
 export interface ApplicationDetail extends ApplicationSummary {

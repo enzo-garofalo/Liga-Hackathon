@@ -329,6 +329,9 @@ class MyApplicationListSerializer(serializers.ModelSerializer):
         source='current_stage.name', default=None
     )
     stage_count = serializers.IntegerField(source='process.stages.count')
+    # Quem decide se o cartão oferece "Cancelar inscrição" é o backend: a regra
+    # depende do prazo do processo, que a tela não tem como conferir sozinha.
+    can_withdraw = serializers.SerializerMethodField()
 
     class Meta:
         model = Application
@@ -342,8 +345,14 @@ class MyApplicationListSerializer(serializers.ModelSerializer):
             'stage_count',
             'submitted_at',
             'updated_at',
+            'can_withdraw',
         ]
         read_only_fields = fields
+
+    def get_can_withdraw(self, obj):
+        from apps.recruitment.services.applications import can_withdraw
+
+        return can_withdraw(obj)
 
 
 class ApplicationTimelineStageSerializer(PublicStageSerializer):

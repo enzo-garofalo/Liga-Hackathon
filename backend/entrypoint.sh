@@ -65,6 +65,9 @@ else:
 echo "==> Ensuring the selection process exists..."
 python manage.py ensure_selection_process
 
+python manage.py check_email_pipeline
+
+
 # ── Start server ──────────────────────────────────────────────────
 echo "==> Starting gunicorn on port ${PORT:-8000}..."
 exec gunicorn config.wsgi:application \

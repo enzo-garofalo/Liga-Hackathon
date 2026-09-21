@@ -219,7 +219,7 @@ function Hero() {
 
         <div className="relative z-10 mx-auto flex min-h-[calc(100svh-6.25rem)] w-[calc(100%-1.5rem)] flex-col justify-between md:min-h-[calc(100vh-8rem)] md:w-[min(94vw,88rem)]">
           <div className="grid flex-1 content-center gap-4 pb-3 pt-5 md:grid-cols-[0.98fr_1.02fr] md:items-center md:gap-5 md:pb-0 md:pt-3">
-            <div className="mx-auto max-w-2xl text-center md:mx-0 md:max-w-6xl md:pt-4 md:text-left">
+            <div className="mx-auto max-w-2xl text-center md:max-w-6xl md:pt-4">
               <h1 className="font-display font-semibold leading-[0.92] tracking-[-0.075em]">
                 <span className="block text-[clamp(1rem,4.8vw,1.25rem)] font-medium tracking-[0.12em] text-white/70 md:text-[clamp(1.2rem,2.2vw,2.2rem)]">
                   Processo Seletivo 2026.2
@@ -228,12 +228,12 @@ function Hero() {
                   Liga de TI
                 </span>
               </h1>
-              <p className="mx-auto mt-5 max-w-sm text-sm leading-6 text-white/58 md:mx-0 md:mt-6 md:max-w-2xl md:text-lg md:leading-7">
+              <p className="mx-auto mt-5 max-w-sm text-sm leading-6 text-white/58 md:mt-6 md:max-w-2xl md:text-lg md:leading-7">
                 Não buscamos quem já sabe mais, e sim quem tem mais potencial para aprender, contribuir e permanecer.
                 Três etapas para mostrar como você pensa, comunica e se compromete.
               </p>
               <RegistrationWindow />
-              <div className="mt-7 flex flex-wrap justify-center gap-3 md:justify-start">
+              <div className="mt-7 flex flex-wrap justify-center gap-3">
                 <Link to="/register">
                   <Button className="h-12 rounded-full bg-white px-7 text-sm font-semibold !text-black hover:bg-black hover:!text-white">
                     Quero me candidatar

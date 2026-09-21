@@ -62,8 +62,14 @@ permanece intocada no domínio do hackathon.
 
 ## 4. Sem RBAC entre organizadores no MVP
 
+<<<<<<< HEAD
 > **Emendada pela decisão §10:** existe uma distinção de papel (`is_coordinator`) para
 > correção anônima e designação de avaliadores. O resto desta decisão continua valendo.
+=======
+> **Superada pela decisão §29:** existem dois cargos com poderes diferentes, coordenador e
+> avaliador, e a distinção vale em todos os endpoints. O registro fica pelo histórico: a
+> evolução prevista no último parágrafo é exatamente a que aconteceu.
+>>>>>>> feature/v3-processo-seletivo
 
 **Decisão:** qualquer usuário com `is_staff=True` pode criar processo, configurar etapas,
 avaliar candidatos, mover entre etapas e enviar comunicados. `OrganizerProfile.role_title`
@@ -377,6 +383,12 @@ de agora). Conferir em "Editar processo" antes de abrir as inscrições.
 
 ## 19. Designação distribui trabalho, não concede permissão
 
+<<<<<<< HEAD
+=======
+> **Superada pela decisão §29:** a tela de designação foi construída e a trava voltou, que é
+> a saída que o último parágrafo desta decisão já apontava.
+
+>>>>>>> feature/v3-processo-seletivo
 **Decisão:** qualquer organizador (`is_staff`) salva nota de qualquer candidato.
 `StageAssignment`, o modelo e os endpoints de distribuição continuam de pé, mas deixaram
 de ser pré-requisito para avaliar. **Isto emenda a §10.**
@@ -478,6 +490,12 @@ que recusa tudo. Agora tem teste, com contraprova de que organizador continua en
 
 ## 23. Correção sem anonimato nesta edição
 
+<<<<<<< HEAD
+=======
+> **Superada pela decisão §29:** o anonimato voltou, agora marcado na etapa (só o case) em
+> vez de no processo inteiro.
+
+>>>>>>> feature/v3-processo-seletivo
 **Decisão:** o processo nasce com `anonymous_evaluation=False`. Todo organizador vê nome,
 e-mail e bio do candidato ao corrigir. **Isto emenda a §10**, que definia correção anônima
 por padrão.
@@ -519,3 +537,242 @@ O campo já é `TextField`, então a convenção resolve sem migração e sem to
 de linha única continua funcionando: o resumo é a própria linha e o pop-up fica só com ela.
 O rótulo humano do tipo vai junto no JSON, como `type_display`, para o frontend não manter
 uma segunda cópia da lista de tipos.
+<<<<<<< HEAD
+=======
+
+
+## 25. O enunciado da etapa também pode ser um PDF
+
+**Decisão:** `Stage` ganha `instructions_file`. Quando a etapa tem arquivo anexado, o
+candidato vê "Baixar o enunciado" no lugar de "O que preciso fazer", e o botão passa para a
+direita da etapa na linha do tempo.
+
+**Motivo:** o enunciado do case não cabe bem em caixa de texto. Ele tem formatação, às vezes
+anexo, e muda a cada edição. O organizador escrevia num campo que não preserva nada disso.
+
+**A regra que importa:** o arquivo segue exatamente a trava do texto, e as duas passam pela
+mesma função, `services/applications.has_reached`. Antes de o candidato chegar na etapa, a
+API não devolve o texto, não devolve o arquivo e **não devolve nem o nome do arquivo** — um
+nome como `case-fintech-2026.pdf` entrega o tema, e a aba de rede do navegador daria dias de
+vantagem a quem soubesse olhar. O download é endpoint autenticado, pela mesma razão dos
+entregáveis: nada de mídia em URL pública.
+
+**Na tela do organizador, um substitui o outro.** O campo "O que o candidato precisa fazer"
+tem duas opções, Escrever e Anexar PDF, e mostra uma de cada vez — é o que o candidato vê.
+Com o PDF anexado o organizador baixa, troca e remove ali mesmo. Se sobrar texto salvo
+embaixo de um PDF, a tela avisa e oferece apagar: texto que fica no banco e some da tela é
+armadilha para a próxima edição.
+
+**Por que não no payload da etapa:** o resto da configuração é JSON e o arquivo é multipart.
+Misturar obrigaria a converter o endpoint inteiro. O arquivo entra e sai por
+`admin/stages/<id>/instructions-file/`, e a tela de configuração o trata como uma ação à
+parte, que vale na hora. Consequência: etapa nova precisa ser salva antes de receber o PDF,
+porque o upload precisa de um id.
+
+**Anexar por cima apaga o anterior.** Sem isso, cada troca de enunciado deixaria uma cópia
+órfã no volume, que ninguém alcança e ninguém apaga.
+
+
+## 26. Processo publicado não perde etapa
+
+**Decisão:** excluir etapa só vale enquanto o processo está em `draft`. Publicado ou
+encerrado, a etapa pode ser editada, mas não removida. A tela do organizador some com o
+botão de excluir e diz por quê.
+
+**Isto aperta a regra anterior**, que deixava excluir etapa de processo publicado desde que
+ela estivesse vazia de candidatos e de avaliações.
+
+**Motivo:** o candidato lê as etapas antes de decidir se se inscreve, e o e-mail de
+confirmação lista todas. Sumir com uma no meio muda o combinado depois do aceite. "Vazia
+agora" também não quer dizer vazia depois: numa etapa futura ninguém chegou ainda, e é
+justamente a que dá mais vontade de apagar.
+
+**O que continua podendo:** editar nome, descrição, datas, peso, critérios e enunciado de
+qualquer etapa, publicado ou não. Corrigir o que foi combinado é diferente de trocar por
+outra coisa.
+
+**O que se perde:** errar uma etapa a mais no rascunho agora custa republicar o processo.
+É de propósito: publicar é o momento em que o desenho vira promessa.
+
+
+## 27. Esqueci minha senha
+
+**Decisão:** quem perde a senha pede um link por e-mail e escolhe outra em
+`/reset-password`. Vale para as duas portas de entrada, candidato e organizador: a conta é a
+mesma `User`, só muda a tela em que a pessoa entra depois. O link aparece sublinhado nas duas
+telas de login.
+
+**O token é o `default_token_generator` do Django, sem tabela nova.** Ele é assinado com o
+hash da senha atual e o `last_login`, então deixa de valer sozinho no instante em que a senha
+muda: o link serve uma vez e não sobra registro para limpar depois. Tabela nova em
+`apps.teams` também esbarraria na fronteira entre os domínios, que está em produção com o
+hackathon.
+
+**O pedido responde igual para e-mail com conta e sem conta.** Um "não encontrei este
+e-mail" transformaria a tela num consultor de quem é da Liga, aberto, sem login. Quem digitou
+errado descobre pela caixa de entrada vazia, e a tela avisa que é para conferir o endereço.
+
+**Teto de pedidos por IP.** É o único endpoint aberto que dispara e-mail para um endereço
+escolhido por quem chama: sem teto dá para encher a caixa de qualquer pessoa e torrar a cota
+do Resend de fora. O teto é generoso (20/hora) porque o campus sai todo pelo mesmo IP.
+
+**A senha nova passa pelas mesmas regras do cadastro** (`validate_password`), senão a
+redefinição viraria a porta dos fundos para uma senha fraca.
+
+**`FRONTEND_URL` é o endereço que vai dentro do link.** O backend não tem como adivinhar em
+que domínio o site está, e quem recebe o e-mail abre o navegador, não a API. Sem a variável,
+cai no primeiro `CORS_ALLOWED_ORIGINS`, que em produção já é o endereço do site: é uma
+herança de propósito, para o link não sair quebrado por causa de mais uma variável esquecida
+no Railway.
+
+**Sem notificação no sino.** A regra de "notificação junto com e-mail" vale para o que
+acontece com a candidatura. Aqui quem esqueceu a senha não consegue entrar para ver o sino,
+e o aviso tem que chegar por fora.
+
+**A resposta diz por qual porta entrar.** Candidato e organizador têm telas de entrada
+diferentes; mandar o organizador para `/login` o deixaria com a senha nova e sem conseguir
+usar. A escolha é pelo perfil, não por `is_staff`, igual ao login.
+
+**A porta acompanha a pessoa o caminho inteiro**, e não só no fim. O link da tela do
+organizador vai com `?area=organizador`, e o link do e-mail sai com `&area=...` montado a
+partir do mesmo `area_de`. Sem isso, todo caminho de volta ("Voltar para o login", a seta do
+topo, "Lembrou a senha? Entrar") devolvia o organizador no login de candidato, que recusa a
+conta dele por não ter `Participant`: a pessoa saía de uma tela de recuperar acesso para uma
+mensagem de erro. Quem chega ao fim da troca não depende disso, porque aí vale o `area` da
+resposta da API.
+
+
+## 28. Desistir da inscrição, enquanto ela está aberta
+
+**Decisão:** o candidato cancela a própria inscrição em `processes/{id}/withdraw/`, com
+confirmação na tela, e pode se inscrever de novo depois. As duas coisas valem **até o fim do
+período de inscrição**. Fechado o prazo, nem uma nem outra: sair vira assunto com a
+organização.
+
+**Por que o prazo é o limite:** dentro dele, entrar e sair não custa nada a ninguém, e
+desistir é informação boa (a vaga volta para a lista). Depois dele, o processo já contou com
+aquela pessoa para montar etapas, distribuir correção e planejar entrevista. Sumir no meio
+disso não é uma caixa de diálogo, é uma conversa.
+
+**A candidatura não é apagada, vira `withdrawn`.** Apagar levaria junto o código do
+candidato (`C-0007`) e as entregas já feitas, e o gerador de código, que conta as
+candidaturas do processo, passaria a repetir códigos de gente que saiu. `withdrawn` entra em
+`FINISHED`: o organizador não move, não avalia e não aprova quem desistiu.
+
+**Separado de `discarded` de propósito.** Descarte é decisão da organização, desistência é do
+candidato. O mesmo estado para as duas faria o histórico mentir sobre quem decidiu, e é
+justamente o que o organizador precisa distinguir na lista.
+
+**Voltar atrás reaproveita a mesma linha.** Inscrever de novo devolve `status=in_progress` e
+a primeira etapa, mantendo o código. Código novo a cada ida e volta bagunçaria a correção
+anônima, e uma segunda candidatura esbarraria na regra de uma por processo.
+
+**Quem desistiu some de onde "inscrito" é o que importa:** `already_applied` volta a ser
+`false` (senão cancelar seria porta só de ida, com a tela recusando nova inscrição), o tile
+"Inscritos" não conta essa pessoa, e o alerta "você ainda não se inscreveu" volta a aparecer
+no dashboard. Descartado continua contando como inscrito: essa pessoa se inscreveu, quem a
+tirou foi a organização.
+
+**A ação mora nos dois lugares em que a pessoa procura:** o cartão do processo no
+dashboard, logo abaixo de "Ver candidatura", e a página do processo. O dashboard é onde ela
+cai ao entrar; para achar a página do processo é preciso saber que ela existe. Os dois
+passam pela mesma confirmação, e quem diz se o botão aparece é o `can_withdraw` da API.
+
+**Sem e-mail e sem notificação.** A regra de "notificação junto com e-mail" existe para o que
+a plataforma decide sobre a candidatura, e aqui quem decidiu foi a própria pessoa, que está
+olhando a tela e acabou de confirmar num diálogo. O histórico de comunicações também não
+registra: ele guarda o que foi dito ao candidato, e nada foi dito.
+
+---
+
+## 29. Dois cargos de organizador, e o anonimato volta na etapa do case
+
+**Decisão:** o organizador tem dois cargos de verdade, com poderes diferentes. Isto emenda a
+§4 (sem RBAC), a §19 (designação não é permissão) e a §23 (sem anonimato nesta edição).
+
+- **Coordenador** (`OrganizerProfile.is_coordinator`, ou superusuário): monta o processo,
+  chama quem vai ajudar, distribui as correções, decide resultado. É o cargo do Bruno, e
+  nada muda para ele.
+- **Avaliador**: entra num processo a convite do coordenador e faz uma coisa só, dar nota
+  no que lhe foi distribuído. Não aprova, não reprova, não move de etapa, não descarta, não
+  escreve comunicado, não cria nem edita processo ou etapa, não publica e não encerra.
+
+**Por que a linha de corte é essa.** Tudo que dispara e-mail para candidato ou muda o rumo
+de uma pessoa é do coordenador. O avaliador opina; quem decide é quem organiza o processo e
+responde por ele. Não é desconfiança de quem foi chamado, é que a Liga precisa saber de
+quem partiu cada decisão, e "qualquer um podia ter feito" não responde isso.
+
+**A entrada é por processo, não global.** `ProcessOrganizer` diz em qual processo cada
+pessoa trabalha. Ser `is_staff` deixa entrar na área do organizador; ser membro daqui é o
+que mostra um processo. Sem isso, quem fosse chamado para corrigir um case enxergaria a
+edição inteira de outro ano, com nome e nota de gente que não tem nada com ele.
+
+**O avaliador vê só a própria fila.** A lista de candidatos do processo devolve, para quem
+não coordena, apenas as candidaturas distribuídas a ele; a ficha e as notas seguem a mesma
+regra, e a resposta é 404, não 403: a candidatura dos outros não existe para ele. Fechar só
+a lista não adiantaria nada, bastava trocar o id na barra de endereços.
+
+**A designação volta a ser trava.** A §19 tirou a trava porque não havia tela para designar
+ninguém, e o avaliador ficava preso: preenchia a nota, clicava em salvar e levava 403 sem
+caminho nenhum para resolver. A §19 já dizia qual era a saída, "construir a tela de
+designação e reintroduzir a trava", e é o que esta decisão faz. A garantia de dois pareceres
+independentes por case volta a valer.
+
+**A distribuição cobre só quem está naquela etapa.** Distribuir o case é repartir quem tem
+case para corrigir; quem já passou para o pitch não tem o que ser corrigido ali, e quem
+ficou pelo caminho muito menos. Redistribuir substitui a distribuição da etapa e **nunca**
+apaga nota: as notas ficam no banco e voltam a valer se a pessoa cair no mesmo candidato.
+
+**O anonimato volta, mas na etapa, não no processo.** `Stage.anonymous_evaluation` substitui
+o campo que estava no processo. Só o case nasce marcado: é onde a proposta deveria pesar
+sozinha. No pitch e na entrevista o avaliador está diante da pessoa, e esconder o nome ali
+seria teatro. Quem manda é a etapa em que o candidato **está**: passada a etapa anônima, o
+avaliador volta a ver quem é, e a correção do case já acabou.
+
+Dois switches que podem discordar são um convite a perder uma tarde, então o campo do
+processo foi removido em vez de virar chave-mestra. Uma migração de dados liga a marca no
+case dos processos que já existiam, porque `ensure_selection_process` não altera processo
+existente e a caixa ficaria desmarcada sem ninguém saber que precisava marcá-la.
+
+**O nome do arquivo entregue também é identidade.** Numa etapa anônima, `case-pedro-xavier.pdf`
+derruba o anonimato antes de o avaliador abrir o PDF, e ninguém pensa no nome do arquivo
+como dado de identificação. O avaliador recebe `C-0042.pdf`, e só baixa o que lhe coube. O
+candidato lendo a própria entrega continua vendo o nome que ele escolheu: o anonimato é
+regra entre organizadores.
+
+**O convite não cria tabela de convite.** A conta nasce sem senha utilizável e a pessoa
+recebe o link do "esqueci minha senha" com `convite=1`, que muda só o texto da tela. O
+coordenador nunca inventa nem enxerga senha de ninguém, não sobra estado pendente para
+alguém limpar, e "convite pendente" é lido de `has_usable_password()` em vez de um campo que
+poderia discordar da realidade. Quem é convidado nunca vira coordenador: coordenação
+continua sendo marcada à mão no Django Admin, porque não se delega por formulário.
+
+**Distribuir começa mostrando gente, não formulário.** A primeira versão da tela pedia
+etapa e quantos avaliadores por candidato antes de exibir um nome, e o coordenador
+distribuía no escuro. Agora os candidatos aparecem agrupados por fase, cada um com quem o
+corrige, e há dois caminhos porque são duas perguntas diferentes: repartir uma fase inteira
+entre a comissão (automático, em rodízio) e decidir quem pega uma pessoa específica
+(manual, candidato a candidato). O manual escolhe também **em quais etapas** aquilo vale,
+com "Todas as etapas" ou uma a uma: designar numa etapa em que o candidato ainda não chegou
+é adiantar trabalho. Salvar **substitui** o que havia naquelas etapas, senão não haveria
+como tirar ninguém.
+
+**A coordenação aparece na lista sem estar em `ProcessOrganizer`.** Ela não é chamada
+para um processo, já coordena todos. Aparece ali porque a aba é também a lista de quem entra
+no rodízio da correção, e sem isso o coordenador não conseguiria se incluir na própria
+distribuição, que é exatamente como a Liga corrige hoje. Foi a verificação contra o servidor
+que encontrou isso: nos testes, a distribuição sempre recebia os ids na mão.
+
+**Candidato do processo não é convidado para corrigi-lo.** Ninguém corrige o próprio case. A
+trava é só no processo em questão: ter se candidatado numa edição passada não impede de
+ajudar nesta.
+
+**Tirar alguém do processo leva as designações, não as notas.** As designações caem, senão a
+pessoa continuaria na carga de trabalho da etapa e voltaria a enxergar candidatos se fosse
+readmitida. As notas que ela deu ficam: foram trabalho feito e entram na média. Apagá-las
+mudaria a nota de candidatos sem ninguém ter pedido.
+
+**O que se perde:** o coordenador vira gargalo. Nada avança sem ele, e se o Bruno sumir numa
+semana de correção o processo trava. O caminho, se isso doer, é marcar um segundo
+coordenador no Django Admin, e não afrouxar a regra.
+>>>>>>> feature/v3-processo-seletivo

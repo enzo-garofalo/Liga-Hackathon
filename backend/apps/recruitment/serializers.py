@@ -9,13 +9,26 @@ from apps.recruitment.models import (
     EvaluationCriterion,
     OrganizerProfile,
     Process,
+<<<<<<< HEAD
     ProcessStatus,
     Stage,
 )
+=======
+    ProcessOrganizer,
+    ProcessStatus,
+    Stage,
+)
+from apps.recruitment.services.applications import has_reached
+>>>>>>> feature/v3-processo-seletivo
 from apps.recruitment.services.processes import (
     assert_criteria_removable,
     next_stage_order,
 )
+<<<<<<< HEAD
+=======
+from apps.recruitment.services.stage_files import download_url as stage_file_url
+from apps.recruitment.services.stage_files import filename as stage_file_name
+>>>>>>> feature/v3-processo-seletivo
 
 
 class EvaluationCriterionSerializer(serializers.ModelSerializer):
@@ -29,6 +42,13 @@ class EvaluationCriterionSerializer(serializers.ModelSerializer):
 class StageSerializer(serializers.ModelSerializer):
     criteria = EvaluationCriterionSerializer(many=True, required=False)
     participant_count = serializers.SerializerMethodField()
+<<<<<<< HEAD
+=======
+    # O arquivo entra e sai por endpoint próprio, multipart. Aqui é só leitura,
+    # para a tela de configuração mostrar o que está anexado.
+    instructions_file_name = serializers.SerializerMethodField()
+    instructions_file_url = serializers.SerializerMethodField()
+>>>>>>> feature/v3-processo-seletivo
 
     class Meta:
         model = Stage
@@ -37,10 +57,19 @@ class StageSerializer(serializers.ModelSerializer):
             'name',
             'description',
             'instructions',
+<<<<<<< HEAD
+=======
+            'instructions_file_name',
+            'instructions_file_url',
+>>>>>>> feature/v3-processo-seletivo
             'order',
             'start_at',
             'end_at',
             'weight',
+<<<<<<< HEAD
+=======
+            'anonymous_evaluation',
+>>>>>>> feature/v3-processo-seletivo
             'accepts_late_submission',
             'allows_file_upload',
             'max_files',
@@ -48,12 +77,30 @@ class StageSerializer(serializers.ModelSerializer):
             'criteria',
             'participant_count',
         ]
+<<<<<<< HEAD
         read_only_fields = ['id', 'participant_count']
+=======
+        read_only_fields = [
+            'id',
+            'participant_count',
+            'instructions_file_name',
+            'instructions_file_url',
+        ]
+>>>>>>> feature/v3-processo-seletivo
         extra_kwargs = {'order': {'required': False}}
 
     def get_participant_count(self, stage):
         return stage.current_applications.count()
 
+<<<<<<< HEAD
+=======
+    def get_instructions_file_name(self, stage):
+        return stage_file_name(stage)
+
+    def get_instructions_file_url(self, stage):
+        return stage_file_url(stage)
+
+>>>>>>> feature/v3-processo-seletivo
     def validate(self, attrs):
         if attrs.get('criteria') is not None:
             validate_weights(attrs['criteria'], 'dos critérios da etapa')
@@ -129,7 +176,10 @@ class ProcessSerializer(serializers.ModelSerializer):
             'score_min',
             'score_max',
             'divergence_threshold',
+<<<<<<< HEAD
             'anonymous_evaluation',
+=======
+>>>>>>> feature/v3-processo-seletivo
             'application_count',
             'stage_count',
             'created_at',
@@ -309,6 +359,12 @@ class MyApplicationListSerializer(serializers.ModelSerializer):
         source='current_stage.name', default=None
     )
     stage_count = serializers.IntegerField(source='process.stages.count')
+<<<<<<< HEAD
+=======
+    # Quem decide se o cartão oferece "Cancelar inscrição" é o backend: a regra
+    # depende do prazo do processo, que a tela não tem como conferir sozinha.
+    can_withdraw = serializers.SerializerMethodField()
+>>>>>>> feature/v3-processo-seletivo
 
     class Meta:
         model = Application
@@ -322,9 +378,21 @@ class MyApplicationListSerializer(serializers.ModelSerializer):
             'stage_count',
             'submitted_at',
             'updated_at',
+<<<<<<< HEAD
         ]
         read_only_fields = fields
 
+=======
+            'can_withdraw',
+        ]
+        read_only_fields = fields
+
+    def get_can_withdraw(self, obj):
+        from apps.recruitment.services.applications import can_withdraw
+
+        return can_withdraw(obj)
+
+>>>>>>> feature/v3-processo-seletivo
 
 class ApplicationTimelineStageSerializer(PublicStageSerializer):
     """Etapa dentro da linha do tempo da candidatura."""
@@ -332,6 +400,10 @@ class ApplicationTimelineStageSerializer(PublicStageSerializer):
     state = serializers.SerializerMethodField()
     deliverables = serializers.SerializerMethodField()
     instructions = serializers.SerializerMethodField()
+<<<<<<< HEAD
+=======
+    instructions_file = serializers.SerializerMethodField()
+>>>>>>> feature/v3-processo-seletivo
 
     class Meta(PublicStageSerializer.Meta):
         fields = PublicStageSerializer.Meta.fields + [
@@ -341,6 +413,10 @@ class ApplicationTimelineStageSerializer(PublicStageSerializer):
             'state',
             'deliverables',
             'instructions',
+<<<<<<< HEAD
+=======
+            'instructions_file',
+>>>>>>> feature/v3-processo-seletivo
         ]
         read_only_fields = fields
 
@@ -351,10 +427,33 @@ class ApplicationTimelineStageSerializer(PublicStageSerializer):
         deixaria o enunciado legível na API antes da etapa abrir — bastaria
         abrir a aba de rede do navegador para começar dias antes dos outros.
         """
+<<<<<<< HEAD
         if self.get_state(stage) == 'upcoming':
             return ''
         return stage.instructions
 
+=======
+        if not self._alcancou(stage):
+            return ''
+        return stage.instructions
+
+    def get_instructions_file(self, stage):
+        """O PDF do enunciado, pela mesma regra do texto.
+
+        Nem o nome do arquivo sai antes da hora: o nome já costuma entregar o
+        tema do case.
+        """
+        if not self._alcancou(stage) or not stage.instructions_file:
+            return None
+        return {
+            'filename': stage_file_name(stage),
+            'download_url': stage_file_url(stage),
+        }
+
+    def _alcancou(self, stage):
+        return has_reached(self.context['application'], stage)
+
+>>>>>>> feature/v3-processo-seletivo
     def get_state(self, stage):
         application = self.context['application']
         current = application.current_stage
@@ -435,9 +534,17 @@ class DeliverableSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_filename(self, deliverable):
+<<<<<<< HEAD
         import os
 
         return os.path.basename(deliverable.file.name)
+=======
+        from apps.recruitment.services.deliverables import display_name
+
+        return display_name(
+            deliverable, hide_identity(self, deliverable.application)
+        )
+>>>>>>> feature/v3-processo-seletivo
 
     def get_size(self, deliverable):
         try:
@@ -453,6 +560,13 @@ class DeliverableSerializer(serializers.ModelSerializer):
 class AdminApplicationDetailSerializer(serializers.ModelSerializer):
     """Ficha completa do candidato, como o modal de perfil exibe."""
 
+<<<<<<< HEAD
+=======
+    # `anonymous` existe para a tela **dizer** que está anônima em vez de
+    # desenhar uma fileira de campos vazios: quem corrige precisa saber que a
+    # identidade foi escondida de propósito, e não que faltou dado.
+
+>>>>>>> feature/v3-processo-seletivo
     participant_name = serializers.CharField(source='participant.full_name')
     email = serializers.EmailField(source='participant.user.email')
     course = serializers.CharField(source='participant.course')
@@ -468,11 +582,19 @@ class AdminApplicationDetailSerializer(serializers.ModelSerializer):
     criteria = serializers.SerializerMethodField()
     my_scores = serializers.SerializerMethodField()
     final_score = serializers.SerializerMethodField()
+<<<<<<< HEAD
+=======
+    anonymous = serializers.SerializerMethodField()
+>>>>>>> feature/v3-processo-seletivo
 
     class Meta:
         model = Application
         fields = [
             'id',
+<<<<<<< HEAD
+=======
+            'anonymous',
+>>>>>>> feature/v3-processo-seletivo
             'participant_name',
             'email',
             'course',
@@ -532,6 +654,12 @@ class AdminApplicationDetailSerializer(serializers.ModelSerializer):
         score = application.final_score
         return round(float(score), 2) if score is not None else None
 
+<<<<<<< HEAD
+=======
+    def get_anonymous(self, application):
+        return hide_identity(self, application)
+
+>>>>>>> feature/v3-processo-seletivo
 
 class EvaluationInputSerializer(serializers.Serializer):
     """Payload do botão 'Salvar Avaliação'."""
@@ -609,6 +737,7 @@ class CommunicationInputSerializer(serializers.Serializer):
 def hide_identity(serializer, application):
     """True quando este leitor não pode ver quem é o candidato.
 
+<<<<<<< HEAD
     A correção anônima do planejamento existe para a nota não ser influenciada
     por quem escreveu. O coordenador enxerga a identidade porque é quem
     distribui as correções e revisa divergências.
@@ -616,16 +745,50 @@ def hide_identity(serializer, application):
     from apps.recruitment.services.evaluations import is_coordinator
 
     if not application.process.anonymous_evaluation:
+=======
+    A correção anônima existe para a nota não ser influenciada por quem
+    escreveu. O coordenador enxerga a identidade porque é quem distribui as
+    correções, revisa divergências e decide resultado.
+
+    Quem manda é a etapa em que o candidato está, não o processo: o anonimato
+    é do case, onde só o que foi entregue deveria pesar. No pitch e na
+    entrevista o avaliador está olhando para a pessoa de qualquer maneira, e
+    esconder o nome ali seria teatro (decisions.md §29).
+    """
+    from apps.recruitment.services.roles import is_coordinator
+
+    stage = application.current_stage
+    if stage is None or not stage.anonymous_evaluation:
+>>>>>>> feature/v3-processo-seletivo
         return False
 
     request = serializer.context.get('request')
     if request is None:
         return False
+<<<<<<< HEAD
     return not is_coordinator(request.user)
 
 
 # Campos que revelam quem é o candidato. Nem todo serializer tem todos — o
 # anonimizador limpa só os que existirem no payload.
+=======
+    # O anonimato é uma regra entre organizadores. O candidato lendo a própria
+    # candidatura não é alcançado por ela: esconder dele o nome do arquivo que
+    # ele mesmo enviou seria só confusão.
+    if not getattr(request.user, 'is_staff', False):
+        return False
+    return not is_coordinator(request.user)
+
+
+# Campos que revelam quem é o candidato. Nem todo serializer tem todos: o
+# anonimizador limpa só os que existirem no payload.
+#
+# Curso e semestre entram na lista porque a comissão é pequena e conhece boa
+# parte dos candidatos: "Ciência da Computação, 8º período" aponta para pouca
+# gente. Anonimato que deixa três pistas cruzáveis não é anonimato. O
+# coordenador continua vendo tudo, e o filtro por curso continua funcionando
+# para ele, porque filtra na consulta e não no que sai no payload.
+>>>>>>> feature/v3-processo-seletivo
 IDENTITY_FIELDS = (
     'participant_name',
     'participant_email',
@@ -634,6 +797,11 @@ IDENTITY_FIELDS = (
     'github',
     'linkedin',
     'bio',
+<<<<<<< HEAD
+=======
+    'course',
+    'semester',
+>>>>>>> feature/v3-processo-seletivo
 )
 
 
@@ -664,6 +832,36 @@ def validate_weights(items, label):
         )
 
 
+<<<<<<< HEAD
+=======
+class ProcessOrganizerSerializer(serializers.Serializer):
+    """Uma linha da aba Organizadores.
+
+    Serializer simples e não de modelo: a lista mistura quem foi chamado para o
+    processo (`ProcessOrganizer`) com a coordenação, que não é chamada porque já
+    coordena todos. `services.organizers.members` monta as duas.
+    """
+
+    id = serializers.CharField(read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
+    email = serializers.CharField(read_only=True)
+    full_name = serializers.CharField(read_only=True)
+    role_title = serializers.CharField(read_only=True)
+    is_coordinator = serializers.BooleanField(read_only=True)
+    pending = serializers.BooleanField(read_only=True)
+    workload = serializers.IntegerField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True, allow_null=True)
+
+
+class OrganizerInviteSerializer(serializers.Serializer):
+    """Payload de "Adicionar organizador"."""
+
+    email = serializers.EmailField()
+    full_name = serializers.CharField(max_length=255, required=False, allow_blank=True)
+    role_title = serializers.CharField(max_length=255, required=False, allow_blank=True)
+
+
+>>>>>>> feature/v3-processo-seletivo
 # ── Perfil do organizador ─────────────────────────────────────────
 
 
@@ -688,6 +886,10 @@ class OrganizerProfileSerializer(serializers.ModelSerializer):
 
     def get_is_coordinator(self, profile):
         """Superusuário também é coordenador — ver decisions.md §12."""
+<<<<<<< HEAD
         from apps.recruitment.services.evaluations import is_coordinator
+=======
+        from apps.recruitment.services.roles import is_coordinator
+>>>>>>> feature/v3-processo-seletivo
 
         return is_coordinator(profile.user)

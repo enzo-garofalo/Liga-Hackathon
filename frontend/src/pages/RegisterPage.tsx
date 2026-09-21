@@ -9,6 +9,7 @@ import { Select } from '../components/ui/Select'
 import { useRegister } from '../hooks/useAuth'
 import type { RegisterPayload } from '../types/auth'
 import { getApiError } from '../utils/errors'
+import { BIO_MAX } from '../utils/perfil'
 
 const COURSES = [
   'Análise e Desenvolvimento de Sistemas',
@@ -29,7 +30,10 @@ const COURSES = [
 ].map((course) => ({ value: course, label: course }))
 
 /** Mesmo teto da tela de perfil: os dois formulários editam o mesmo campo. */
+<<<<<<< HEAD
 const BIO_MAX = 500
+=======
+>>>>>>> feature/v3-processo-seletivo
 
 interface FormShape {
   email: string
@@ -107,7 +111,7 @@ function RegisterShowcase() {
       <div className="relative z-10 flex min-h-full flex-col justify-between p-8 xl:p-10">
         <Link to="/" className="flex items-center gap-3">
           <img src={logo} alt="Liga de TI" className="h-8 brightness-0 invert" />
-          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/72">Arena</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-white/72">Processo Seletivo</span>
         </Link>
 
         <div />
@@ -181,7 +185,7 @@ export function RegisterPage() {
           <div className="mb-8 flex items-center justify-between md:hidden">
             <Link to="/" className="flex items-center gap-3">
               <img src={logo} alt="Liga de TI" className="h-8" />
-              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-black/60">Arena</span>
+              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-black/60">Processo Seletivo</span>
             </Link>
             <Link to="/" className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black shadow-[0_10px_30px_rgba(20,16,30,0.08)]" aria-label="Voltar">
               <ArrowLeft className="h-4 w-4" />
@@ -314,6 +318,12 @@ export function RegisterPage() {
                       <textarea
                         id="register-bio"
                         rows={4}
+<<<<<<< HEAD
+=======
+                        // Trava a digitação no teto. Sem isto dava para escrever
+                        // mil caracteres e só descobrir o limite ao enviar.
+                        maxLength={BIO_MAX}
+>>>>>>> feature/v3-processo-seletivo
                         {...register('bio', {
                           required: 'Conte um pouco sobre você.',
                           // Mesmo teto do perfil: sem ele, quem se cadastra com

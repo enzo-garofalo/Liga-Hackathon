@@ -24,6 +24,10 @@ function caseStage(overrides: Partial<TimelineStage> = {}): TimelineStage {
     name: 'Resolução do Case',
     description: '',
     instructions: '',
+<<<<<<< HEAD
+=======
+    instructions_file: null,
+>>>>>>> feature/v3-processo-seletivo
     order: 2,
     start_at: null,
     end_at: null,

@@ -158,6 +158,63 @@ def test_delete_empty_stage_succeeds(admin_client, process):
     assert admin_client.delete(stage_url(stage.id)).status_code == 204
 
 
+<<<<<<< HEAD
+=======
+# ── Publicado não perde etapa ─────────────────────────────────────
+#
+# O candidato lê as etapas antes de se inscrever, e o e-mail de confirmação
+# lista todas. Sumir com uma depois muda o combinado depois do aceite. Editar
+# continua valendo: é acertar o que foi combinado, não trocar por outro.
+
+
+def test_published_process_does_not_lose_stages(admin_client, process):
+    stage = StageFactory(process=process, order=1)
+    process.status = ProcessStatus.PUBLISHED
+    process.save(update_fields=['status'])
+
+    r = admin_client.delete(stage_url(stage.id))
+
+    assert r.status_code == 400
+    assert 'não excluídas' in str(r.data)
+    assert Stage.objects.filter(id=stage.id).exists()
+
+
+def test_empty_stage_of_published_process_is_also_kept(admin_client, process):
+    """Etapa vazia também fica: alguém ainda vai chegar nela."""
+    stage = StageFactory(process=process, order=1)
+    process.status = ProcessStatus.PUBLISHED
+    process.save(update_fields=['status'])
+    assert not stage.current_applications.exists()
+
+    assert admin_client.delete(stage_url(stage.id)).status_code == 400
+
+
+def test_published_process_still_allows_editing_the_stage(admin_client, process):
+    stage = StageFactory(process=process, order=1, name='Case')
+    process.status = ProcessStatus.PUBLISHED
+    process.save(update_fields=['status'])
+
+    r = admin_client.patch(
+        stage_url(stage.id), {'name': 'Resolução do Case'}, format='json'
+    )
+
+    assert r.status_code == 200
+    stage.refresh_from_db()
+    assert stage.name == 'Resolução do Case'
+
+
+def test_closed_process_does_not_lose_stages_either(admin_client, process):
+    # Encerrado já é barrado antes, por assert_process_editable. O teste fica
+    # como garantia do resultado, não da regra que o produz.
+    stage = StageFactory(process=process, order=1)
+    process.status = ProcessStatus.CLOSED
+    process.save(update_fields=['status'])
+
+    assert admin_client.delete(stage_url(stage.id)).status_code == 400
+    assert Stage.objects.filter(id=stage.id).exists()
+
+
+>>>>>>> feature/v3-processo-seletivo
 def test_reorder_stages(admin_client, process):
     first = StageFactory(process=process, order=1)
     second = StageFactory(process=process, order=2)

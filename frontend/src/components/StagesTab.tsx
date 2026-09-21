@@ -2,6 +2,10 @@ import { FileUp, Pencil, Plus, Trash2, Users } from 'lucide-react'
 import { useState } from 'react'
 import { useApplications } from '../hooks/useApplications'
 import { useStages } from '../hooks/useStages'
+<<<<<<< HEAD
+=======
+import type { ProcessStatus } from '../types/process'
+>>>>>>> feature/v3-processo-seletivo
 import type { Stage } from '../types/stage'
 import { getApiError } from '../utils/errors'
 import { QueryError } from './QueryError'
@@ -50,7 +54,20 @@ function CandidateCount({
   )
 }
 
+<<<<<<< HEAD
 export function StagesTab({ processId }: { processId: string }) {
+=======
+export function StagesTab({
+  processId,
+  processStatus,
+}: {
+  processId: string
+  processStatus: ProcessStatus
+}) {
+  // Publicado, a etapa não some mais: o candidato já leu o desenho do
+  // processo quando se inscreveu (decisions.md §26).
+  const podeExcluir = processStatus === 'draft'
+>>>>>>> feature/v3-processo-seletivo
   const { query, create, update, remove } = useStages(processId)
   // Reaproveita a listagem de candidatos: ela já devolve o código no lugar do
   // nome quando a correção é anônima.
@@ -84,7 +101,18 @@ export function StagesTab({ processId }: { processId: string }) {
 
   return (
     <div>
+<<<<<<< HEAD
       <div className="mb-4 flex justify-end">
+=======
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        {podeExcluir ? (
+          <span />
+        ) : (
+          <p className="font-ui text-xs text-ink/60">
+            Processo publicado: as etapas podem ser editadas, mas não excluídas.
+          </p>
+        )}
+>>>>>>> feature/v3-processo-seletivo
         <Button onClick={() => setCreating(true)}>
           <Plus className="h-4 w-4" />
           Nova etapa
@@ -176,6 +204,7 @@ export function StagesTab({ processId }: { processId: string }) {
                     <Pencil className="h-3.5 w-3.5" />
                     Editar
                   </button>
+<<<<<<< HEAD
                   <button
                     type="button"
                     onClick={() => {
@@ -189,6 +218,23 @@ export function StagesTab({ processId }: { processId: string }) {
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
+=======
+                  {podeExcluir && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRemoveError(null)
+                        remove.mutate(stage.id, {
+                          onError: (e) => setRemoveError(getApiError(e)),
+                        })
+                      }}
+                      className="rounded-xl border border-ink/15 p-1.5 text-ink/60 transition-colors hover:border-red-400 hover:bg-red-500/10 hover:text-red-600"
+                      aria-label={`Excluir ${stage.name}`}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+>>>>>>> feature/v3-processo-seletivo
                 </div>
               </div>
             </div>
@@ -213,6 +259,12 @@ export function StagesTab({ processId }: { processId: string }) {
           onClose={() => setEditing(null)}
           saving={update.isPending}
           error={update.error}
+<<<<<<< HEAD
+=======
+          // O PDF sobe por endpoint próprio: sem recarregar, o card continuaria
+          // mostrando o estado anterior do anexo.
+          onFileChange={() => query.refetch()}
+>>>>>>> feature/v3-processo-seletivo
           onSave={(payload) =>
             update.mutate(
               { id: editing.id, payload },

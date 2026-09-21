@@ -47,7 +47,11 @@ describe('CandidatesTab', () => {
   })
 
   it('mostra a nota final de quem foi avaliado', async () => {
+<<<<<<< HEAD
     renderWithProviders(<CandidatesTab process={process} />)
+=======
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
+>>>>>>> feature/v3-processo-seletivo
     expect(await screen.findByText('4,47')).toBeInTheDocument()
     // Sem avaliação, a coluna fica vazia em vez de mostrar zero.
     const bruno = screen.getByText('Bruno Reitano').closest('tr') as HTMLElement
@@ -55,7 +59,11 @@ describe('CandidatesTab', () => {
   })
 
   it('o menu de ações só aparece com alguém selecionado', async () => {
+<<<<<<< HEAD
     renderWithProviders(<CandidatesTab process={process} />)
+=======
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
+>>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
     expect(screen.queryByText(/selecionado/)).not.toBeInTheDocument()
 
@@ -64,7 +72,11 @@ describe('CandidatesTab', () => {
   })
 
   it('aprovar fica desabilitado fora da última etapa', async () => {
+<<<<<<< HEAD
     renderWithProviders(<CandidatesTab process={process} />)
+=======
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
+>>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
     await selectRow('Ana Lima')
 
@@ -74,7 +86,11 @@ describe('CandidatesTab', () => {
   })
 
   it('aprovar libera para quem está na última etapa', async () => {
+<<<<<<< HEAD
     renderWithProviders(<CandidatesTab process={process} />)
+=======
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
+>>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Bruno Reitano')
     await selectRow('Bruno Reitano')
 
@@ -83,7 +99,11 @@ describe('CandidatesTab', () => {
   })
 
   it('mover etapa exige escolher o destino antes de aplicar', async () => {
+<<<<<<< HEAD
     renderWithProviders(<CandidatesTab process={process} />)
+=======
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
+>>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
     await selectRow('Ana Lima')
 
@@ -98,7 +118,11 @@ describe('CandidatesTab', () => {
   })
 
   it('aplica a ação em massa nos selecionados', async () => {
+<<<<<<< HEAD
     renderWithProviders(<CandidatesTab process={process} />)
+=======
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
+>>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
     await selectRow('Ana Lima')
 
@@ -119,7 +143,11 @@ describe('CandidatesTab', () => {
     vi.mocked(runBulkAction).mockRejectedValue(
       httpError(400, ['A aprovação final só é permitida na última etapa.']),
     )
+<<<<<<< HEAD
     renderWithProviders(<CandidatesTab process={process} />)
+=======
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
+>>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
     await selectRow('Ana Lima')
 
@@ -147,7 +175,11 @@ describe('CandidatesTab', () => {
       recipients: [],
     })
 
+<<<<<<< HEAD
     renderWithProviders(<CandidatesTab process={process} />)
+=======
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
+>>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
     await selectRow('Ana Lima')
 
@@ -172,7 +204,11 @@ describe('CandidatesTab', () => {
 
   it('erro de API mostra aviso em vez de tabela vazia', async () => {
     vi.mocked(listApplications).mockRejectedValue(httpError(500))
+<<<<<<< HEAD
     renderWithProviders(<CandidatesTab process={process} />)
+=======
+    renderWithProviders(<CandidatesTab process={process} canDecide />)
+>>>>>>> feature/v3-processo-seletivo
 
     expect(
       await screen.findByText('Não foi possível carregar os candidatos'),

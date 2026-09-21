@@ -17,9 +17,18 @@ from .models import (
     TeamInvite,
     TeamMembership,
 )
+from .services import password_reset
 from .services.teams import assert_deadline_not_passed
 
 User = get_user_model()
+
+
+# Teto da bio, o mesmo que os dois formulários prometem na tela.
+#
+# Vive aqui e não no modelo porque `apps.teams` está em produção com o
+# hackathon e a fronteira entre os domínios proíbe mexer na estrutura desses
+# modelos. O contrato da API é o serializer, e é o que o cliente encontra.
+BIO_MAX_LENGTH = 1500
 
 
 class ParticipantPublicSerializer(serializers.ModelSerializer):
@@ -81,6 +90,9 @@ class MeSerializer(serializers.ModelSerializer):
             'updated_at',
         ]
         read_only_fields = ['id', 'email', 'has_team', 'team', 'created_at', 'updated_at']
+        # O modelo é TextField sem teto: sem isto, a API aceitava bio de
+        # qualquer tamanho enquanto a tela prometia 500.
+        extra_kwargs = {'bio': {'max_length': BIO_MAX_LENGTH}}
 
     def get_team(self, obj):
         membership = (
@@ -324,7 +336,7 @@ class RegisterSerializer(serializers.Serializer):
     phone = serializers.CharField(max_length=20, required=False, allow_blank=True, allow_null=True)
     course = serializers.CharField(max_length=255)
     semester = serializers.IntegerField(min_value=1, max_value=20)
-    bio = serializers.CharField()
+    bio = serializers.CharField(max_length=BIO_MAX_LENGTH)
     github = serializers.URLField(required=False, allow_blank=True, allow_null=True)
     linkedin = serializers.URLField(required=False, allow_blank=True, allow_null=True)
 
@@ -408,3 +420,32 @@ class AdminTokenObtainPairSerializer(EmailTokenObtainPairSerializer):
         if not self.user.is_staff:
             raise AuthenticationFailed('Acesso restrito a administradores.')
         return data
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    """Pedido do link. Só o endereço, e a resposta é sempre a mesma.
+
+    Nada de validar se a conta existe: a mensagem de erro diria a qualquer um,
+    sem login, quem tem conta na Liga.
+    """
+
+    email = serializers.EmailField()
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    """O link em uso: identidade vem do token, não de quem está chamando.
+
+    `min_length` repete o cadastro; `validate_password` aplica as mesmas regras
+    do Django que valem na criação da conta, para a redefinição não virar a
+    porta dos fundos para uma senha fraca.
+    """
+
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    password = serializers.CharField(write_only=True, min_length=8, max_length=128)
+
+    def validate(self, attrs):
+        user = password_reset.conta_do_link(attrs['uid'], attrs['token'])
+        validate_password(attrs['password'], user=user)
+        attrs['user'] = user
+        return attrs

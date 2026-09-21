@@ -35,6 +35,20 @@ def published_processes():
     return Process.objects.filter(status=ProcessStatus.PUBLISHED)
 
 
+<<<<<<< HEAD
+=======
+def has_reached(application, stage):
+    """Se o candidato já chegou nesta etapa.
+
+    Uma regra só, usada pelo enunciado em texto e pelo enunciado em PDF. Nenhum
+    dos dois pode ser lido antes da etapa abrir: bastaria a aba de rede do
+    navegador para começar dias antes dos outros.
+    """
+    current = application.current_stage
+    return current is not None and stage.order <= current.order
+
+
+>>>>>>> feature/v3-processo-seletivo
 # ── Texto das notificações ────────────────────────────────────────
 #
 # Convenção: a primeira linha é o resumo que aparece na lista do sino; o que vem
@@ -110,6 +124,7 @@ def apply_to_process(process, participant):
     if now > process.registration_end:
         raise ValidationError('As inscrições para este processo já encerraram.')
 
+<<<<<<< HEAD
     if Application.objects.filter(process=process, participant=participant).exists():
         raise ValidationError('Você já está inscrito neste processo seletivo.')
 
@@ -121,6 +136,35 @@ def apply_to_process(process, participant):
         status=ApplicationStatus.IN_PROGRESS,
         submitted_at=now,
     )
+=======
+    existente = Application.objects.filter(
+        process=process, participant=participant
+    ).first()
+    if existente and existente.status != ApplicationStatus.WITHDRAWN:
+        raise ValidationError('Você já está inscrito neste processo seletivo.')
+
+    if existente:
+        # Quem desistiu e mudou de ideia volta na mesma candidatura, e não numa
+        # nova: a linha guarda o código do candidato, e um código novo a cada
+        # ida e volta bagunçaria a correção anônima. Voltar também devolve a
+        # pessoa à primeira etapa, que é onde ela estava ao desistir.
+        application = existente
+        application.status = ApplicationStatus.IN_PROGRESS
+        application.current_stage = process.first_stage
+        application.submitted_at = now
+        application.save(
+            update_fields=['status', 'current_stage', 'submitted_at', 'updated_at']
+        )
+    else:
+        application = Application.objects.create(
+            process=process,
+            participant=participant,
+            current_stage=process.first_stage,
+            code=next_application_code(process),
+            status=ApplicationStatus.IN_PROGRESS,
+            submitted_at=now,
+        )
+>>>>>>> feature/v3-processo-seletivo
 
     notify(
         participant,
@@ -139,6 +183,62 @@ def apply_to_process(process, participant):
     return application
 
 
+<<<<<<< HEAD
+=======
+def can_withdraw(application):
+    """Se dá para cancelar esta inscrição agora.
+
+    A tela precisa saber disso antes de oferecer o botão, e a resposta tem que
+    ser a mesma que `withdraw_from_process` vai dar. Lá as condições aparecem
+    uma a uma porque cada recusa tem o seu motivo escrito; aqui é só o sim ou
+    não. `test_can_withdraw_matches_what_the_endpoint_does` prende as duas
+    juntas, para uma não passar a mentir sobre a outra.
+    """
+    return (
+        application.status == ApplicationStatus.IN_PROGRESS
+        and registration_is_open(application.process)
+    )
+
+
+@transaction.atomic
+def withdraw_from_process(process, participant):
+    """Desistência do próprio candidato, enquanto as inscrições estão abertas.
+
+    O prazo é o mesmo da inscrição, e é o ponto da regra: até ele fechar, a
+    pessoa entra e sai à vontade; depois, o processo já contou com ela para
+    montar as etapas e a correção, e sair vira assunto com a organização.
+
+    A candidatura não é apagada. Some da lista de inscritos, mas a linha fica:
+    apagar levaria junto o código do candidato e qualquer entrega já feita, e
+    abriria espaço para o próximo inscrito receber um código que já foi de
+    outra pessoa.
+    """
+    application = Application.objects.filter(
+        process=process, participant=participant
+    ).first()
+
+    if application is None or application.status == ApplicationStatus.WITHDRAWN:
+        raise ValidationError('Você não está inscrito neste processo seletivo.')
+
+    if application.status != ApplicationStatus.IN_PROGRESS:
+        raise ValidationError(
+            'Esta candidatura já foi finalizada pela organização e não pode '
+            'ser cancelada por aqui.'
+        )
+
+    if not registration_is_open(process):
+        raise ValidationError(
+            'O período de inscrição deste processo já encerrou, então a '
+            'inscrição não pode mais ser cancelada pela plataforma. '
+            'Fale com a organização da Liga.'
+        )
+
+    application.status = ApplicationStatus.WITHDRAWN
+    application.save(update_fields=['status', 'updated_at'])
+    return application
+
+
+>>>>>>> feature/v3-processo-seletivo
 # ── Ações em massa do organizador ─────────────────────────────────
 
 MOVE_STAGE = 'move_stage'

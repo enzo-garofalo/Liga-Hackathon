@@ -15,6 +15,10 @@ const statusLabel: Record<ApplicationStatus, string> = {
   approved: 'Aprovado',
   rejected: 'Não aprovado',
   discarded: 'Encerrada',
+<<<<<<< HEAD
+=======
+  withdrawn: 'Cancelada',
+>>>>>>> feature/v3-processo-seletivo
 }
 
 const statusClass: Record<ApplicationStatus, string> = {
@@ -22,6 +26,10 @@ const statusClass: Record<ApplicationStatus, string> = {
   approved: 'border-brand-green/25 bg-brand-green/10 text-brand-green',
   rejected: 'border-red-400/25 bg-red-500/10 text-red-600',
   discarded: 'border-ink/10 bg-ink/[0.06] text-ink/60',
+<<<<<<< HEAD
+=======
+  withdrawn: 'border-ink/10 bg-ink/[0.06] text-ink/60',
+>>>>>>> feature/v3-processo-seletivo
 }
 
 const processStatusLabel: Record<ProcessStatus, string> = {
@@ -37,7 +45,11 @@ const processStatusClass: Record<ProcessStatus, string> = {
 }
 
 const actionClass =
+<<<<<<< HEAD
   'mt-auto inline-flex items-center justify-center gap-2 rounded-2xl border border-ink/20 px-5 py-2.5 font-ui text-sm font-medium text-ink transition-colors hover:border-brand hover:bg-brand/5 hover:text-brand'
+=======
+  'inline-flex items-center justify-center gap-2 rounded-2xl border border-ink/20 px-5 py-2.5 font-ui text-sm font-medium text-ink transition-colors hover:border-brand hover:bg-brand/5 hover:text-brand'
+>>>>>>> feature/v3-processo-seletivo
 
 interface ProcessCardProps {
   name: string
@@ -57,6 +69,16 @@ interface ProcessCardProps {
   to?: string
   onAction?: () => void
   actionLabel: string
+<<<<<<< HEAD
+=======
+  /**
+   * Ação discreta logo abaixo da principal, como cancelar a inscrição.
+   * Fica no cartão porque é aqui que a pessoa chega primeiro; na página do
+   * processo ela também existe, mas lá é preciso saber que a página existe.
+   */
+  secondaryLabel?: string
+  onSecondaryAction?: () => void
+>>>>>>> feature/v3-processo-seletivo
 }
 
 export function ProcessCard({
@@ -73,6 +95,11 @@ export function ProcessCard({
   to,
   onAction,
   actionLabel,
+<<<<<<< HEAD
+=======
+  secondaryLabel,
+  onSecondaryAction,
+>>>>>>> feature/v3-processo-seletivo
 }: ProcessCardProps) {
   return (
     <div className="dark-card flex h-full flex-col rounded-[21px] p-6 transition-all hover:-translate-y-0.5 hover:border-brand/40">
@@ -138,6 +165,7 @@ export function ProcessCard({
         )}
       </div>
 
+<<<<<<< HEAD
       {onAction ? (
         <button type="button" onClick={onAction} className={actionClass}>
           {actionLabel}
@@ -149,6 +177,31 @@ export function ProcessCard({
           <ArrowRight className="h-4 w-4" />
         </Link>
       )}
+=======
+      <div className="mt-auto flex flex-col gap-2">
+        {onAction ? (
+          <button type="button" onClick={onAction} className={actionClass}>
+            {actionLabel}
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        ) : (
+          <Link to={to as string} className={actionClass}>
+            {actionLabel}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        )}
+
+        {secondaryLabel && onSecondaryAction && (
+          <button
+            type="button"
+            onClick={onSecondaryAction}
+            className="font-ui text-sm font-medium text-ink/60 underline underline-offset-4 transition-colors hover:text-red-600"
+          >
+            {secondaryLabel}
+          </button>
+        )}
+      </div>
+>>>>>>> feature/v3-processo-seletivo
     </div>
   )
 }

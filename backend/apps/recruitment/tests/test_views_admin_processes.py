@@ -138,4 +138,8 @@ def test_detail_returns_correct_stats(admin_client, process):
         'approved': 1,
         'rejected': 1,
         'discarded': 0,
+<<<<<<< HEAD
+=======
+        'withdrawn': 0,
+>>>>>>> feature/v3-processo-seletivo
     }

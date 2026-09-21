@@ -1,24 +1,42 @@
 import { useQuery } from '@tanstack/react-query'
+<<<<<<< HEAD
 import { CalendarDays, Clock, Layers, ListChecks, Mail, MessageCircle, User, Users } from 'lucide-react'
+=======
+import { AlertCircle, ArrowRight, CalendarDays, Clock, Layers, ListChecks, Mail, User, Users } from 'lucide-react'
+>>>>>>> feature/v3-processo-seletivo
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getInfo } from '../api/info'
+import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
 import { CreateTeamModal } from '../components/CreateTeamModal'
 import { InviteListItem } from '../components/InviteListItem'
 import { ProcessCard } from '../components/ProcessCard'
 import { QueryError } from '../components/QueryError'
 import { StatusBanner } from '../components/StatusBanner'
 import { Button } from '../components/ui/Button'
+<<<<<<< HEAD
 import { SHOW_HACKATHON } from '../featureFlags'
+=======
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
+import { SHOW_HACKATHON } from '../featureFlags'
+import { WHATSAPP_LINK } from '../links'
+>>>>>>> feature/v3-processo-seletivo
 import { useMyInvites } from '../hooks/useInvites'
 import { useMyApplications } from '../hooks/useMyApplications'
 import { useProcesses } from '../hooks/useProcesses'
 import { useProfile } from '../hooks/useProfile'
+import { useWithdrawFromProcess } from '../hooks/useProcess'
 import { useOpenTeams } from '../hooks/useTeams'
+<<<<<<< HEAD
 import type { ApplicationStatus } from '../types/application'
+=======
+import type { ApplicationStatus, ApplicationSummary } from '../types/application'
+>>>>>>> feature/v3-processo-seletivo
 
-const WHATSAPP_LINK = (import.meta as unknown as { env: Record<string, string> }).env.VITE_WHATSAPP_LINK || '#'
 const EVENT_DATE = new Date('2026-06-20T10:00:00')
+
+const botaoInscrever =
+  'inline-flex flex-shrink-0 items-center justify-center gap-2 rounded-2xl bg-brand px-6 py-3 font-ui text-sm font-semibold text-white transition-colors hover:bg-[#5f28d4]'
 
 function daysUntil(date: Date) {
   return Math.max(0, Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
@@ -41,6 +59,10 @@ const statusLabel: Record<ApplicationStatus, string> = {
   approved: 'Aprovado',
   rejected: 'Não aprovado',
   discarded: 'Encerrada',
+<<<<<<< HEAD
+=======
+  withdrawn: 'Cancelada',
+>>>>>>> feature/v3-processo-seletivo
 }
 
 const statusClass: Record<ApplicationStatus, string> = {
@@ -48,6 +70,10 @@ const statusClass: Record<ApplicationStatus, string> = {
   approved: 'bg-brand-green/10 text-brand-green',
   rejected: 'bg-red-500/10 text-red-600',
   discarded: 'bg-ink/[0.06] text-ink/60',
+<<<<<<< HEAD
+=======
+  withdrawn: 'bg-ink/[0.06] text-ink/60',
+>>>>>>> feature/v3-processo-seletivo
 }
 
 function StatCard({
@@ -84,6 +110,28 @@ export function DashboardPage() {
 
   const me = profileQuery.data
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  // A candidatura que a pessoa pediu para cancelar, enquanto ela confirma.
+  const [cancelando, setCancelando] = useState<ApplicationSummary | null>(null)
+  const withdraw = useWithdrawFromProcess(cancelando?.process_id)
+
+  const myApplications = applicationsQuery.data ?? []
+  // Quem cancelou a inscrição volta a ser alguém sem inscrição: o alerta que
+  // avisa "você criou conta mas não se inscreveu" tem que aparecer de novo, e
+  // a candidatura cancelada não pode segurá-lo escondido.
+  const inscricoesVivas = myApplications.filter((a) => a.status !== 'withdrawn')
+  const allProcesses = processesQuery.data ?? []
+  const availableProcesses = allProcesses.filter((p) => !p.already_applied)
+  const openProcesses = availableProcesses.filter((p) => p.registration_open)
+
+  // A candidatura em andamento e a que interessa no topo; se nao houver, a mais recente.
+  const activeApplication =
+    myApplications.find((a) => a.status === 'in_progress') ??
+    inscricoesVivas[0] ??
+    myApplications[0]
+
+  const nextDeadline = openProcesses
+    .map((p) => p.registration_end)
+    .sort()[0]
 
   const myApplications = applicationsQuery.data ?? []
   const allProcesses = processesQuery.data ?? []
@@ -132,6 +180,18 @@ export function DashboardPage() {
               {me.course} - {me.semester} semestre
             </p>
           )}
+
+          {/* No topo e fora de qualquer condição: antes o convite só existia no
+              estado "nenhum processo aberto", que quase ninguém vê. */}
+          <a
+            href={WHATSAPP_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 inline-flex items-center justify-center gap-2 rounded-2xl bg-[#149e61] px-5 py-2.5 font-ui text-sm font-semibold text-white shadow-[0_14px_32px_rgba(20,158,97,0.24)] transition-colors hover:bg-[#108150]"
+          >
+            <WhatsAppIcon className="h-4 w-4" />
+            Acesse o grupo da Liga
+          </a>
         </div>
       </div>
 
@@ -149,7 +209,17 @@ export function DashboardPage() {
                 {statusLabel[activeApplication.status]}
               </span>
             ) : (
+<<<<<<< HEAD
               <span className="rounded-full bg-ink/[0.06] px-2 py-0.5 font-ui text-base font-medium text-ink/60">
+=======
+              <span
+                className={`rounded-full px-2 py-0.5 font-ui text-base font-medium ${
+                  openProcesses.length > 0
+                    ? 'bg-amber-400/20 text-amber-700'
+                    : 'bg-ink/[0.06] text-ink/60'
+                }`}
+              >
+>>>>>>> feature/v3-processo-seletivo
                 Sem inscrição
               </span>
             )
@@ -176,6 +246,7 @@ export function DashboardPage() {
         />
       </div>
 
+<<<<<<< HEAD
       {myApplications.length > 0 && (
         <section className="mt-8">
           <h2 className="font-display text-2xl font-semibold text-ink">Meus processos</h2>
@@ -195,12 +266,111 @@ export function DashboardPage() {
                 actionLabel="Ver candidatura"
               />
             ))}
+=======
+      {/* Criar conta não é se inscrever, e é fácil achar que sim: a pessoa
+          preencheu um formulário, recebeu e-mail e chegou aqui. Sem este aviso,
+          o único sinal era a pílula cinza "Sem inscrição".
+
+          Só aparece com inscrição aberta de verdade: avisar que falta se
+          inscrever sem ter onde clicar é só aflição. E nunca enquanto carrega,
+          para não acusar de "não inscrito" quem está inscrito. */}
+      {!statsUnknown && inscricoesVivas.length === 0 && openProcesses.length > 0 && (
+        <section className="mt-6 rounded-[32px] border-2 border-amber-400/50 bg-amber-400/10 p-6 md:p-8">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div className="flex gap-4">
+              <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-amber-400/25">
+                <AlertCircle className="h-5 w-5 text-amber-700" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="font-display text-xl font-semibold text-ink">
+                  Você ainda não se inscreveu
+                </h2>
+                <p className="mt-1 max-w-xl text-sm font-medium leading-relaxed text-ink/75">
+                  Criar a conta não inscreve ninguém no processo seletivo. Para concorrer a
+                  uma vaga na Liga, falta enviar sua inscrição.
+                  {nextDeadline && ` As inscrições vão até ${formatShortDate(nextDeadline)}.`}
+                </p>
+              </div>
+            </div>
+
+            {/* Com um processo aberto, o botão leva direto a ele. Com mais de
+                um, não dá para escolher pela pessoa: desce para a lista, e aí
+                é âncora na própria página, não troca de rota. */}
+            {openProcesses.length === 1 ? (
+              <Link to={`/processes/${openProcesses[0].id}`} className={botaoInscrever}>
+                Quero me inscrever
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            ) : (
+              <a href="#processos-disponiveis" className={botaoInscrever}>
+                Quero me inscrever
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            )}
+>>>>>>> feature/v3-processo-seletivo
           </div>
         </section>
       )}
 
+<<<<<<< HEAD
       {availableProcesses.length > 0 && (
         <section className="mt-8">
+          <h2 className="font-display text-2xl font-semibold text-ink">
+            Processos disponíveis
+          </h2>
+          <p className="mb-4 mt-1 text-sm text-ink/70">
+            Processos seletivos abertos para inscrição.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {availableProcesses.map((process) => (
+              <ProcessCard
+                key={process.id}
+                name={process.name}
+                registrationStart={process.registration_start}
+                registrationEnd={process.registration_end}
+                stageCount={process.stage_count}
+                registrationOpen={process.registration_open}
+                to={`/processes/${process.id}`}
+                actionLabel="Ver detalhes"
+=======
+      {myApplications.length > 0 && (
+        <section className="mt-8">
+          <h2 className="font-display text-2xl font-semibold text-ink">Meus processos</h2>
+          <p className="mb-4 mt-1 text-sm text-ink/70">
+            Acompanhe suas candidaturas ao processo seletivo da Liga.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {myApplications.map((application) => (
+              <ProcessCard
+                key={application.id}
+                name={application.process_name}
+                submittedAt={application.submitted_at}
+                stageCount={application.stage_count}
+                applicationStatus={application.status}
+                currentStageName={application.current_stage_name}
+                to={`/applications/${application.id}`}
+                actionLabel="Ver candidatura"
+                // Quem responde se dá para cancelar é a API: a regra é o prazo
+                // de inscrição do processo, que este cartão não conhece. Sem
+                // rótulo o cartão não desenha a ação, então a decisão fica
+                // num lugar só, e não numa guarda repetida no handler.
+                secondaryLabel={
+                  application.can_withdraw ? 'Cancelar minha inscrição' : undefined
+                }
+                onSecondaryAction={() => setCancelando(application)}
+>>>>>>> feature/v3-processo-seletivo
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+<<<<<<< HEAD
+      {/* Sem candidatura e sem processo aberto: a tela ficaria vazia. */}
+      {!loadingProcesses && !processError && myApplications.length === 0 && availableProcesses.length === 0 && (
+=======
+      {availableProcesses.length > 0 && (
+        <section id="processos-disponiveis" className="mt-8">
           <h2 className="font-display text-2xl font-semibold text-ink">
             Processos disponíveis
           </h2>
@@ -225,7 +395,8 @@ export function DashboardPage() {
       )}
 
       {/* Sem candidatura e sem processo aberto: a tela ficaria vazia. */}
-      {!loadingProcesses && !processError && myApplications.length === 0 && availableProcesses.length === 0 && (
+      {!loadingProcesses && !processError && inscricoesVivas.length === 0 && availableProcesses.length === 0 && (
+>>>>>>> feature/v3-processo-seletivo
         <section className="purple-cta relative mt-8 overflow-hidden rounded-[32px] p-8 text-white">
           <div className="relative">
             <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-white/10">
@@ -238,15 +409,24 @@ export function DashboardPage() {
               Quando a Liga abrir um novo processo seletivo, ele aparece aqui e você
               recebe um aviso por e-mail.
             </p>
+<<<<<<< HEAD
             {WHATSAPP_LINK !== '#' && (
+=======
+            {(
+>>>>>>> feature/v3-processo-seletivo
               <a
                 href={WHATSAPP_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-6 inline-flex items-center justify-center gap-2 rounded-2xl bg-[#149e61] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(20,158,97,0.24)] transition-colors hover:bg-[#108150]"
               >
+<<<<<<< HEAD
                 <MessageCircle className="h-4 w-4" />
                 Entrar no grupo da Liga
+=======
+                <WhatsAppIcon className="h-4 w-4" />
+                Acesse o grupo da Liga
+>>>>>>> feature/v3-processo-seletivo
               </a>
             )}
           </div>
@@ -352,15 +532,24 @@ export function DashboardPage() {
                     >
                       Explorar equipes abertas
                     </Link>
+<<<<<<< HEAD
                     {WHATSAPP_LINK !== '#' && (
+=======
+                    {(
+>>>>>>> feature/v3-processo-seletivo
                       <a
                         href={WHATSAPP_LINK}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#149e61] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_32px_rgba(20,158,97,0.24)] transition-colors hover:bg-[#108150] sm:w-auto"
                       >
+<<<<<<< HEAD
                         <MessageCircle className="h-4 w-4" />
                         Grupo WhatsApp
+=======
+                        <WhatsAppIcon className="h-4 w-4" />
+                        Acesse o grupo da Liga
+>>>>>>> feature/v3-processo-seletivo
                       </a>
                     )}
                   </div>
@@ -383,6 +572,24 @@ export function DashboardPage() {
         </>
       )}
 
+<<<<<<< HEAD
+=======
+      {cancelando && (
+        <ConfirmDialog
+          title="Cancelar inscrição"
+          question={`Tem certeza que quer cancelar sua inscrição no ${cancelando.process_name}?`}
+          detail="Você sai da lista de inscritos. Enquanto as inscrições estiverem abertas, dá para se inscrever de novo pela página do processo. Depois que elas encerrarem, não."
+          confirmLabel="Cancelar inscrição"
+          tone="danger"
+          loading={withdraw.isPending}
+          onConfirm={() =>
+            withdraw.mutate(undefined, { onSuccess: () => setCancelando(null) })
+          }
+          onCancel={() => setCancelando(null)}
+        />
+      )}
+
+>>>>>>> feature/v3-processo-seletivo
       <div className="h-8" />
     </main>
   )

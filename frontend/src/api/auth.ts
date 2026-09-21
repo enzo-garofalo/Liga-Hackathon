@@ -1,4 +1,11 @@
-import type { LoginPayload, RegisterPayload, TokenPair } from '../types/auth'
+import type {
+  LoginPayload,
+  PasswordResetConfirmPayload,
+  PasswordResetRequestPayload,
+  PasswordResetResult,
+  RegisterPayload,
+  TokenPair,
+} from '../types/auth'
 import type { MeProfile } from '../types/participant'
 import client from './client'
 
@@ -13,3 +20,13 @@ export const adminLogin = (payload: LoginPayload) =>
 
 export const refreshToken = (refresh: string) =>
   client.post<{ access: string }>('/auth/token/refresh/', { refresh }).then((r) => r.data)
+
+export const requestPasswordReset = (payload: PasswordResetRequestPayload) =>
+  client
+    .post<{ detail: string }>('/auth/password-reset/', payload)
+    .then((r) => r.data)
+
+export const confirmPasswordReset = (payload: PasswordResetConfirmPayload) =>
+  client
+    .post<PasswordResetResult>('/auth/password-reset/confirm/', payload)
+    .then((r) => r.data)

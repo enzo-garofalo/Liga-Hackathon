@@ -20,7 +20,7 @@ export function Header({ me, admin = false }: HeaderProps) {
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <Link to={admin ? '/admin/dashboard' : me ? '/dashboard' : '/'} className="flex items-center gap-3">
             <img src={logo} alt="Liga de TI" className="h-7 brightness-0 invert" />
-            <span className="font-clash text-2xl font-semibold text-white">Arena</span>
+            <span className="font-clash text-2xl font-semibold text-white">Processo Seletivo</span>
           </Link>
           {admin ? (
             <div className="flex items-center gap-3">

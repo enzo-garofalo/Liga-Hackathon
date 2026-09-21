@@ -14,6 +14,17 @@ Reaproveitada da v2 sem mudanças:
 - `POST /api/v1/auth/token/` — login do candidato
 - `POST /api/v1/auth/token/refresh/` — renova access token
 - `POST /api/v1/auth/admin/token/` — login do organizador (valida `is_staff=True`)
+<<<<<<< HEAD
+=======
+- `POST /api/v1/auth/password-reset/` — pede o link de troca de senha por e-mail.
+  Responde sempre 200 com o mesmo texto, exista ou não conta com aquele endereço.
+  Tem teto de pedidos por IP (`password_reset`, padrão 20/hora).
+- `POST /api/v1/auth/password-reset/confirm/` — grava a senha nova.
+  Corpo: `uid`, `token` (os dois vêm no link do e-mail) e `password`.
+  Devolve `area`, que diz se a conta entra como `candidato` ou `organizador`.
+  O link do e-mail também carrega `area`, para a tela saber a porta de quem abre
+  e desiste antes de trocar a senha.
+>>>>>>> feature/v3-processo-seletivo
 
 Candidato usa os endpoints em `/processes/` e `/me/`; organizador usa `/admin/`.
 Todo endpoint sob `/admin/` exige `is_staff=True`.
@@ -64,14 +75,42 @@ Cria a candidatura do participante autenticado. Sem body. Resposta 201 com a can
 Validações:
 - `process.status == published` — senão 400.
 - Agora dentro de `registration_start`..`registration_end` — senão 400 "inscrições encerradas".
+<<<<<<< HEAD
 - Participante ainda não tem candidatura neste processo — senão 400.
+=======
+- Participante ainda não tem candidatura neste processo — senão 400. Candidatura
+  `withdrawn` é exceção: nela a inscrição é refeita, e não duplicada.
+>>>>>>> feature/v3-processo-seletivo
 
 Efeitos: `status=in_progress`, `current_stage` = etapa de menor `order`,
 `submitted_at=now`. Dispara e-mail + notificação `application_confirmed`.
 
+<<<<<<< HEAD
 ## GET /api/v1/me/applications/
 Lista as candidaturas do participante autenticado ("Meus processos").
 Campos: processo (nome, datas), `status`, `current_stage`, `updated_at`.
+=======
+## POST /api/v1/processes/{id}/withdraw/
+Cancela a inscrição do participante autenticado. Sem body. Resposta 200 com a candidatura.
+
+Validações:
+- Existe candidatura ativa do participante neste processo — senão 400.
+- `status == in_progress` — candidatura já finalizada pela organização não vira
+  desistência.
+- Inscrições abertas agora — senão 400. **É a regra principal**: passado o prazo,
+  não se cancela mais pela plataforma.
+
+Efeitos: `status=withdrawn`. A linha **não é apagada**: guarda o código do candidato e
+o que ele já entregou. O processo volta a responder `already_applied: false`, e
+`stats.total` deixa de contar essa pessoa (decisions.md §28).
+
+## GET /api/v1/me/applications/
+Lista as candidaturas do participante autenticado ("Meus processos").
+Campos: processo (nome, datas), `status`, `current_stage`, `updated_at` e
+`can_withdraw` — se dá para cancelar a inscrição agora. Quem decide é o backend, pela
+mesma regra de `withdraw/`: a tela não tem o prazo do processo nesta lista, e não pode
+oferecer um botão que a API vai recusar.
+>>>>>>> feature/v3-processo-seletivo
 
 ## GET /api/v1/me/applications/{id}/
 Detalhe da candidatura ("Ver candidatura"). Inclui a linha do tempo das etapas, marcando
@@ -105,6 +144,23 @@ Baixa o arquivo. Permitido ao dono da candidatura e a qualquer organizador
 Os arquivos **não são servidos por URL pública**: são material de candidatura e o caminho
 em `/media/` seria adivinhável. Todo acesso passa por este endpoint.
 
+<<<<<<< HEAD
+=======
+## DELETE /api/v1/admin/stages/{id}/
+Exclui a etapa. Só em processo `draft`: publicado ou encerrado responde 400 (decisions.md
+§26). Em rascunho, ainda recusa etapa com candidatos ou com avaliações registradas.
+
+## POST/DELETE /api/v1/admin/stages/{id}/instructions-file/
+Anexa (multipart, campo `file`) ou remove o enunciado em PDF da etapa. Só organizador.
+Devolve a etapa, com `instructions_file_name` e `instructions_file_url`. Anexar por cima
+apaga o arquivo anterior do disco.
+
+## GET /api/v1/stages/{id}/instructions-file/download/
+Baixa o enunciado. Organizador sempre; candidato só depois de chegar na etapa. Na linha do
+tempo, `instructions_file` vem nulo enquanto a etapa é futura — nem o nome do arquivo sai
+antes da hora (decisions.md §25).
+
+>>>>>>> feature/v3-processo-seletivo
 ## GET /api/v1/me/notifications/
 Reaproveita o endpoint da v2. Ganha os tipos novos listados em [email.md](email.md).
 
@@ -364,6 +420,7 @@ O perfil é criado na primeira visita: nem todo `is_staff` tem um — o superusu
 pelo `entrypoint.sh`, por exemplo, nunca passou por aqui.
 
 ### PATCH /api/v1/admin/me/
+<<<<<<< HEAD
 Atualiza os campos editáveis do perfil. `is_coordinator` é somente leitura — concede
 acesso à identidade dos candidatos, então não pode ser autoatribuído.
 `role_title` é informativo — não concede nem restringe permissão (ver
@@ -374,6 +431,77 @@ acesso à identidade dos candidatos, então não pode ser autoatribuído.
 O planejamento prevê dois corretores independentes por case, distribuídos entre
 candidatos diferentes. A designação **organiza quem corrige o quê — não dá nem tira
 permissão**: avaliador sem designação pontua normalmente (decisions.md §19).
+=======
+Atualiza os campos editáveis do perfil. `is_coordinator` é somente leitura: é o que separa
+os dois cargos, então não pode ser autoatribuído. `role_title` é informativo, não concede
+nem restringe permissão.
+
+## Cargos do organizador
+
+Dois cargos, com poderes diferentes (decisions.md §29). A tela usa `is_coordinator` de
+`GET /admin/me/` para decidir o que mostrar; a API recusa de qualquer maneira.
+
+| | Coordenador | Avaliador |
+|---|---|---|
+| Criar, editar, publicar, encerrar processo | sim | **403** |
+| Criar, editar, apagar e reordenar etapa | sim | **403** |
+| Aprovar, reprovar, mover, descartar (bulk-action) | sim | **403** |
+| Comunicados | sim | **403** |
+| Chamar organizador e distribuir correções | sim | **403** |
+| Ver a lista de candidatos | processo inteiro | **só a própria fila** |
+| Abrir ficha e notas de um candidato | qualquer um | só a fila (senão **404**) |
+| Baixar entrega do candidato | qualquer uma | só a fila (senão **403**) |
+| Processos visíveis | todos | só os em que foi posto (senão **404**) |
+
+404 e não 403 para candidatura e processo fora do alcance: para quem não foi chamado,
+aquilo não existe. Um 403 confirmaria que o id é de algo real.
+
+## Organizadores do processo
+
+### GET /api/v1/admin/processes/{id}/organizers/
+Quem foi chamado para este processo. Coordenador apenas.
+```json
+[{ "id": "uuid", "user_id": 8, "email": "ana@...", "full_name": "Ana Souza",
+   "role_title": "", "is_coordinator": false, "pending": true, "workload": 12,
+   "created_at": "..." }]
+```
+`pending` é conta sem senha utilizável: quem foi convidado e ainda não entrou.
+`workload` é quantas correções a pessoa tem neste processo, somando as etapas.
+
+A lista traz **a coordenação junto com quem foi chamado**, embora a coordenação não esteja
+em `ProcessOrganizer`: ela coordena todo processo, e esta é também a lista de quem pode
+entrar no rodízio da correção. Sem ela, o coordenador não conseguiria se incluir na própria
+distribuição, que é como a Liga corrige hoje. Quem é coordenador e também foi chamado
+explicitamente aparece uma vez só.
+
+### POST /api/v1/admin/processes/{id}/organizers/
+Chama alguém como **avaliador** e dispara o e-mail de convite. Devolve a lista atualizada.
+```json
+{ "email": "ana@exemplo.com", "full_name": "Ana Souza", "role_title": "Diretora" }
+```
+Conta que ainda não existe é criada sem senha utilizável, e o e-mail leva o link de
+`/reset-password?...&convite=1` para a pessoa escolher a senha. Conta que já existe recebe
+só o aviso, com a senha intacta. Convite nunca cria coordenador.
+
+400 quando: a pessoa já está no processo, a conta está desativada, ou ela é candidata
+**deste** processo (ninguém corrige o próprio case).
+
+### POST /api/v1/admin/processes/{id}/organizers/{user_id}/
+Reenvia o convite, para quem perdeu o e-mail. O link anterior continua valendo enquanto não
+for usado.
+
+### DELETE /api/v1/admin/processes/{id}/organizers/{user_id}/
+Tira a pessoa do processo: ela perde o acesso e as designações dela caem. As notas que ela
+já deu **ficam** e continuam na média. 400 ao tentar se tirar do próprio processo.
+
+## Designação de avaliadores
+
+Dois corretores independentes por case, distribuídos entre candidatos diferentes. A
+designação **é permissão** para quem não coordena: sem ela o avaliador não abre a ficha nem
+salva nota. Foi assim que a §19 previu o retorno da trava, uma vez existindo tela para
+distribuir (decisions.md §29). O coordenador avalia qualquer candidato, com ou sem
+designação. Todos os endpoints desta seção são do coordenador.
+>>>>>>> feature/v3-processo-seletivo
 
 ### GET /api/v1/admin/stages/{id}/assignments/
 Distribuição atual da etapa: a carga de cada avaliador e a lista de designações
@@ -388,12 +516,48 @@ Designa avaliadores para uma candidatura específica.
 ### DELETE /api/v1/admin/stages/{id}/assignments/
 Remove uma designação. Body: `{ "application": "uuid", "evaluator": "user_id" }`.
 
+<<<<<<< HEAD
+=======
+### GET /api/v1/admin/processes/{id}/assignments/
+O quadro de distribuição inteiro: cada etapa com os candidatos que estão nela e quem
+corrige cada um. Uma chamada só, porque a tela é uma só.
+```json
+{
+  "stages": [
+    { "id": "uuid", "name": "Resolução do Case", "order": 2, "anonymous_evaluation": true,
+      "candidates": [
+        { "application": "uuid", "name": "Ana Lima", "code": "C-0001",
+          "status": "in_progress", "evaluators": [7, 8] }
+      ] }
+  ],
+  "workload": { "7": 12, "8": 9 }
+}
+```
+O coordenador vê o nome mesmo na etapa anônima: ele precisa saber quem está mandando para
+quem, e o `code` vai junto para cruzar com o que o avaliador enxerga. Quem desistiu não
+entra: não há o que distribuir. Etapa sem ninguém volta com `candidates: []`, e não some.
+
+### POST /api/v1/admin/processes/{id}/assignments/
+Troca quem corrige uma candidatura, numa etapa ou em várias de uma vez.
+```json
+{ "application": "uuid", "evaluators": [7, 8], "stages": ["uuid", "uuid"] }
+```
+**Substitui**, não acrescenta: o modal mostra quem está lá e o coordenador marca e
+desmarca até ficar como quer. Lista de avaliadores vazia tira todo mundo daquelas etapas.
+Designar numa etapa em que o candidato ainda não chegou é adiantar trabalho, não erro.
+As notas já dadas ficam e voltam a valer se a pessoa for designada de novo.
+
+400 quando: nenhuma etapa escolhida, avaliador fora do processo, etapa de outro processo,
+processo encerrado. Devolve o mesmo corpo do GET, para a tela se redesenhar sem outra volta.
+
+>>>>>>> feature/v3-processo-seletivo
 ### POST /api/v1/admin/stages/{id}/assignments/auto/
 Distribui automaticamente, em rodízio, equilibrando a carga.
 ```json
 { "evaluators": ["user_id", "user_id", "user_id"], "per_application": 2 }
 ```
 
+<<<<<<< HEAD
 Cada candidatura recebe `per_application` avaliadores **distintos**, e o rodízio evita
 que a mesma dupla se repita em todos os candidatos. Redistribuir substitui a distribuição
 anterior da etapa, mas **não apaga avaliação já registrada** — as notas permanecem no
@@ -414,3 +578,31 @@ pelo `code` da candidatura (`C-0001`).
 
 O coordenador (`OrganizerProfile.is_coordinator=True`) enxerga a identidade normalmente,
 porque é quem distribui as correções e revisa divergências.
+=======
+Entram apenas os candidatos que estão **nesta** etapa e em andamento. Cada candidatura
+recebe `per_application` avaliadores **distintos**, e o rodízio evita que a mesma dupla se
+repita em todos os candidatos. Redistribuir substitui a distribuição anterior da etapa, mas
+**não apaga avaliação já registrada**: as notas permanecem no banco e voltam a valer se a
+pessoa cair no mesmo candidato.
+
+Validação (400): menos de `per_application` avaliadores; avaliador que não faz parte do
+processo; nenhum candidato nesta etapa.
+
+## Correção anônima
+
+**Marca da etapa, não do processo** (`Stage.anonymous_evaluation`, decisions.md §29). Só a
+etapa do case nasce marcada; `ensure_selection_process` a cria assim, e a migração 0007 liga
+nos processos que já existiam. O campo entra e sai pelo payload da etapa, como qualquer
+outra configuração.
+
+Quem manda é a etapa em que o candidato **está**. Enquanto ele estiver numa etapa marcada,
+os endpoints `/admin/applications/` e `/admin/processes/{id}/applications/` devolvem `null`
+nos campos de identidade (e-mail, telefone, GitHub, LinkedIn, bio), substituem
+`participant_name` pelo `code` da candidatura (`C-0001`), e o `filename` de cada entrega sai
+como `C-0001.pdf`: o nome original entregaria a pessoa antes de o arquivo abrir. O download
+baixa com esse mesmo nome.
+
+O coordenador enxerga tudo normalmente, porque é quem distribui as correções, revisa
+divergências e decide resultado. O candidato lendo a própria candidatura também: o anonimato
+é regra entre organizadores.
+>>>>>>> feature/v3-processo-seletivo

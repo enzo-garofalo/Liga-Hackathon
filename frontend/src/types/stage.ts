@@ -11,10 +11,21 @@ export interface Stage {
   description: string
   /** Texto longo do que fazer na etapa. Vazio quando o candidato ainda não chegou nela. */
   instructions: string
+<<<<<<< HEAD
+=======
+  /** Enunciado em PDF. Entra e sai por endpoint próprio, não pelo payload. */
+  instructions_file_name: string
+  instructions_file_url: string | null
+>>>>>>> feature/v3-processo-seletivo
   order: number
   start_at: string | null
   end_at: string | null
   weight: number
+<<<<<<< HEAD
+=======
+  /** Correção anônima desta etapa: o avaliador vê o código, não a pessoa. */
+  anonymous_evaluation: boolean
+>>>>>>> feature/v3-processo-seletivo
   accepts_late_submission: boolean
   allows_file_upload: boolean
   max_files: number | null
@@ -30,6 +41,10 @@ export interface StagePayload {
   start_at?: string | null
   end_at?: string | null
   weight?: number
+<<<<<<< HEAD
+=======
+  anonymous_evaluation?: boolean
+>>>>>>> feature/v3-processo-seletivo
   accepts_late_submission?: boolean
   allows_file_upload?: boolean
   max_files?: number | null

@@ -395,7 +395,9 @@ Observacoes:
 > nada acusa o erro. Ver a secao "E-mail, Celery e Redis".
 
 
-O projeto possui arquivos `railway.toml` para backend e frontend.
+O projeto possui arquivos `railway.toml` para backend e frontend, e
+`backend/railway.worker.toml` para o worker. O passo a passo completo, com os cinco
+servicos e as variaveis de cada um, esta em `specs/v3/deploy-railway.md`.
 
 Backend em producao:
 

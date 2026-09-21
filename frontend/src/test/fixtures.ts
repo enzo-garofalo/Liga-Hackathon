@@ -1,5 +1,15 @@
+<<<<<<< HEAD
 import type { AdminApplicationDetail, ApplicationRow } from '../types/adminApplication'
 import type { AdminProcess, AdminProcessDetail } from '../types/adminProcess'
+=======
+import type {
+  AdminApplicationDetail,
+  ApplicationRow,
+  OrganizerProfile,
+} from '../types/adminApplication'
+import type { AdminProcess, AdminProcessDetail } from '../types/adminProcess'
+import type { ProcessOrganizer } from '../types/organizer'
+>>>>>>> feature/v3-processo-seletivo
 import type { Stage } from '../types/stage'
 
 export function makeStage(overrides: Partial<Stage> = {}): Stage {
@@ -8,10 +18,19 @@ export function makeStage(overrides: Partial<Stage> = {}): Stage {
     name: 'Resolução do Case',
     description: '',
     instructions: '',
+<<<<<<< HEAD
+=======
+    instructions_file_name: '',
+    instructions_file_url: null,
+>>>>>>> feature/v3-processo-seletivo
     order: 1,
     start_at: null,
     end_at: null,
     weight: 35,
+<<<<<<< HEAD
+=======
+    anonymous_evaluation: false,
+>>>>>>> feature/v3-processo-seletivo
     accepts_late_submission: false,
     allows_file_upload: true,
     max_files: 1,
@@ -39,7 +58,10 @@ export function makeProcess(overrides: Partial<AdminProcess> = {}): AdminProcess
     score_min: 1,
     score_max: 5,
     divergence_threshold: '1.50',
+<<<<<<< HEAD
     anonymous_evaluation: true,
+=======
+>>>>>>> feature/v3-processo-seletivo
     application_count: 7,
     stage_count: 2,
     created_at: '2026-07-01T12:00:00Z',
@@ -53,7 +75,18 @@ export function makeProcessDetail(
 ): AdminProcessDetail {
   return {
     ...makeProcess(),
+<<<<<<< HEAD
     stats: { total: 7, in_progress: 5, approved: 1, rejected: 1, discarded: 0 },
+=======
+    stats: {
+      total: 7,
+      in_progress: 5,
+      approved: 1,
+      rejected: 1,
+      discarded: 0,
+      withdrawn: 0,
+    },
+>>>>>>> feature/v3-processo-seletivo
     stages: [
       makeStage(),
       makeStage({ id: 'stage-2', name: 'Entrevista', order: 2, criteria: [] }),
@@ -84,6 +117,10 @@ export function makeApplicationDetail(
 ): AdminApplicationDetail {
   return {
     id: 'app-1',
+<<<<<<< HEAD
+=======
+    anonymous: false,
+>>>>>>> feature/v3-processo-seletivo
     participant_name: 'Ana Lima',
     email: 'ana@aluno.dev',
     course: 'CC',
@@ -107,3 +144,42 @@ export function makeApplicationDetail(
     ...overrides,
   }
 }
+<<<<<<< HEAD
+=======
+
+
+export function makeOrganizer(
+  overrides: Partial<ProcessOrganizer> = {},
+): ProcessOrganizer {
+  return {
+    id: 'org-1',
+    user_id: 7,
+    email: 'bruno@ligadeti.com.br',
+    full_name: 'Bruno Alves',
+    role_title: 'Diretor de Operações',
+    is_coordinator: true,
+    pending: false,
+    workload: 0,
+    created_at: '2026-08-01T12:00:00Z',
+    ...overrides,
+  }
+}
+
+
+export function makeOrganizerProfile(
+  overrides: Partial<OrganizerProfile> = {},
+): OrganizerProfile {
+  return {
+    id: 'prof-1',
+    email: 'bruno@ligadeti.com.br',
+    full_name: 'Bruno Alves',
+    role_title: 'Diretor de Operações',
+    is_coordinator: true,
+    phone: '',
+    github: '',
+    linkedin: '',
+    updated_at: '2026-08-01T12:00:00Z',
+    ...overrides,
+  }
+}
+>>>>>>> feature/v3-processo-seletivo

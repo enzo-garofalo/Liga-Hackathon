@@ -25,6 +25,12 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             required={required}
             aria-required={required}
             {...props}
+            // Depois do spread de propósito: o rótulo aponta para este id, e
+            // sem ele o par ficava só na intenção. O campo de senha do login,
+            // do cadastro e do acesso do organizador estava solto do rótulo,
+            // e o teste antigo não pegava porque `getByLabelText(/senha/i)`
+            // casava com o aria-label do botão de revelar.
+            id={inputId}
             className={[
               'w-full px-0 py-2.5 pr-10 rounded-none border-0 border-b font-ui text-sm text-ink',
               'placeholder:text-ink/40 bg-transparent',

@@ -170,9 +170,13 @@ function RegistrationWindow() {
   )
 }
 
+/** Navbar e hero compartilham a mesma largura e o mesmo padding lateral,
+ *  senão a borda esquerda do texto não bate com a do logo da nav. */
+const HERO_CONTAINER = 'mx-auto w-[min(90vw,74rem)] px-1'
+
 function HeroPanel() {
   return (
-    <div className="floating-stage relative mx-auto flex min-h-[14rem] w-full max-w-[38rem] items-center justify-center md:min-h-[26rem]">
+    <div className="floating-stage relative mx-auto flex min-h-[14rem] w-full max-w-[38rem] items-center justify-center md:mr-0 md:min-h-[26rem] md:justify-end">
       <div className="floating-panel floating-panel-liga flex h-32 w-32 items-center justify-center rounded-[1.4rem] bg-white shadow-[0_38px_120px_rgba(168,135,255,0.3)] md:h-56 md:w-56 md:rounded-[1.9rem]">
         <img src={logo} alt="Liga de TI" className="h-[5.75rem] w-[6.5rem] object-contain md:h-[9.5rem] md:w-[10.5rem]" />
       </div>
@@ -186,7 +190,7 @@ function Hero() {
       <div className="aeline-floating-canvas relative min-h-[calc(100svh-1rem)] overflow-hidden rounded-[1.45rem] md:min-h-[calc(100vh-1.5rem)] md:rounded-[1.75rem]">
         <div className="aeline-grid" />
         <div className="aeline-particles" />
-        <nav className="relative z-30 mx-auto mt-5 flex h-12 w-[min(90vw,74rem)] items-center justify-between px-1 text-[0.66rem] uppercase tracking-[0.18em] text-white/58">
+        <nav className={`${HERO_CONTAINER} relative z-30 mt-5 flex h-12 items-center justify-between text-[0.66rem] uppercase tracking-[0.18em] text-white/58`}>
           <Link to="/" aria-label="Liga de TI" className="flex items-center gap-3">
             <img src={logo} alt="Liga de TI" className="h-7 brightness-0 invert" />
             <span className="hidden font-semibold text-white/78 sm:inline">Processo Seletivo</span>
@@ -217,9 +221,9 @@ function Hero() {
           </div>
         </nav>
 
-        <div className="relative z-10 mx-auto flex min-h-[calc(100svh-6.25rem)] w-[calc(100%-1.5rem)] flex-col justify-between md:min-h-[calc(100vh-8rem)] md:w-[min(94vw,88rem)]">
+        <div className={`${HERO_CONTAINER} relative z-10 flex min-h-[calc(100svh-6.25rem)] flex-col justify-between md:min-h-[calc(100vh-8rem)]`}>
           <div className="grid flex-1 content-center gap-4 pb-3 pt-5 md:grid-cols-[0.98fr_1.02fr] md:items-center md:gap-5 md:pb-0 md:pt-3">
-            <div className="mx-auto max-w-2xl text-center md:max-w-6xl md:pt-4">
+            <div className="mx-auto max-w-2xl text-center md:mx-0 md:max-w-6xl md:pt-4 md:text-left">
               <h1 className="font-display font-semibold leading-[0.92] tracking-[-0.075em]">
                 <span className="block text-[clamp(1rem,4.8vw,1.25rem)] font-medium tracking-[0.12em] text-white/70 md:text-[clamp(1.2rem,2.2vw,2.2rem)]">
                   Processo Seletivo 2026.2
@@ -228,12 +232,12 @@ function Hero() {
                   Liga de TI
                 </span>
               </h1>
-              <p className="mx-auto mt-5 max-w-sm text-sm leading-6 text-white/58 md:mt-6 md:max-w-2xl md:text-lg md:leading-7">
+              <p className="mx-auto mt-5 max-w-sm text-sm leading-6 text-white/58 md:mx-0 md:mt-6 md:max-w-2xl md:text-lg md:leading-7">
                 Não buscamos quem já sabe mais, e sim quem tem mais potencial para aprender, contribuir e permanecer.
                 Três etapas para mostrar como você pensa, comunica e se compromete.
               </p>
               <RegistrationWindow />
-              <div className="mt-7 flex flex-wrap justify-center gap-3">
+              <div className="mt-7 flex flex-wrap justify-center gap-3 md:justify-start">
                 <Link to="/register">
                   <Button className="h-12 rounded-full bg-white px-7 text-sm font-semibold !text-black hover:bg-black hover:!text-white">
                     Quero me candidatar

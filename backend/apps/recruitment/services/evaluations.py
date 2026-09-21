@@ -3,13 +3,21 @@
 from decimal import Decimal
 
 from django.db import transaction
+<<<<<<< HEAD
 from rest_framework.exceptions import ValidationError
+=======
+from rest_framework.exceptions import PermissionDenied, ValidationError
+>>>>>>> feature/v3-processo-seletivo
 
 from apps.recruitment.models import (
     Evaluation,
     EvaluationCriterion,
     ProcessStatus,
 )
+<<<<<<< HEAD
+=======
+from apps.recruitment.services.roles import can_evaluate, is_coordinator  # noqa: F401
+>>>>>>> feature/v3-processo-seletivo
 from apps.recruitment.services.scoring import (
     evaluator_stage_scores,
     needs_third_review,
@@ -18,6 +26,7 @@ from apps.recruitment.services.scoring import (
 
 
 
+<<<<<<< HEAD
 def is_coordinator(user):
     """Coordenador do processo, para efeito de correcao anonima e designacao.
 
@@ -31,14 +40,22 @@ def is_coordinator(user):
     return bool(profile and profile.is_coordinator)
 
 
+=======
+>>>>>>> feature/v3-processo-seletivo
 @transaction.atomic
 def save_evaluation(application, stage, evaluator, scores, notes=''):
     """Grava as notas de um avaliador para uma etapa.
 
+<<<<<<< HEAD
     Qualquer organizador avalia qualquer candidato. `StageAssignment` continua
     existindo para distribuir o trabalho, mas não é trava: não havia tela para
     designar, e a trava deixava todo avaliador que não fosse coordenador sem
     conseguir salvar nota nenhuma.
+=======
+    O coordenador avalia qualquer candidato. O avaliador só avalia quem lhe foi
+    distribuído: a trava da designação voltou a valer agora que existe tela
+    para distribuir (decisions.md §29, emendando a §19).
+>>>>>>> feature/v3-processo-seletivo
 
     Upsert por (candidatura, critério, avaliador): reenviar sobrescreve a nota
     do mesmo avaliador em vez de duplicar, que é o comportamento esperado de
@@ -51,6 +68,14 @@ def save_evaluation(application, stage, evaluator, scores, notes=''):
         raise ValidationError('Processo encerrado não aceita novas avaliações.')
     if stage.process_id != application.process_id:
         raise ValidationError('A etapa não pertence ao processo desta candidatura.')
+<<<<<<< HEAD
+=======
+    if not can_evaluate(evaluator, application, stage):
+        raise PermissionDenied(
+            'Você não foi designado para corrigir esta candidatura nesta etapa. '
+            'Fale com a coordenação do processo.'
+        )
+>>>>>>> feature/v3-processo-seletivo
 
     scale_min = Decimal(application.process.score_min)
     scale_max = Decimal(application.process.score_max)

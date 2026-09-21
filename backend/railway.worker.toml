@@ -1,0 +1,13 @@
+# Config do serviço `worker` no Railway (Settings → Config-as-code → /backend/railway.worker.toml).
+#
+# Mesma imagem do backend, mas sem entrypoint.sh (não roda migração nem gunicorn)
+# e sem healthcheck: o worker não expõe HTTP, e herdar o healthcheck do
+# railway.toml faria o deploy falhar. Precisa de DJANGO_SETTINGS_MODULE
+# nas variáveis do serviço — no backend quem exporta isso é o entrypoint.
+[build]
+builder = "dockerfile"
+dockerfilePath = "backend/Dockerfile.prod"
+
+[deploy]
+startCommand = "celery -A core worker --loglevel=info"
+restartPolicyType = "on_failure"

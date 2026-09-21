@@ -21,6 +21,10 @@ const STATUSES: { value: ApplicationStatus | ''; label: string }[] = [
   { value: 'approved', label: 'Aprovados' },
   { value: 'rejected', label: 'Reprovados' },
   { value: 'discarded', label: 'Descartados' },
+<<<<<<< HEAD
+=======
+  { value: 'withdrawn', label: 'Desistiram' },
+>>>>>>> feature/v3-processo-seletivo
 ]
 
 const ORDERINGS = [
@@ -30,7 +34,21 @@ const ORDERINGS = [
   { value: '-updated_at', label: 'Atualização recente' },
 ]
 
+<<<<<<< HEAD
 export function CandidatesTab({ process }: { process: AdminProcessDetail }) {
+=======
+interface CandidatesTabProps {
+  process: AdminProcessDetail
+  /**
+   * Coordenador. Sem isto a tela ofereceria aprovar, reprovar, mover e
+   * comunicar para quem a API recusa, e o avaliador só descobriria o erro
+   * depois de clicar (decisions.md §29).
+   */
+  canDecide: boolean
+}
+
+export function CandidatesTab({ process, canDecide }: CandidatesTabProps) {
+>>>>>>> feature/v3-processo-seletivo
   const [search, setSearch] = useState('')
   const [debounced, setDebounced] = useState('')
   const [stage, setStage] = useState('')
@@ -65,8 +83,21 @@ export function CandidatesTab({ process }: { process: AdminProcessDetail }) {
   const communications = useCommunications(process.id)
 
   const rows = query.data?.results ?? []
+<<<<<<< HEAD
   const lastStage = process.stages[process.stages.length - 1]
   const courses = Array.from(new Set(rows.map((row) => row.course))).sort()
+=======
+  // Fila vazia tem dois motivos bem diferentes: filtro que não achou nada, e
+  // coordenação que ainda não distribuiu. Só o segundo precisa de explicação.
+  const filtrando = Boolean(debounced || stage || status || course)
+  const semDistribuicao = !canDecide && !filtrando
+  const lastStage = process.stages[process.stages.length - 1]
+  // Curso vem nulo na correção anônima: quem enxerga o filtro é quem enxerga
+  // os cursos, e para o avaliador ele simplesmente não aparece.
+  const courses = Array.from(
+    new Set(rows.map((row) => row.course).filter((item): item is string => Boolean(item))),
+  ).sort()
+>>>>>>> feature/v3-processo-seletivo
 
   // Aprovar só vale para quem está na última etapa — o backend recusa o resto.
   const selectedRows = rows.filter((row) => selected.includes(row.id))
@@ -225,7 +256,11 @@ export function CandidatesTab({ process }: { process: AdminProcessDetail }) {
       )}
 
       {/* Ações em massa */}
+<<<<<<< HEAD
       {selected.length > 0 && (
+=======
+      {canDecide && selected.length > 0 && (
+>>>>>>> feature/v3-processo-seletivo
         <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-brand/25 bg-brand/[0.06] px-4 py-3">
           <span className="font-ui text-sm font-medium text-ink">
             {selected.length} candidato{selected.length === 1 ? '' : 's'} selecionado
@@ -289,12 +324,29 @@ export function CandidatesTab({ process }: { process: AdminProcessDetail }) {
 
       <CandidatesTable
         rows={rows}
+<<<<<<< HEAD
         selected={selected}
         onToggle={toggle}
         onToggleAll={toggleAll}
         onOpenProfile={(row) => setProfileRow(row)}
         onOpenEvaluation={(row) => setEvaluationRow(row)}
         loading={query.isLoading}
+=======
+        selected={canDecide ? selected : []}
+        onToggle={canDecide ? toggle : undefined}
+        onToggleAll={canDecide ? toggleAll : undefined}
+        onOpenProfile={(row) => setProfileRow(row)}
+        onOpenEvaluation={(row) => setEvaluationRow(row)}
+        loading={query.isLoading}
+        emptyTitle={
+          semDistribuicao ? 'Nada distribuído para você ainda' : undefined
+        }
+        emptyHint={
+          semDistribuicao
+            ? 'A coordenação ainda não passou correções suas neste processo. Assim que passar, os candidatos aparecem aqui.'
+            : undefined
+        }
+>>>>>>> feature/v3-processo-seletivo
       />
 
       {query.data && query.data.count > rows.length && (
@@ -310,8 +362,13 @@ export function CandidatesTab({ process }: { process: AdminProcessDetail }) {
           scaleMax={process.score_max}
           nextStageName={nextStageOf(profileRow)?.name ?? null}
           deciding={bulk.isPending}
+<<<<<<< HEAD
           onApprove={() => askDecision('approve', [profileRow])}
           onReject={() => askDecision('reject', [profileRow])}
+=======
+          onApprove={canDecide ? () => askDecision('approve', [profileRow]) : undefined}
+          onReject={canDecide ? () => askDecision('reject', [profileRow]) : undefined}
+>>>>>>> feature/v3-processo-seletivo
           onClose={() => setProfileRow(null)}
         />
       )}

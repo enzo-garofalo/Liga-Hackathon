@@ -2,9 +2,19 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { listParticipants, listTeams } from '../api/admin'
+<<<<<<< HEAD
 import { createProcess, listProcesses } from '../api/adminProcesses'
 import { AdminDashboardPage } from '../pages/AdminDashboardPage'
 import { makeProcess } from './fixtures'
+=======
+import {
+  createProcess,
+  getOrganizerProfile,
+  listProcesses,
+} from '../api/adminProcesses'
+import { AdminDashboardPage } from '../pages/AdminDashboardPage'
+import { makeOrganizerProfile, makeProcess } from './fixtures'
+>>>>>>> feature/v3-processo-seletivo
 import { httpError } from './http'
 import { renderWithProviders } from './render'
 
@@ -43,6 +53,10 @@ const draft = makeProcess({
 
 describe('AdminDashboardPage', () => {
   beforeEach(() => {
+<<<<<<< HEAD
+=======
+    vi.mocked(getOrganizerProfile).mockResolvedValue(makeOrganizerProfile())
+>>>>>>> feature/v3-processo-seletivo
     vi.mocked(listProcesses).mockResolvedValue([published, draft])
   })
 

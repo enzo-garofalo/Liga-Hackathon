@@ -5,12 +5,20 @@ import { getMyApplications } from '../api/applications'
 import { getInfo } from '../api/info'
 import { listMyInvites } from '../api/invites'
 import { getMe } from '../api/me'
+<<<<<<< HEAD
 import { getProcesses } from '../api/processes'
+=======
+import { getProcesses, withdrawFromProcess } from '../api/processes'
+>>>>>>> feature/v3-processo-seletivo
 import { getOpenTeams } from '../api/teams'
 import { DashboardPage } from '../pages/DashboardPage'
 import type { ApplicationSummary } from '../types/application'
 import type { MeProfile } from '../types/participant'
 import type { ProcessSummary } from '../types/process'
+<<<<<<< HEAD
+=======
+import { WHATSAPP_LINK } from '../links'
+>>>>>>> feature/v3-processo-seletivo
 import { httpError } from './http'
 import { renderWithProviders } from './render'
 
@@ -19,6 +27,10 @@ vi.mock('../api/processes', () => ({
   getProcesses: vi.fn(),
   getProcess: vi.fn(),
   applyToProcess: vi.fn(),
+<<<<<<< HEAD
+=======
+  withdrawFromProcess: vi.fn(),
+>>>>>>> feature/v3-processo-seletivo
 }))
 vi.mock('../api/applications', () => ({
   getMyApplications: vi.fn(),
@@ -63,6 +75,10 @@ const application: ApplicationSummary = {
   stage_count: 4,
   submitted_at: '2026-08-02T12:00:00Z',
   updated_at: '2026-08-10T12:00:00Z',
+<<<<<<< HEAD
+=======
+  can_withdraw: true,
+>>>>>>> feature/v3-processo-seletivo
 }
 
 const openProcess: ProcessSummary = {
@@ -178,3 +194,211 @@ describe('DashboardPage', () => {
     })
   })
 })
+<<<<<<< HEAD
+=======
+
+// ── Quem criou conta mas não se inscreveu ─────────────────────────
+//
+// Criar conta não é se inscrever, e é fácil achar que sim: a pessoa preencheu
+// um formulário, recebeu e-mail e caiu aqui. Antes, o único sinal era uma
+// pílula cinza dizendo "Sem inscrição".
+
+describe('DashboardPage: ainda não se inscreveu', () => {
+  beforeEach(() => {
+    vi.mocked(getMe).mockResolvedValue(me)
+    vi.mocked(getMyApplications).mockResolvedValue([])
+    vi.mocked(getProcesses).mockResolvedValue([openProcess])
+  })
+
+  it('avisa em destaque que falta se inscrever', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    expect(await screen.findByText('Você ainda não se inscreveu')).toBeInTheDocument()
+    expect(
+      screen.getByText(/Criar a conta não inscreve ninguém no processo seletivo/),
+    ).toBeInTheDocument()
+  })
+
+  it('diz até quando dá para se inscrever', async () => {
+    renderWithProviders(<DashboardPage />)
+    expect(await screen.findByText(/As inscrições vão até 30\/09/)).toBeInTheDocument()
+  })
+
+  it('leva direto ao processo quando só há um aberto', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    expect(await screen.findByRole('link', { name: /quero me inscrever/i })).toHaveAttribute(
+      'href',
+      '/processes/proc-2',
+    )
+  })
+
+  it('com mais de um processo aberto, leva à lista', async () => {
+    vi.mocked(getProcesses).mockResolvedValue([
+      openProcess,
+      { ...openProcess, id: 'proc-3', name: 'PS Liga 2027.2' },
+    ])
+    renderWithProviders(<DashboardPage />)
+
+    expect(await screen.findByRole('link', { name: /quero me inscrever/i })).toHaveAttribute(
+      'href',
+      '#processos-disponiveis',
+    )
+  })
+
+  it('quem já se inscreveu não vê o aviso', async () => {
+    vi.mocked(getMyApplications).mockResolvedValue([application])
+    renderWithProviders(<DashboardPage />)
+
+    await screen.findByText('Meus processos')
+    expect(screen.queryByText('Você ainda não se inscreveu')).not.toBeInTheDocument()
+  })
+
+  it('quem cancelou a inscrição volta a ver o aviso', async () => {
+    // Cancelar devolve a pessoa à condição de quem não se inscreveu, e é
+    // justamente quando ela pode achar que ainda está no processo. A
+    // candidatura cancelada continua na lista, então sem tratar o status o
+    // aviso ficaria escondido por ela.
+    vi.mocked(getMyApplications).mockResolvedValue([
+      { ...application, status: 'withdrawn' },
+    ])
+    renderWithProviders(<DashboardPage />)
+
+    expect(await screen.findByText('Você ainda não se inscreveu')).toBeInTheDocument()
+  })
+
+  it('sem inscrição aberta, não cobra o que não dá para fazer', async () => {
+    vi.mocked(getProcesses).mockResolvedValue([
+      { ...openProcess, registration_open: false },
+    ])
+    renderWithProviders(<DashboardPage />)
+
+    await screen.findByText('Processos disponíveis')
+    expect(screen.queryByText('Você ainda não se inscreveu')).not.toBeInTheDocument()
+  })
+
+  it('não acusa "não inscrito" enquanto ainda está carregando', async () => {
+    // Um flash de "você não se inscreveu" para quem está inscrito é pior que
+    // não avisar nada.
+    let liberar: (v: ApplicationSummary[]) => void = () => {}
+    vi.mocked(getMyApplications).mockReturnValue(
+      new Promise((resolve) => {
+        liberar = resolve
+      }),
+    )
+    renderWithProviders(<DashboardPage />)
+
+    expect(screen.queryByText('Você ainda não se inscreveu')).not.toBeInTheDocument()
+
+    liberar([application])
+    await screen.findByText('Meus processos')
+    expect(screen.queryByText('Você ainda não se inscreveu')).not.toBeInTheDocument()
+  })
+
+  it('com falha na API, não afirma que a pessoa não se inscreveu', async () => {
+    vi.mocked(getMyApplications).mockRejectedValue(httpError(500))
+    renderWithProviders(<DashboardPage />)
+
+    await waitFor(() =>
+      expect(screen.queryByText('Você ainda não se inscreveu')).not.toBeInTheDocument(),
+    )
+  })
+})
+
+describe('DashboardPage: grupo no WhatsApp', () => {
+  beforeEach(() => {
+    vi.mocked(getMe).mockResolvedValue(me)
+    vi.mocked(getMyApplications).mockResolvedValue([application])
+    vi.mocked(getProcesses).mockResolvedValue([openProcess])
+  })
+
+  it('o convite fica no topo, à vista', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    const link = await screen.findByRole('link', { name: /acesse o grupo da liga/i })
+    expect(link).toHaveAttribute('href', WHATSAPP_LINK)
+    expect(link).toHaveAttribute('target', '_blank')
+    expect(link.getAttribute('rel')).toContain('noopener')
+  })
+
+  it('aparece também para quem ainda não se inscreveu', async () => {
+    // Antes o convite só existia no estado "nenhum processo aberto", que quase
+    // ninguém chega a ver.
+    vi.mocked(getMyApplications).mockResolvedValue([])
+    renderWithProviders(<DashboardPage />)
+
+    expect(
+      await screen.findByRole('link', { name: /acesse o grupo da liga/i }),
+    ).toBeInTheDocument()
+  })
+})
+
+// ── Cancelar a inscrição pelo cartão ──────────────────────────────
+//
+// A ação já existia na página do processo, mas para chegar lá é preciso saber
+// que a página existe. O dashboard é onde a pessoa cai.
+
+describe('DashboardPage: cancelar a inscrição', () => {
+  beforeEach(() => {
+    vi.mocked(getMe).mockResolvedValue(me)
+    vi.mocked(getMyApplications).mockResolvedValue([application])
+    vi.mocked(getProcesses).mockResolvedValue([])
+    vi.mocked(withdrawFromProcess).mockResolvedValue({ id: 'app-1' })
+  })
+
+  it('o cartão oferece cancelar embaixo de "Ver candidatura"', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    expect(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    ).toBeInTheDocument()
+  })
+
+  it('cancelar pergunta antes de fazer', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    )
+
+    expect(await screen.findByText(/tem certeza que quer cancelar/i)).toBeInTheDocument()
+    expect(withdrawFromProcess).not.toHaveBeenCalled()
+  })
+
+  it('confirmar cancela a inscrição daquele processo', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar inscrição' }))
+
+    expect(withdrawFromProcess).toHaveBeenCalledWith('proc-1')
+  })
+
+  it('desistir da confirmação não cancela nada', async () => {
+    renderWithProviders(<DashboardPage />)
+
+    await userEvent.click(
+      await screen.findByRole('button', { name: /cancelar minha inscrição/i }),
+    )
+    await userEvent.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+    expect(withdrawFromProcess).not.toHaveBeenCalled()
+  })
+
+  it('sem permissão da API, o cartão não oferece cancelar', async () => {
+    // Quem decide é o backend: fora do prazo, ou com a candidatura já
+    // finalizada, `can_withdraw` vem falso e o botão não aparece.
+    vi.mocked(getMyApplications).mockResolvedValue([
+      { ...application, can_withdraw: false },
+    ])
+    renderWithProviders(<DashboardPage />)
+
+    await screen.findByText('Meus processos')
+    expect(
+      screen.queryByRole('button', { name: /cancelar minha inscrição/i }),
+    ).not.toBeInTheDocument()
+  })
+})
+>>>>>>> feature/v3-processo-seletivo

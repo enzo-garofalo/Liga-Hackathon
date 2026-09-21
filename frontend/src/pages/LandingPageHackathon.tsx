@@ -23,9 +23,16 @@ import {
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import logo from '../assets/logo.svg'
+<<<<<<< HEAD
 import { Button } from '../components/ui/Button'
 
 const WHATSAPP_LINK = (import.meta as unknown as { env: Record<string, string> }).env.VITE_WHATSAPP_LINK || '#'
+=======
+import { WhatsAppIcon } from '../components/ui/WhatsAppIcon'
+import { WHATSAPP_LINK } from '../links'
+import { Button } from '../components/ui/Button'
+
+>>>>>>> feature/v3-processo-seletivo
 const EVENT_DATE = new Date('2026-06-20T10:00:00')
 
 const SCHEDULE = [
@@ -149,7 +156,11 @@ function Hero() {
         <nav className="relative z-30 mx-auto mt-5 flex h-12 w-[min(90vw,74rem)] items-center justify-between px-1 text-[0.66rem] uppercase tracking-[0.18em] text-white/58">
           <Link to="/" aria-label="Liga de TI" className="flex items-center gap-3">
             <img src={logo} alt="Liga de TI" className="h-7 brightness-0 invert" />
+<<<<<<< HEAD
             <span className="hidden font-semibold text-white/78 sm:inline">Arena</span>
+=======
+            <span className="hidden font-semibold text-white/78 sm:inline">Processo Seletivo</span>
+>>>>>>> feature/v3-processo-seletivo
           </Link>
           <div className="hidden items-center gap-7 md:flex">
             <a href="#sobre" className="transition hover:text-white">Sobre</a>
@@ -498,10 +509,18 @@ function FinalCTA() {
           <Link to="/register">
             <Button className="h-12 w-full rounded-full bg-black px-7 text-white hover:bg-brand sm:w-auto">Participar do Hackathon</Button>
           </Link>
+<<<<<<< HEAD
           {WHATSAPP_LINK !== '#' && (
             <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">
               <Button variant="outlined" className="h-12 w-full rounded-full border-white/20 bg-white/[0.06] px-7 text-white hover:bg-white/10 hover:text-white sm:w-auto">
                 Grupo WhatsApp
+=======
+          {(
+            <a href={WHATSAPP_LINK} target="_blank" rel="noreferrer">
+              <Button variant="outlined" className="h-12 w-full rounded-full border-white/20 bg-white/[0.06] px-7 text-white hover:bg-white/10 hover:text-white sm:w-auto">
+                <WhatsAppIcon className="h-4 w-4" />
+                Acesse o grupo da Liga
+>>>>>>> feature/v3-processo-seletivo
               </Button>
             </a>
           )}
@@ -521,7 +540,11 @@ function Footer() {
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-3">
                 <img src={logo} alt="Liga de TI" className="h-7 brightness-0 invert" />
+<<<<<<< HEAD
                 <span className="font-semibold">Arena</span>
+=======
+                <span className="font-semibold">Processo Seletivo</span>
+>>>>>>> feature/v3-processo-seletivo
               </div>
               <p className="mt-6 max-w-sm text-sm leading-7 text-white/46">
                 Plataforma oficial para formar equipes, gerenciar convites e acompanhar o fluxo de submissão do evento com nossos parceiros.

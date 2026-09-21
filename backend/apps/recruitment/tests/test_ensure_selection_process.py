@@ -35,6 +35,7 @@ def test_creates_the_process_with_every_stage_and_criterion():
         assert stage.criteria.count() == len(data['criteria'])
 
 
+<<<<<<< HEAD
 def test_process_is_born_without_anonymous_marking():
     """Decisão da Liga: todo organizador vê a identidade do candidato.
 
@@ -42,6 +43,21 @@ def test_process_is_born_without_anonymous_marking():
     """
     run()
     assert Process.objects.get(name=PROCESS_NAME).anonymous_evaluation is False
+=======
+def test_only_the_case_stage_is_born_anonymous():
+    """O anonimato é do case, e de mais nenhuma etapa.
+
+    Marcar tudo esconderia o candidato também no pitch e na entrevista, onde o
+    avaliador está diante da pessoa e o código não esconderia coisa nenhuma.
+    """
+    run()
+
+    process = Process.objects.get(name=PROCESS_NAME)
+    anonimas = set(
+        process.stages.filter(anonymous_evaluation=True).values_list('name', flat=True)
+    )
+    assert anonimas == {'Resolução do Case'}
+>>>>>>> feature/v3-processo-seletivo
 
 
 def test_process_is_born_as_draft():

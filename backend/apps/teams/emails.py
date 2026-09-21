@@ -7,6 +7,10 @@ from core.email_layout import (  # noqa: F401
     MONO as _MONO,
     badge as _badge,
     base_html as _base_html,
+<<<<<<< HEAD
+=======
+    button as _button,
+>>>>>>> feature/v3-processo-seletivo
     em as _em,
     footnote as _footnote,
     info_rows as _info_rows,
@@ -370,3 +374,79 @@ def send_team_disbanded(participant, team):
         top_color='#dc2626',
     )
     _send(subject, text, html, [participant.user.email])
+
+
+def _validade_do_link():
+    """Validade em horas, lida do mesmo lugar que a regra usa.
+
+    Escrever "2 horas" à mão faria o e-mail mentir no dia em que alguém
+    mudasse PASSWORD_RESET_TIMEOUT.
+    """
+    horas = max(1, settings.PASSWORD_RESET_TIMEOUT // 3600)
+    return f'{horas} hora' if horas == 1 else f'{horas} horas'
+
+
+def _primeiro_nome(user):
+    """Primeiro nome, quando a conta tem um.
+
+    Organizador criado pelo `createsuperuser` não tem `Participant` nem nome
+    preenchido. Nesse caso o e-mail abre só com "Olá.", em vez de saudar um
+    nome vazio.
+    """
+    participant = getattr(user, 'participant', None)
+    if participant and participant.full_name.strip():
+        return participant.full_name.split()[0]
+    nome_completo = user.get_full_name().strip()
+    return nome_completo.split()[0] if nome_completo else ''
+
+
+def send_password_reset(user, url):
+    """Link para escolher uma senha nova.
+
+    O endereço aparece duas vezes de propósito: no botão e escrito por extenso.
+    Cliente de e-mail corporativo reescreve ou bloqueia o botão, e sem o texto
+    a pessoa fica sem saída.
+    """
+    validade = _validade_do_link()
+    nome = _primeiro_nome(user)
+    saudacao = f'Olá, {nome}.' if nome else 'Olá.'
+    subject = '[Liga de TI] Redefinição de senha'
+    text = (
+        f'{saudacao}\n\n'
+        f'Recebemos um pedido para redefinir a senha da sua conta na '
+        f'plataforma da Liga de TI.\n\n'
+        f'Abra o endereço abaixo para escolher uma senha nova:\n{url}\n\n'
+        f'O link vale por {validade} e só pode ser usado uma vez.\n\n'
+        f'Se não foi você quem pediu, ignore este e-mail. '
+        f'Sua senha atual continua valendo.\n\n'
+        f'Liga de TI'
+    )
+    body = (
+        _badge('Redefinir Senha', '#f3f0ff', '#7132f5')
+        + _p(f'Olá, {_em(nome)}.' if nome else 'Olá.')
+        + _p(
+            'Recebemos um pedido para redefinir a senha da sua conta na '
+            'plataforma da Liga de TI. É só clicar no botão abaixo.'
+        )
+        + _button('Escolher uma senha nova', url)
+        + _p(
+            'Se o botão não funcionar, copie e cole este endereço no navegador:'
+            f'<br><span style="font-family:{_MONO};font-size:13px;color:#7132f5;'
+            f'word-break:break-all;">{url}</span>'
+        )
+        + _info_rows([
+            ('Validade do link', validade),
+            ('Uso', 'Uma vez só'),
+        ])
+        + _footnote(
+            'Se não foi você quem pediu, ignore este e-mail. Sua senha atual '
+            'continua valendo e nada muda na sua conta.'
+        )
+    )
+    html = _base_html(
+        subject,
+        f'Link para escolher uma senha nova. Vale por {validade}.',
+        'Redefinição de senha',
+        body,
+    )
+    _send(subject, text, html, [user.email])

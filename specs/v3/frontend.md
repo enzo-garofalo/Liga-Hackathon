@@ -27,11 +27,24 @@ As rotas do hackathon (v2) continuam existindo. As rotas abaixo são adicionadas
 |------|--------|-----------|
 | /admin/login | AdminLoginPage | Existente, sem alteração |
 | /admin/dashboard | AdminDashboardPage | Existente — lista de processos, "Novo processo" e "Meu perfil"; abas do hackathon atrás de `SHOW_HACKATHON` |
+<<<<<<< HEAD
 | /admin/processes/:id | ManageProcessPage | Gerenciar processo: tiles de estatísticas + abas Candidatos / Etapas / Comunicações |
+=======
+| /admin/processes/:id | ManageProcessPage | Gerenciar processo: tiles de estatísticas + abas Candidatos / Etapas / Comunicações / Organizadores |
+>>>>>>> feature/v3-processo-seletivo
 
 `ManageProcessPage` controla a aba ativa por query string (`?tab=candidates`) para que
 recarregar a página ou compartilhar o link mantenha o contexto.
 
+<<<<<<< HEAD
+=======
+**A tela muda com o cargo** (decisions.md §29). `is_coordinator`, de `GET /admin/me/`,
+decide o que aparece: para o avaliador ficam só a aba Candidatos e a fila dele, sem editar,
+publicar, encerrar, sem ações em massa e sem os tiles do processo. Um `?tab=organizers` na
+mão cai em Candidatos, e não numa aba que a API vai recusar. A regra de verdade está no
+backend: a tela só evita oferecer porta trancada.
+
+>>>>>>> feature/v3-processo-seletivo
 ### Modais
 
 Todos usam o invólucro `components/ui/Modal.tsx` (fundo, painel, título, fechar, Esc).
@@ -297,6 +310,20 @@ src/types/
   com `audience: specific`. Por isso a tabela devolve o id do participante além do id da
   candidatura — o comunicado é endereçado por pessoa.
 - **Processo encerrado é somente leitura.** Abas continuam navegáveis, ações ficam ocultas.
+<<<<<<< HEAD
+=======
+- **Aba Organizadores (só do coordenador):** quem está no processo, com cargo, convite
+  pendente e carga de correção, e abaixo a distribuição. Convidar é um e-mail; tirar do
+  processo passa por `ConfirmDialog`, porque manda alguém embora.
+- **Distribuir correções (`DistribuicaoTab`) começa mostrando gente**, não formulário: os
+  candidatos aparecem agrupados por fase, cada um com quem o corrige ou "Sem avaliador".
+  A primeira versão pedia etapa e número antes de exibir um candidato, e o coordenador
+  distribuía no escuro. Dois caminhos, porque são duas perguntas: **automático** por fase
+  (botão no cabeçalho da fase, modal com quantos avaliadores por candidato e quem entra no
+  rodízio) e **manual** por candidato (modal com os avaliadores marcados como estão hoje,
+  mais as etapas em que aquilo vale, com "Todas as etapas" ou uma a uma). Salvar substitui
+  o que havia nas etapas marcadas, e a resposta já traz o quadro redesenhado.
+>>>>>>> feature/v3-processo-seletivo
 - **Estados vazios:** "nenhum processo disponível", "nenhum candidato neste filtro" e
   "nenhum comunicado enviado" precisam de mensagem própria, não tabela vazia.
 - **Upload fora do prazo** mostra o motivo (prazo encerrado, tipo não permitido, limite de

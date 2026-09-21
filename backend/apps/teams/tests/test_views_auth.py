@@ -158,3 +158,59 @@ def test_organizer_who_is_also_a_candidate_gets_in(api_client, django_user_model
         TOKEN_URL, {'email': 'ana@x.com', 'password': 'strongpass123'}, format='json'
     )
     assert r.status_code == 200
+<<<<<<< HEAD
+=======
+
+
+# ── Teto da bio ───────────────────────────────────────────────────
+#
+# As duas telas prometem 500 caracteres, mas o modelo é TextField sem teto e a
+# API aceitava qualquer tamanho. Quem passasse pela API, ou por um cliente que
+# ignorasse o formulário, gravava texto sem limite num campo que o organizador
+# lê na correção.
+
+from apps.teams.serializers import BIO_MAX_LENGTH  # noqa: E402
+
+
+def test_register_rejects_bio_above_the_limit(api_client):
+    payload = {**VALID_REGISTER, 'bio': 'x' * (BIO_MAX_LENGTH + 1)}
+
+    r = api_client.post(REGISTER_URL, payload, format='json')
+
+    assert r.status_code == 400
+    assert 'bio' in r.data
+    assert not Participant.objects.filter(user__username=payload['email']).exists()
+
+
+def test_register_accepts_bio_exactly_at_the_limit(api_client):
+    payload = {**VALID_REGISTER, 'bio': 'x' * BIO_MAX_LENGTH}
+
+    r = api_client.post(REGISTER_URL, payload, format='json')
+
+    assert r.status_code == 201
+    assert len(Participant.objects.get(user__username=payload['email']).bio) == BIO_MAX_LENGTH
+
+
+def test_profile_update_rejects_bio_above_the_limit(auth_client):
+    r = auth_client.patch(ME_URL, {'bio': 'y' * (BIO_MAX_LENGTH + 1)}, format='json')
+
+    assert r.status_code == 400
+    assert 'bio' in r.data
+
+
+def test_profile_update_accepts_bio_at_the_limit(auth_client):
+    r = auth_client.patch(ME_URL, {'bio': 'y' * BIO_MAX_LENGTH}, format='json')
+
+    assert r.status_code == 200
+    assert len(r.data['bio']) == BIO_MAX_LENGTH
+
+
+def test_the_limit_is_the_number_the_screens_promise():
+    """Se o número mudar aqui, tem que mudar em utils/perfil.ts junto.
+
+    O par deste teste está em AuthPages.test.tsx, preso no mesmo número: assim
+    nenhum dos dois lados muda sozinho e sai prometendo um teto que o outro não
+    aplica.
+    """
+    assert BIO_MAX_LENGTH == 1500
+>>>>>>> feature/v3-processo-seletivo

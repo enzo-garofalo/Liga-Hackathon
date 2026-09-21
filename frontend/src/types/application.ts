@@ -5,6 +5,11 @@ export type ApplicationStatus =
   | 'approved'
   | 'rejected'
   | 'discarded'
+<<<<<<< HEAD
+=======
+  /** Desistência do próprio candidato, durante o período de inscrição. */
+  | 'withdrawn'
+>>>>>>> feature/v3-processo-seletivo
 
 export type StageState = 'done' | 'current' | 'upcoming'
 
@@ -23,6 +28,11 @@ export interface TimelineStage extends PublicStage {
   deliverables: Deliverable[]
   /** Vem vazio enquanto o candidato não chega na etapa. */
   instructions: string
+<<<<<<< HEAD
+=======
+  /** Enunciado em PDF. Vem nulo enquanto o candidato não chega na etapa. */
+  instructions_file: { filename: string; download_url: string } | null
+>>>>>>> feature/v3-processo-seletivo
 }
 
 export interface ApplicationSummary {
@@ -35,6 +45,14 @@ export interface ApplicationSummary {
   stage_count: number
   submitted_at: string | null
   updated_at: string
+<<<<<<< HEAD
+=======
+  /**
+   * Se dá para cancelar a inscrição agora. Quem decide é o backend: a regra
+   * depende do prazo do processo, que esta lista não traz.
+   */
+  can_withdraw: boolean
+>>>>>>> feature/v3-processo-seletivo
 }
 
 export interface ApplicationDetail extends ApplicationSummary {

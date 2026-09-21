@@ -161,10 +161,15 @@ test_negative_score_is_rejected
 ```
 
 ### tests/test_anonymous_evaluation.py
+<<<<<<< HEAD
+=======
+O anonimato é marca da **etapa** (decisions.md §29).
+>>>>>>> feature/v3-processo-seletivo
 ```python
 test_evaluator_sees_code_instead_of_name
 test_coordinator_sees_identity
 test_candidate_list_is_anonymous_for_evaluator
+<<<<<<< HEAD
 test_identity_is_visible_when_anonymity_is_off
 test_application_gets_sequential_code_on_apply
 test_superuser_sees_identity
@@ -173,6 +178,102 @@ test_superuser_sees_identity
 ### tests/test_assignments.py
 ```python
 test_evaluator_grades_without_assignment
+=======
+test_identity_is_visible_when_the_stage_is_not_anonymous
+test_identity_appears_once_the_candidate_leaves_the_anonymous_stage
+test_application_gets_sequential_code_on_apply
+test_superuser_sees_identity
+test_the_filename_does_not_give_the_candidate_away
+test_the_coordinator_sees_the_real_filename
+test_the_candidate_still_sees_their_own_filename
+test_course_and_semester_are_hidden_too
+test_the_coordinator_still_sees_course_and_semester
+test_the_sheet_says_it_is_anonymous
+test_the_sheet_is_not_anonymous_for_the_coordinator
+```
+
+### tests/test_organizer_roles.py
+O que o avaliador não faz, e o que ele enxerga.
+```python
+test_evaluator_cannot_publish_the_process
+test_evaluator_cannot_close_the_process
+test_evaluator_cannot_edit_the_process
+test_evaluator_cannot_create_a_process
+test_evaluator_cannot_create_a_stage
+test_evaluator_cannot_edit_a_stage
+test_evaluator_cannot_approve_or_move
+test_evaluator_cannot_send_a_communication
+test_evaluator_cannot_distribute_work
+test_evaluator_cannot_invite_another_organizer
+test_coordinator_still_edits_the_process
+test_coordinator_still_moves_candidates
+test_evaluator_only_sees_processes_they_were_called_to
+test_evaluator_cannot_open_a_process_they_are_not_in
+test_coordinator_sees_every_process
+test_evaluator_list_shows_only_their_queue
+test_coordinator_list_shows_everyone
+test_evaluator_cannot_open_an_application_outside_their_queue
+test_evaluator_opens_their_own_queue
+test_evaluator_scores_what_was_distributed_to_them
+test_evaluator_cannot_score_outside_their_queue
+test_coordinator_scores_anyone
+test_assignment_removed_takes_the_access_with_it
+```
+
+### tests/test_assignment_board.py
+O quadro por fase e a escolha manual de avaliadores.
+```python
+test_the_board_groups_candidates_by_stage
+test_the_coordinator_sees_names_even_in_the_anonymous_stage
+test_an_empty_stage_comes_back_empty_not_missing
+test_someone_who_withdrew_is_not_in_the_board
+test_the_board_shows_who_corrects_each_candidate
+test_the_board_is_only_for_the_coordinator
+test_choosing_evaluators_for_one_stage
+test_choosing_evaluators_for_every_stage
+test_choosing_replaces_instead_of_adding
+test_removing_everyone_keeps_the_scores
+test_choosing_without_a_stage_is_refused
+test_cannot_choose_someone_outside_the_process
+test_a_stage_from_another_process_is_refused
+test_an_application_from_another_process_is_refused
+test_a_closed_process_does_not_accept_new_distribution
+test_choosing_is_only_for_the_coordinator
+test_the_answer_already_brings_the_board_back
+```
+
+### tests/test_organizer_invite.py
+Convite, remoção e a distribuição restrita a quem está no processo.
+```python
+test_invite_creates_the_account_as_organizer
+test_the_invited_account_has_no_password_yet
+test_the_invited_person_never_becomes_a_coordinator
+test_the_invite_email_carries_a_link_to_create_the_password
+test_the_invite_link_lets_the_person_set_a_password
+test_inviting_someone_who_already_has_an_account_keeps_their_password
+test_inviting_the_same_person_twice_is_refused
+test_a_candidate_of_the_process_cannot_be_invited
+test_the_list_shows_who_is_still_pending
+test_someone_who_already_logged_in_is_not_pending
+test_removing_takes_the_assignments_but_keeps_the_scores
+test_removed_organizer_loses_access_to_the_process
+test_the_coordinator_cannot_remove_themselves
+test_removing_someone_who_is_not_in_the_process_is_refused
+test_resending_sends_the_email_again
+test_resending_to_someone_outside_the_process_is_refused
+test_the_list_includes_the_coordination
+test_nobody_appears_twice
+test_the_coordinator_can_be_given_corrections
+test_cannot_distribute_to_someone_outside_the_process
+test_distribution_only_covers_candidates_in_that_stage
+```
+
+### tests/test_assignments.py
+A designação voltou a ser trava para quem não coordena.
+```python
+test_evaluator_cannot_grade_without_assignment
+test_the_service_refuses_an_undistributed_correction
+>>>>>>> feature/v3-processo-seletivo
 test_coordinator_grades_without_assignment
 test_auto_distribute_gives_two_evaluators_per_candidate
 test_auto_distribute_balances_workload
@@ -375,6 +476,31 @@ código para confirmar que algum teste acusa:
 | pílulas afirmando "Sem inscrição" durante erro | "erro da API mostra aviso" |
 | enviar assim que o arquivo é escolhido | "escolher o arquivo não envia nada", "o × troca o arquivo" |
 | tratar qualquer erro como "não encontrado" | "erro de servidor NÃO diz não encontrado" |
+<<<<<<< HEAD
+=======
+| pedido de senha revelando quais e-mails têm conta | backend: `test_pedido_de_email_desconhecido_responde_igual_e_nao_envia` |
+| endpoint aberto de senha sem teto de pedidos | backend: `test_pedido_em_excesso_e_barrado` |
+| senha nova sem as regras do Django | backend: `test_senha_fraca_e_recusada_e_a_antiga_continua` |
+| token do link de senha não conferido | backend: `test_token_adulterado_e_recusado` |
+| conta desativada recebendo link de senha | backend: `test_conta_desativada_nao_recebe_link` |
+| link do e-mail apontando para o backend, não para o site | backend: `test_link_usa_o_endereco_do_frontend` |
+| tela de login sem o link de senha esquecida | "a tela de entrar do candidato oferece Esqueci minha senha" |
+| tela de senha sem conferir se as duas batem | "senhas diferentes nem chegam a gastar o link" |
+| organizador mandado para a entrada do candidato | "o organizador vai para a entrada da organização" |
+| `ui/PasswordInput` sem aplicar o `id` no campo | "o campo de senha de %s é associado ao rótulo" |
+| link do e-mail sem dizer de qual porta é a conta | backend: `test_link_do_organizador_diz_que_a_porta_e_a_da_organizacao` |
+| cancelar inscrição valendo depois do prazo | backend: `test_candidate_cannot_withdraw_after_registration_closes` |
+| quem desistiu sem conseguir se inscrever de novo | backend: `test_candidate_can_apply_again_after_withdrawing` |
+| tela seguindo "já inscrito" depois de cancelar | backend: `test_the_process_offers_to_apply_again` |
+| quem desistiu contando como inscrito nos tiles | backend: `test_withdrawn_does_not_count_as_enrolled` |
+| organizador movendo de etapa quem desistiu | backend: `test_organizer_cannot_move_someone_who_withdrew` |
+| cancelar inscrição sem pedir confirmação | "não pergunta nada antes de abrir a confirmação" |
+| opção de cancelar aparecendo fora do prazo | "fora do prazo a opção some" |
+| cartão do dashboard sem a opção de cancelar | "o cartão oferece cancelar embaixo de Ver candidatura" |
+| `can_withdraw` prometendo o que o endpoint recusa | backend: `test_can_withdraw_matches_what_the_endpoint_does` |
+| alerta de "não se inscreveu" escondido por candidatura cancelada | "quem cancelou a inscrição volta a ver o aviso" |
+| caminho de volta fixo em `/login` nas telas de senha | "quem veio como organizador volta para a entrada dele", "na tela de trocar a senha, o organizador volta pela porta que veio no link" |
+>>>>>>> feature/v3-processo-seletivo
 | aprovar liberado em qualquer etapa | "aprovar fica desabilitado fora da última etapa" |
 | religar `SHOW_HACKATHON` no painel do organizador | "hackathon desativado: sem abas de equipe" |
 | comunicado dirigido perdendo os destinatários | "Enviar comunicado endereça os selecionados" |
@@ -510,6 +636,53 @@ pede a lista inteira, não só a primeira página
 etapa vazia não lista ninguém
 ```
 
+<<<<<<< HEAD
+=======
+### Implementados (cargos do organizador)
+```
+// OrganizersTab.test.tsx
+mostra quem coordena, quem avalia e quem ainda não entrou
+convida pelo e-mail e avisa que o convite saiu
+mostra o motivo quando a API recusa o convite
+reenviar convite só aparece para quem ainda não criou a senha
+tirar do processo pergunta antes
+não oferece tirar o coordenador do próprio processo
+
+// DistribuicaoTab.test.tsx (o quadro por fase)
+mostra os candidatos agrupados por fase
+diz quem corrige cada um, e quem está sem ninguém
+a fase vazia diz que está vazia, em vez de sumir
+não oferece distribuir automaticamente uma fase sem ninguém
+o modal do candidato já vem com quem corrige ele marcado
+começa marcando só a etapa em que o candidato está
+"todas as etapas" marca todas de uma vez
+salva os avaliadores nas etapas marcadas
+deixa tirar todo mundo de um candidato
+sem etapa marcada não deixa salvar
+mostra o motivo quando a API recusa
+o automático abre já dizendo quantos candidatos a fase tem
+distribui a fase entre quem foi marcado
+não distribui mais correções do que há gente para fazer
+
+// OrganizerRoles.test.tsx
+o coordenador vê as quatro abas
+o avaliador vê só a aba de candidatos
+o avaliador não pode editar, publicar nem encerrar o processo
+o coordenador continua podendo editar o processo
+o avaliador lê que aquilo ali é a fila dele, não o processo inteiro
+a aba pedida pelo endereço não dá a volta na regra
+o avaliador não seleciona candidato, porque não há ação em massa
+o coordenador continua selecionando
+diz que escondeu, em vez de mostrar campos vazios
+e continua deixando o avaliador salvar a nota
+```
+
+O nome de cada organizador aparece duas vezes na aba (na lista e no rodízio da
+distribuição), então as buscas são escopadas pela lista, que tem
+`aria-label="Organizadores deste processo"`. Uma busca solta acharia as duas e o teste
+quebraria por ambiguidade, não por regra errada.
+
+>>>>>>> feature/v3-processo-seletivo
 Fixtures compartilhadas em `src/test/fixtures.ts`.
 
 ## Regressão do hackathon

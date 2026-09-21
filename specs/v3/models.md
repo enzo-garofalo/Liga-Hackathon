@@ -32,7 +32,10 @@
 | score_min | PositiveSmallIntegerField | default=1 — menor nota da escala |
 | score_max | PositiveSmallIntegerField | default=5 — maior nota da escala |
 | divergence_threshold | DecimalField | default=1.5 — diferença entre avaliadores que aciona terceiro |
+<<<<<<< HEAD
 | anonymous_evaluation | BooleanField | default=True — avaliador vê só o código do candidato |
+=======
+>>>>>>> feature/v3-processo-seletivo
 | created_at / updated_at | | |
 
 Regras:
@@ -51,6 +54,10 @@ Regras:
 | order | PositiveSmallIntegerField | define a sequência |
 | start_at / end_at | DateTimeField | |
 | weight | DecimalField | peso da etapa na nota final, em % (ex.: 35). Zero em todas = peso igual |
+<<<<<<< HEAD
+=======
+| anonymous_evaluation | BooleanField | default=False — nesta etapa, quem não coordena vê o código, não a pessoa |
+>>>>>>> feature/v3-processo-seletivo
 | accepts_late_submission | BooleanField | default=False |
 | allows_file_upload | BooleanField | default=False |
 | max_files | PositiveSmallIntegerField | null=True |
@@ -75,7 +82,11 @@ Constraint: `unique_together(process, order)`.
 | process | FK → Process | |
 | participant | FK → Participant | |
 | current_stage | FK → Stage | null=True (null antes da 1ª etapa iniciar) |
+<<<<<<< HEAD
 | status | CharField | `in_progress / approved / rejected / discarded` |
+=======
+| status | CharField | `in_progress / approved / rejected / discarded / withdrawn` |
+>>>>>>> feature/v3-processo-seletivo
 | code | CharField | identificador anônimo sequencial (C-0001) mostrado ao avaliador |
 | submitted_at | DateTimeField | |
 | created_at / updated_at | | |
@@ -152,6 +163,7 @@ resolvido, seguindo a regra existente de "nunca um sem o outro".
 | user | OneToOne → User | organizadores continuam sendo `is_staff=True` |
 | full_name | CharField | blank=True |
 | role_title | CharField | ex.: "Diretor de Operações" — informativo |
+<<<<<<< HEAD
 | is_coordinator | BooleanField | default=False — vê identidade e administra designações |
 | phone / github / linkedin | | mesmos campos do modal "Perfil organizador" |
 
@@ -160,6 +172,33 @@ resolvido, seguindo a regra existente de "nunca um sem o outro".
 >
 > Com a correção anônima desligada (§23), todo organizador enxerga a identidade, então a
 > distinção perde metade do efeito. O campo continua porque o anonimato pode voltar.
+=======
+| is_coordinator | BooleanField | default=False — separa os dois cargos |
+| phone / github / linkedin | | mesmos campos do modal "Perfil organizador" |
+
+> `role_title` é informativo e não concede permissão. **`is_coordinator` concede**: é a
+> diferença entre conduzir o processo e só corrigir o que foi distribuído
+> (decisions.md §29). Superusuário conta como coordenador (§12).
+
+### ProcessOrganizer (quem foi chamado para o processo)
+| Campo | Tipo | Obs |
+|---|---|---|
+| id | UUID PK | |
+| process | FK → Process | `related_name='organizers'` |
+| user | FK → User (`is_staff=True`) | |
+| invited_by | FK → User | null=True, quem chamou |
+| created_at | DateTimeField | auto_now_add |
+
+Constraint: `unique_together(process, user)`.
+
+`is_staff` deixa entrar na área do organizador; ser membro daqui é o que mostra um
+processo. Sem isso, quem fosse chamado para corrigir um case enxergaria a edição inteira de
+outro ano.
+
+**Não há campo de "convite aceito"**: quem ainda não criou a senha é quem está com
+`has_usable_password()` falso. Um campo diria a mesma coisa e poderia discordar da
+realidade.
+>>>>>>> feature/v3-processo-seletivo
 
 ### StageAssignment (designação de avaliador)
 | Campo | Tipo | Obs |
@@ -172,9 +211,16 @@ resolvido, seguindo a regra existente de "nunca um sem o outro".
 
 Constraint: `unique_together(stage, application, evaluator)`.
 
+<<<<<<< HEAD
 O planejamento prevê dois corretores independentes por case, distribuídos entre
 candidatos diferentes. A designação registra essa distribuição, mas **não é permissão**:
 qualquer organizador avalia qualquer candidato (decisions.md §19).
+=======
+Dois corretores independentes por case, distribuídos entre candidatos diferentes. A
+designação **é permissão** para quem não coordena: sem ela, o avaliador não abre a ficha,
+não baixa a entrega e não salva nota. O coordenador avalia qualquer candidato
+(decisions.md §29, retomando o caminho que a §19 apontava).
+>>>>>>> feature/v3-processo-seletivo
 
 ## Reconciliação com o hackathon existente
 `Team`/`TeamMembership` continuam existindo do jeito que estão — não fazem parte do
@@ -187,5 +233,10 @@ risco para os dados de produção do hackathon.
 ## Pendências antes de gerar migrations
 Os enums de `Process.status` e `Application.status` estão definidos em [overview.md](overview.md) — ciclo de vida.
 
+<<<<<<< HEAD
 Resolvido: `StageAssignment` existe para distribuir a correção entre dois avaliadores,
 sem ser trava de permissão (decisions.md §19).
+=======
+Resolvido: `StageAssignment` distribui a correção entre dois avaliadores e, desde a §29,
+volta a ser trava de permissão para quem não coordena.
+>>>>>>> feature/v3-processo-seletivo

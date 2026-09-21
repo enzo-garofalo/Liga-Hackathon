@@ -1,6 +1,10 @@
 # PROGRESS — v3 Processo Seletivo
 
+<<<<<<< HEAD
 Estado do trabalho na branch `feature/v3-processo-seletivo`, atualizado em 18/09/2026.
+=======
+Estado do trabalho na branch `feature/v3-processo-seletivo`, atualizado em 20/09/2026.
+>>>>>>> feature/v3-processo-seletivo
 Este arquivo é o ponto de partida de quem retomar a v3: o que está pronto, o que foi
 decidido e por quê, e o que falta.
 
@@ -26,8 +30,17 @@ Fases 1 a 9 do [roadmap](specs/v3/roadmap.md) entregues. Falta a **fase 10 (prod
 | 9 | Landing page do processo seletivo | pronta, commitada |
 | 10 | Produção (deploy, storage, revisão de permissões) | não começou |
 
+<<<<<<< HEAD
 Suítes: **260 testes de backend** e **132 de frontend (17 arquivos)**, todos passando.
 `tsc --noEmit` limpo e `npm run build` ok. A suíte do hackathon continua inteira.
+=======
+Suítes: **329 testes de backend** (`apps/recruitment`) e **279 de frontend (27
+arquivos)**, todos passando. `tsc --noEmit` limpo. A suíte do hackathon continua inteira.
+
+Depois da fase 9 entraram, a pedido do Pedro: esqueci minha senha, desistência da inscrição,
+e os **dois cargos de organizador** com a correção anônima do case
+([decisions.md](specs/v3/decisions.md) §27, §28, §29).
+>>>>>>> feature/v3-processo-seletivo
 
 ---
 
@@ -96,8 +109,14 @@ cada uma. As que mais afetam quem for mexer no código:
 - **§17 — publicar e editar moram na tela do processo.** O dashboard só cria e lista.
 - **§18 — o processo nasce junto com o ambiente.** `ensure_selection_process` roda no
   `entrypoint.sh`, é idempotente, não altera processo existente e cria em `draft`.
+<<<<<<< HEAD
 - **§19 — designação distribui trabalho, não dá permissão.** Qualquer organizador avalia
   qualquer candidato; `StageAssignment` só organiza quem corrige o quê.
+=======
+- **§19 — designação distribuía trabalho, não dava permissão.** *Superada pela §29:* a
+  tela de distribuição foi construída e a trava voltou, que é a saída que a própria §19
+  apontava.
+>>>>>>> feature/v3-processo-seletivo
 - **§20 — a landing é do seletivo.** A do hackathon ficou em `LandingPageHackathon.tsx`,
   atrás da chave. A empresa parceira daquela edição saiu do projeto inteiro.
 - **§21 — o prazo na landing vem da API.** `GET /open-process/` é aberto e devolve a janela
@@ -137,7 +156,15 @@ comunica, de propósito.
 
 ## Próximos passos
 
+<<<<<<< HEAD
 1. **Fase 10 — produção:**
+=======
+1. **Antes de abrir a correção do case:** marcar a caixa "Correção anônima nesta etapa"
+   na etapa do case, se a migração 0007 não tiver pegado (ela liga a marca nos processos que
+   já existiam, procurando pela etapa chamada "Resolução do Case"). Sem a marca, o avaliador
+   vê nome e e-mail normalmente e ninguém recebe erro nenhum.
+2. **Fase 10 — produção:**
+>>>>>>> feature/v3-processo-seletivo
    - `MEDIA_ROOT` apontando para o volume do Railway ([decisions.md](specs/v3/decisions.md) §5)
    - `MAX_UPLOAD_BYTES` configurado
    - o processo já sobe criado pelo `entrypoint.sh`; falta só conferir as datas e publicar
@@ -145,7 +172,10 @@ comunica, de propósito.
    - **worker do Celery rodando** — sem ele o e-mail nunca sai e ninguém percebe. Rodar
      `manage.py check_email_pipeline` antes de abrir inscrições.
    - teste do fluxo completo com dados reais antes de abrir para os candidatos
+<<<<<<< HEAD
 2. **Front de login e telas de conta** — próximo assunto combinado com o Pedro.
+=======
+>>>>>>> feature/v3-processo-seletivo
 3. **Conferir o hackathon com `SHOW_HACKATHON = true`** antes de considerar a v3 fechada,
    para garantir que os arquivos compartilhados não quebraram o fluxo antigo.
 
@@ -153,12 +183,34 @@ comunica, de propósito.
 
 ## Armadilhas que já custaram tempo
 
+<<<<<<< HEAD
+=======
+- **Regra de cargo que só existe na tela não é regra.** A tela esconde a aba, mas quem
+  decide é a API: `IsCoordinator` nos endpoints de escrita, e 404 (não 403) para processo e
+  candidatura fora do alcance do avaliador. O teste `test_permissions.py` varre o URLconf
+  preenchendo parâmetro por tipo, então rota nova entra na varredura sozinha.
+- **O nome do arquivo entregue é identidade.** Numa etapa anônima, `case-pedro-xavier.pdf`
+  derruba o anonimato antes de o PDF abrir. Ninguém pensa no nome do arquivo como dado
+  pessoal, e foi o último lugar onde o vazamento apareceu.
+- **`UserFactory` não persiste a senha.** Comparar `user.password` antes e depois de uma
+  operação compara o hash em memória com o vazio que está no banco, e o teste acusa um
+  problema que não existe. Gravar a senha explicitamente antes.
+
+>>>>>>> feature/v3-processo-seletivo
 - **E-mail sem worker falha em silêncio.** A requisição responde 200, a task fica na fila e
   ninguém recebe nada. Em desenvolvimento sem Redis, `CELERY_TASK_ALWAYS_EAGER=True`.
 - **`apps.teams.services.notifications.notify()` com tipo do seletivo** cria a notificação,
   loga um warning e não manda e-mail. O `recruitment` tem o dispatch dele.
 - **O `vitest.config` reseta mocks entre testes.** `mockResolvedValue` na factory do
   `vi.mock` some; defina no `beforeEach`.
+<<<<<<< HEAD
+=======
+- **`getByLabelText(/senha/i)` casa com o botão de revelar.** O `ui/PasswordInput` tem um
+  botão com `aria-label="Revelar senha"`, e a busca por rótulo acha botão também. Por isso o
+  `id` faltando no campo passou despercebido: o rótulo apontava para um id que nunca era
+  aplicado, e todo campo de senha do site (login, cadastro, organizador) estava solto do
+  rótulo. Corrigido; nos testes, usar `/^senha/i`.
+>>>>>>> feature/v3-processo-seletivo
 - **Teste de "X não aparece" pode ser vazio.** Um já passou despercebido aqui. Sempre
   quebrar a regra de propósito e confirmar que o teste acusa — a tabela de sabotagens está
   em [specs/v3/tests.md](specs/v3/tests.md).

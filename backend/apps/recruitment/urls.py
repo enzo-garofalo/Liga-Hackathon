@@ -11,10 +11,20 @@ from .views import (
     AdminProcessCloseView,
     AdminProcessDetailView,
     AdminProcessListCreateView,
+<<<<<<< HEAD
+=======
+    AdminProcessAssignmentView,
+    AdminProcessOrganizerDetailView,
+    AdminProcessOrganizerView,
+>>>>>>> feature/v3-processo-seletivo
     AdminProcessPublishView,
     AdminStageAssignmentView,
     AdminStageAutoDistributeView,
     AdminStageDetailView,
+<<<<<<< HEAD
+=======
+    AdminStageInstructionsFileView,
+>>>>>>> feature/v3-processo-seletivo
     AdminStageListCreateView,
     AdminStageReorderView,
     DeliverableDownloadView,
@@ -24,8 +34,15 @@ from .views import (
     MyDeliverableView,
     ProcessApplyView,
     ProcessDetailView,
+<<<<<<< HEAD
     OpenProcessView,
     ProcessListView,
+=======
+    StageInstructionsFileDownloadView,
+    OpenProcessView,
+    ProcessListView,
+    ProcessWithdrawView,
+>>>>>>> feature/v3-processo-seletivo
 )
 
 urlpatterns = [
@@ -39,6 +56,14 @@ urlpatterns = [
         ProcessApplyView.as_view(),
         name='process-apply',
     ),
+<<<<<<< HEAD
+=======
+    path(
+        'processes/<uuid:pk>/withdraw/',
+        ProcessWithdrawView.as_view(),
+        name='process-withdraw',
+    ),
+>>>>>>> feature/v3-processo-seletivo
     path('me/applications/', MyApplicationListView.as_view(), name='my-applications'),
     path(
         'me/applications/<uuid:pk>/',
@@ -97,6 +122,19 @@ urlpatterns = [
         name='admin-stage-detail',
     ),
     path(
+<<<<<<< HEAD
+=======
+        'admin/stages/<uuid:pk>/instructions-file/',
+        AdminStageInstructionsFileView.as_view(),
+        name='admin-stage-instructions-file',
+    ),
+    path(
+        'stages/<uuid:pk>/instructions-file/download/',
+        StageInstructionsFileDownloadView.as_view(),
+        name='stage-instructions-file-download',
+    ),
+    path(
+>>>>>>> feature/v3-processo-seletivo
         'admin/processes/<uuid:pk>/applications/',
         AdminApplicationListView.as_view(),
         name='admin-applications',
@@ -127,6 +165,14 @@ urlpatterns = [
         name='admin-communication-detail',
     ),
     path(
+<<<<<<< HEAD
+=======
+        'admin/processes/<uuid:pk>/assignments/',
+        AdminProcessAssignmentView.as_view(),
+        name='admin-process-assignments',
+    ),
+    path(
+>>>>>>> feature/v3-processo-seletivo
         'admin/stages/<uuid:pk>/assignments/',
         AdminStageAssignmentView.as_view(),
         name='admin-stage-assignments',
@@ -137,6 +183,19 @@ urlpatterns = [
         name='admin-stage-auto-distribute',
     ),
     path(
+<<<<<<< HEAD
+=======
+        'admin/processes/<uuid:pk>/organizers/',
+        AdminProcessOrganizerView.as_view(),
+        name='admin-process-organizers',
+    ),
+    path(
+        'admin/processes/<uuid:pk>/organizers/<int:user_id>/',
+        AdminProcessOrganizerDetailView.as_view(),
+        name='admin-process-organizer-detail',
+    ),
+    path(
+>>>>>>> feature/v3-processo-seletivo
         'admin/me/',
         AdminOrganizerProfileView.as_view(),
         name='admin-organizer-profile',

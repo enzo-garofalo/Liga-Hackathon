@@ -3,6 +3,7 @@ import os
 import dj_database_url
 
 from core.settings import *  # noqa: F401, F403
+from core.settings import resolve_frontend_url
 
 # ── Core ──────────────────────────────────────────────────────────
 SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
@@ -39,6 +40,11 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     o.strip() for o in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if o.strip()
 ]
+
+# Recalculado aqui de propósito: a lista de origens acabou de mudar, e o valor
+# herdado de core.settings ainda apontava para o localhost do desenvolvimento.
+# É este endereço que vai dentro do link de redefinição de senha.
+FRONTEND_URL = resolve_frontend_url(CORS_ALLOWED_ORIGINS)
 
 # ── Security ──────────────────────────────────────────────────────
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

@@ -1,10 +1,26 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+<<<<<<< HEAD
 import { createStage, deleteStage, listStages, updateStage } from '../api/stages'
 import { StagesTab } from '../components/StagesTab'
 import { listApplications } from '../api/adminApplications'
 import { makeRow, makeStage } from './fixtures'
+=======
+import {
+  createStage,
+  deleteStage,
+  deleteStageInstructionsFile,
+  downloadStageInstructionsFile,
+  listStages,
+  updateStage,
+  uploadStageInstructionsFile,
+} from '../api/stages'
+import { StagesTab } from '../components/StagesTab'
+import { listApplications } from '../api/adminApplications'
+import { makeRow, makeStage } from './fixtures'
+import { saveBlob } from '../utils/download'
+>>>>>>> feature/v3-processo-seletivo
 import { httpError } from './http'
 import { renderWithProviders } from './render'
 
@@ -14,7 +30,15 @@ vi.mock('../api/stages', () => ({
   updateStage: vi.fn(),
   deleteStage: vi.fn(),
   reorderStages: vi.fn(),
+<<<<<<< HEAD
 }))
+=======
+  uploadStageInstructionsFile: vi.fn(),
+  deleteStageInstructionsFile: vi.fn(),
+  downloadStageInstructionsFile: vi.fn(),
+}))
+vi.mock('../utils/download', () => ({ saveBlob: vi.fn() }))
+>>>>>>> feature/v3-processo-seletivo
 vi.mock('../api/adminApplications', () => ({
   listApplications: vi.fn(),
   getApplication: vi.fn(),
@@ -38,7 +62,11 @@ describe('StagesTab', () => {
   })
 
   it('mostra a etapa com participantes, peso e critérios', async () => {
+<<<<<<< HEAD
     renderWithProviders(<StagesTab processId="proc-1" />)
+=======
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+>>>>>>> feature/v3-processo-seletivo
     expect(await screen.findByText('Resolução do Case')).toBeInTheDocument()
     expect(screen.getByText('3 candidatos')).toBeInTheDocument()
     expect(screen.getByText('35%')).toBeInTheDocument()
@@ -48,14 +76,22 @@ describe('StagesTab', () => {
 
   it('avisa quando não há etapa, porque publicar exige uma', async () => {
     vi.mocked(listStages).mockResolvedValue([])
+<<<<<<< HEAD
     renderWithProviders(<StagesTab processId="proc-1" />)
+=======
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+>>>>>>> feature/v3-processo-seletivo
 
     expect(await screen.findByText('Nenhuma etapa configurada')).toBeInTheDocument()
     expect(screen.getByText(/só pode ser publicado com ao menos uma etapa/)).toBeInTheDocument()
   })
 
   it('cria etapa com critérios e pesos', async () => {
+<<<<<<< HEAD
     renderWithProviders(<StagesTab processId="proc-1" />)
+=======
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+>>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Resolução do Case')
 
     await userEvent.click(screen.getByRole('button', { name: /nova etapa/i }))
@@ -76,7 +112,11 @@ describe('StagesTab', () => {
   })
 
   it('avisa quando os pesos não somam 100', async () => {
+<<<<<<< HEAD
     renderWithProviders(<StagesTab processId="proc-1" />)
+=======
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+>>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Resolução do Case')
     await userEvent.click(screen.getByRole('button', { name: /editar/i }))
 
@@ -92,7 +132,11 @@ describe('StagesTab', () => {
     vi.mocked(listStages).mockResolvedValue([
       makeStage({ allows_file_upload: false, allowed_file_types: [] }),
     ])
+<<<<<<< HEAD
     renderWithProviders(<StagesTab processId="proc-1" />)
+=======
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+>>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Resolução do Case')
     await userEvent.click(screen.getByRole('button', { name: /editar/i }))
 
@@ -105,7 +149,11 @@ describe('StagesTab', () => {
     vi.mocked(deleteStage).mockRejectedValue(
       httpError(400, ['Há candidatos nesta etapa. Mova-os antes de excluí-la.']),
     )
+<<<<<<< HEAD
     renderWithProviders(<StagesTab processId="proc-1" />)
+=======
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+>>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Resolução do Case')
 
     await userEvent.click(screen.getByLabelText('Excluir Resolução do Case'))
@@ -140,13 +188,21 @@ describe('StagesTab — quem está em cada etapa', () => {
       'e você recebe um aviso por e-mail assim que isso acontecer.'
     vi.mocked(listStages).mockResolvedValue([makeStage({ description: longa })])
 
+<<<<<<< HEAD
     renderWithProviders(<StagesTab processId="proc-1" />)
+=======
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+>>>>>>> feature/v3-processo-seletivo
     expect(await screen.findByText(longa)).toBeInTheDocument()
   })
 
   it('o card mostra a contagem; os nomes ficam atrás do botão', async () => {
     // Nome solto no card esticava a etapa e desalinhava a grade com muita gente.
+<<<<<<< HEAD
     renderWithProviders(<StagesTab processId="proc-1" />)
+=======
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+>>>>>>> feature/v3-processo-seletivo
 
     const caseCard = (await screen.findByText('Resolução do Case')).closest(
       'div.dark-card',
@@ -163,7 +219,11 @@ describe('StagesTab — quem está em cada etapa', () => {
   })
 
   it('a lista de cada etapa traz só quem está nela', async () => {
+<<<<<<< HEAD
     renderWithProviders(<StagesTab processId="proc-1" />)
+=======
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+>>>>>>> feature/v3-processo-seletivo
     const interviewCard = (await screen.findByText('Entrevista')).closest(
       'div.dark-card',
     ) as HTMLElement
@@ -190,7 +250,11 @@ describe('StagesTab — quem está em cada etapa', () => {
       results: muitos,
     })
 
+<<<<<<< HEAD
     renderWithProviders(<StagesTab processId="proc-1" />)
+=======
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+>>>>>>> feature/v3-processo-seletivo
 
     const caseCard = (await screen.findByText('Resolução do Case')).closest(
       'div.dark-card',
@@ -206,7 +270,11 @@ describe('StagesTab — quem está em cada etapa', () => {
   })
 
   it('pede a lista inteira, não só a primeira página', async () => {
+<<<<<<< HEAD
     renderWithProviders(<StagesTab processId="proc-1" />)
+=======
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+>>>>>>> feature/v3-processo-seletivo
     await screen.findAllByRole('button', { name: /ver lista/i })
 
     expect(listApplications).toHaveBeenCalledWith(
@@ -222,7 +290,11 @@ describe('StagesTab — quem está em cada etapa', () => {
       previous: null,
       results: [],
     })
+<<<<<<< HEAD
     renderWithProviders(<StagesTab processId="proc-1" />)
+=======
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+>>>>>>> feature/v3-processo-seletivo
 
     const caseCard = (await screen.findByText('Resolução do Case')).closest(
       'div.dark-card',
@@ -233,3 +305,232 @@ describe('StagesTab — quem está em cada etapa', () => {
     ).not.toBeInTheDocument()
   })
 })
+<<<<<<< HEAD
+=======
+
+// ── Enunciado em PDF da etapa ─────────────────────────────────────
+//
+// Sobe por endpoint próprio, multipart, e não pelo "Salvar" da etapa: o resto
+// da configuração é JSON.
+
+describe('StagesTab: enunciado em PDF', () => {
+  beforeEach(() => {
+    vi.mocked(listStages).mockResolvedValue([makeStage()])
+    vi.mocked(listApplications).mockResolvedValue({
+      count: 0,
+      next: null,
+      previous: null,
+      results: [],
+    })
+    vi.mocked(uploadStageInstructionsFile).mockResolvedValue(
+      makeStage({ instructions_file_name: 'case-2026-2.pdf' }),
+    )
+    vi.mocked(deleteStageInstructionsFile).mockResolvedValue(
+      makeStage({ instructions_file_name: '' }),
+    )
+    vi.mocked(downloadStageInstructionsFile).mockResolvedValue(new Blob(['pdf']))
+    vi.mocked(updateStage).mockResolvedValue(makeStage())
+  })
+
+  async function abrirEdicao() {
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+    await userEvent.click(await screen.findByRole('button', { name: /editar/i }))
+    return screen.getByRole('dialog', { name: /editar etapa/i })
+  }
+
+  /** Etapa sem PDF abre escrevendo; o anexo é a outra opção do mesmo campo. */
+  async function abrirModoPdf() {
+    const modal = await abrirEdicao()
+    await userEvent.click(within(modal).getByRole('button', { name: 'Anexar PDF' }))
+    return modal
+  }
+
+  it('o PDF toma o lugar do campo de texto, não fica ao lado', async () => {
+    // O candidato vê um ou outro; a tela do organizador acompanha isso.
+    const modal = await abrirEdicao()
+    expect(within(modal).getByLabelText(/o que o candidato precisa fazer/i)).toHaveProperty(
+      'tagName',
+      'TEXTAREA',
+    )
+
+    await userEvent.click(within(modal).getByRole('button', { name: 'Anexar PDF' }))
+
+    expect(
+      within(modal).queryByRole('textbox', { name: /o que o candidato precisa fazer/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('anexa o PDF pela tela de edição da etapa', async () => {
+    const modal = await abrirModoPdf()
+    const arquivo = new File(['%PDF'], 'case-2026-2.pdf', { type: 'application/pdf' })
+
+    await userEvent.upload(
+      within(modal).getByLabelText(/anexar pdf do enunciado/i),
+      arquivo,
+    )
+
+    await waitFor(() =>
+      expect(uploadStageInstructionsFile).toHaveBeenCalledWith('stage-1', arquivo),
+    )
+    expect(await within(modal).findByText('case-2026-2.pdf')).toBeInTheDocument()
+  })
+
+  it('mostra o arquivo já anexado e deixa remover', async () => {
+    vi.mocked(listStages).mockResolvedValue([
+      makeStage({ instructions_file_name: 'case-2026-2.pdf' }),
+    ])
+    const modal = await abrirEdicao()
+    expect(within(modal).getByText('case-2026-2.pdf')).toBeInTheDocument()
+
+    await userEvent.click(
+      within(modal).getByRole('button', { name: 'Remover case-2026-2.pdf' }),
+    )
+
+    await waitFor(() =>
+      expect(deleteStageInstructionsFile).toHaveBeenCalledWith('stage-1'),
+    )
+    await waitFor(() =>
+      expect(within(modal).queryByText('case-2026-2.pdf')).not.toBeInTheDocument(),
+    )
+  })
+
+  it('o organizador baixa o PDF que anexou', async () => {
+    vi.mocked(listStages).mockResolvedValue([
+      makeStage({ instructions_file_name: 'case-2026-2.pdf' }),
+    ])
+    const modal = await abrirEdicao()
+
+    await userEvent.click(
+      within(modal).getByRole('button', { name: 'Baixar case-2026-2.pdf' }),
+    )
+
+    await waitFor(() =>
+      expect(saveBlob).toHaveBeenCalledWith(expect.any(Blob), 'case-2026-2.pdf'),
+    )
+  })
+
+  it('avisa quando sobrou texto que o candidato não vai ver', async () => {
+    // Texto salvo com PDF anexado é armadilha: fica no banco e some da tela.
+    vi.mocked(listStages).mockResolvedValue([
+      makeStage({
+        instructions_file_name: 'case-2026-2.pdf',
+        instructions: 'Enunciado antigo em texto.',
+      }),
+    ])
+    const modal = await abrirEdicao()
+
+    expect(within(modal).getByText(/ainda tem o texto antigo salvo/i)).toBeInTheDocument()
+
+    await userEvent.click(within(modal).getByRole('button', { name: /apagar o texto/i }))
+    await userEvent.click(within(modal).getByRole('button', { name: /^salvar$/i }))
+
+    await waitFor(() =>
+      expect(updateStage).toHaveBeenCalledWith(
+        'stage-1',
+        expect.objectContaining({ instructions: '' }),
+      ),
+    )
+  })
+
+  it('sem texto sobrando, não avisa nada', async () => {
+    vi.mocked(listStages).mockResolvedValue([
+      makeStage({ instructions_file_name: 'case-2026-2.pdf', instructions: '' }),
+    ])
+    const modal = await abrirEdicao()
+
+    expect(
+      within(modal).queryByText(/ainda tem o texto antigo salvo/i),
+    ).not.toBeInTheDocument()
+  })
+
+  it('diz o motivo quando o backend recusa o arquivo', async () => {
+    // O `accept=".pdf"` do campo já barra outro formato antes de sair daqui, e
+    // o teto de tamanho só o backend conhece. É este o erro que chega à tela.
+    vi.mocked(uploadStageInstructionsFile).mockRejectedValue(
+      httpError(400, ['O arquivo excede o limite de 10 MB.']),
+    )
+    const modal = await abrirModoPdf()
+
+    await userEvent.upload(
+      within(modal).getByLabelText(/anexar pdf do enunciado/i),
+      new File(['%PDF'], 'enorme.pdf', { type: 'application/pdf' }),
+    )
+
+    expect(
+      await within(modal).findByText('O arquivo excede o limite de 10 MB.'),
+    ).toBeInTheDocument()
+  })
+
+  it('etapa nova não oferece anexo antes de existir', async () => {
+    // O arquivo precisa de um id de etapa. Sem isso o upload não teria destino.
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+    await userEvent.click(await screen.findByRole('button', { name: /nova etapa/i }))
+    const modal = screen.getByRole('dialog', { name: /nova etapa/i })
+    await userEvent.click(within(modal).getByRole('button', { name: 'Anexar PDF' }))
+
+    expect(within(modal).getByText(/Salve a etapa primeiro/)).toBeInTheDocument()
+    expect(
+      within(modal).queryByLabelText(/anexar pdf do enunciado/i),
+    ).not.toBeInTheDocument()
+  })
+})
+
+// ── Processo publicado não perde etapa ────────────────────────────
+//
+// O backend recusa (decisions.md §26). A tela não pode oferecer um botão que
+// sempre vai dar erro.
+
+describe('StagesTab: processo publicado', () => {
+  beforeEach(() => {
+    vi.mocked(listStages).mockResolvedValue([makeStage()])
+    vi.mocked(listApplications).mockResolvedValue({
+      count: 0,
+      next: null,
+      previous: null,
+      results: [],
+    })
+  })
+
+  it('não oferece excluir etapa', async () => {
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="published" />)
+
+    await screen.findByText('Resolução do Case')
+    expect(
+      screen.queryByRole('button', { name: /excluir resolução do case/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('diz por que não dá para excluir', async () => {
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="published" />)
+
+    expect(
+      await screen.findByText(/editadas, mas não excluídas/i),
+    ).toBeInTheDocument()
+  })
+
+  it('continua oferecendo editar', async () => {
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="published" />)
+
+    expect(await screen.findByRole('button', { name: /editar/i })).toBeInTheDocument()
+  })
+
+  it('processo encerrado também não oferece excluir', async () => {
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="closed" />)
+
+    await screen.findByText('Resolução do Case')
+    expect(
+      screen.queryByRole('button', { name: /excluir resolução do case/i }),
+    ).not.toBeInTheDocument()
+  })
+
+  it('em rascunho, excluir continua na tela', async () => {
+    // Sem isto, o teste acima passaria mesmo se o botão sumisse para todo mundo.
+    renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
+
+    expect(
+      await screen.findByRole('button', { name: /excluir resolução do case/i }),
+    ).toBeInTheDocument()
+    expect(screen.queryByText(/editadas, mas não excluídas/i)).not.toBeInTheDocument()
+  })
+})
+>>>>>>> feature/v3-processo-seletivo

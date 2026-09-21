@@ -124,12 +124,45 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    # Só o pedido de redefinição de senha usa throttle, por escopo. É o único
+    # endpoint aberto que dispara e-mail para um endereço escolhido por quem
+    # chama: sem teto, dá para encher a caixa de qualquer pessoa e torrar a
+    # cota do Resend de fora, sem conta nenhuma. O teto é por IP e generoso de
+    # propósito: o campus sai todo pelo mesmo endereço, e um limite apertado
+    # trancaria quem não fez nada.
+    'DEFAULT_THROTTLE_RATES': {
+        'password_reset': os.environ.get('PASSWORD_RESET_RATE', '20/hour'),
+    },
 }
+
+# Validade do link de redefinição de senha. O e-mail anuncia este mesmo valor,
+# lido daqui, para texto e regra não descolarem.
+PASSWORD_RESET_TIMEOUT = int(os.environ.get('PASSWORD_RESET_TIMEOUT', 2 * 60 * 60))
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
 ]
+
+
+def resolve_frontend_url(cors_origins):
+    """Endereço público do frontend, usado nos links que saem por e-mail.
+
+    O backend não tem como adivinhar em que domínio o site está: quem recebe o
+    link de redefinição abre o navegador, não a API. Sem `FRONTEND_URL`, cai no
+    primeiro CORS_ALLOWED_ORIGINS, que em produção já é o endereço do site.
+    Essa herança existe para o link nunca sair quebrado por falta de mais uma
+    variável de ambiente esquecida no Railway.
+    """
+    configured = os.environ.get('FRONTEND_URL', '').strip()
+    if configured:
+        return configured.rstrip('/')
+    if cors_origins:
+        return cors_origins[0].rstrip('/')
+    return 'http://localhost:5173'
+
+
+FRONTEND_URL = resolve_frontend_url(CORS_ALLOWED_ORIGINS)
 
 EMAIL_BACKEND = os.environ.get(
     'EMAIL_BACKEND',

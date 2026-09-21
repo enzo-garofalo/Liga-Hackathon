@@ -51,6 +51,12 @@ STAGES = [
     {
         'name': 'Resolução do Case',
         'description': 'Entrega de um case prático em até 7 dias.',
+<<<<<<< HEAD
+=======
+        # A única etapa anônima: aqui o avaliador deveria estar julgando a
+        # proposta, e o nome de quem escreveu não ajuda nisso.
+        'anonymous_evaluation': True,
+>>>>>>> feature/v3-processo-seletivo
         'instructions': (
             'SUBSTITUA ESTE PARÁGRAFO PELO ENUNCIADO DESTA EDIÇÃO. O tema muda a cada processo seletivo; o resto deste texto vale para qualquer um.\n'
             '\n'

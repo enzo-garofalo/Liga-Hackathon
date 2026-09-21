@@ -1,7 +1,10 @@
 from celery import shared_task
+from django.contrib.auth import get_user_model
 
 from apps.teams import emails
 from apps.teams.models import JoinRequest, Participant, Team, TeamInvite
+
+User = get_user_model()
 
 _TASK_OPTS = dict(
     bind=True,
@@ -87,3 +90,15 @@ def send_team_disbanded(self, participant_id: int, team_id: int) -> None:
         return
     participant = Participant.objects.get(pk=participant_id)
     emails.send_team_disbanded(participant, team)
+
+
+@shared_task(**_TASK_OPTS)
+def send_password_reset(self, user_id: int, url: str) -> None:
+    """E-mail com o link de redefinição.
+
+    A conta vem por id e o link pronto: o token é assinado no momento do
+    pedido, e refazê-lo aqui daria um link diferente do que a pessoa pediu se
+    a task rodasse depois de uma nova tentativa.
+    """
+    user = User.objects.get(pk=user_id)
+    emails.send_password_reset(user, url)

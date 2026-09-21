@@ -62,14 +62,9 @@ permanece intocada no domínio do hackathon.
 
 ## 4. Sem RBAC entre organizadores no MVP
 
-<<<<<<< HEAD
-> **Emendada pela decisão §10:** existe uma distinção de papel (`is_coordinator`) para
-> correção anônima e designação de avaliadores. O resto desta decisão continua valendo.
-=======
 > **Superada pela decisão §29:** existem dois cargos com poderes diferentes, coordenador e
 > avaliador, e a distinção vale em todos os endpoints. O registro fica pelo histórico: a
 > evolução prevista no último parágrafo é exatamente a que aconteceu.
->>>>>>> feature/v3-processo-seletivo
 
 **Decisão:** qualquer usuário com `is_staff=True` pode criar processo, configurar etapas,
 avaliar candidatos, mover entre etapas e enviar comunicados. `OrganizerProfile.role_title`
@@ -383,12 +378,9 @@ de agora). Conferir em "Editar processo" antes de abrir as inscrições.
 
 ## 19. Designação distribui trabalho, não concede permissão
 
-<<<<<<< HEAD
-=======
 > **Superada pela decisão §29:** a tela de designação foi construída e a trava voltou, que é
 > a saída que o último parágrafo desta decisão já apontava.
 
->>>>>>> feature/v3-processo-seletivo
 **Decisão:** qualquer organizador (`is_staff`) salva nota de qualquer candidato.
 `StageAssignment`, o modelo e os endpoints de distribuição continuam de pé, mas deixaram
 de ser pré-requisito para avaliar. **Isto emenda a §10.**
@@ -490,12 +482,9 @@ que recusa tudo. Agora tem teste, com contraprova de que organizador continua en
 
 ## 23. Correção sem anonimato nesta edição
 
-<<<<<<< HEAD
-=======
 > **Superada pela decisão §29:** o anonimato voltou, agora marcado na etapa (só o case) em
 > vez de no processo inteiro.
 
->>>>>>> feature/v3-processo-seletivo
 **Decisão:** o processo nasce com `anonymous_evaluation=False`. Todo organizador vê nome,
 e-mail e bio do candidato ao corrigir. **Isto emenda a §10**, que definia correção anônima
 por padrão.
@@ -537,8 +526,6 @@ O campo já é `TextField`, então a convenção resolve sem migração e sem to
 de linha única continua funcionando: o resumo é a própria linha e o pop-up fica só com ela.
 O rótulo humano do tipo vai junto no JSON, como `type_display`, para o frontend não manter
 uma segunda cópia da lista de tipos.
-<<<<<<< HEAD
-=======
 
 
 ## 25. O enunciado da etapa também pode ser um PDF
@@ -775,4 +762,3 @@ mudaria a nota de candidatos sem ninguém ter pedido.
 **O que se perde:** o coordenador vira gargalo. Nada avança sem ele, e se o Bruno sumir numa
 semana de correção o processo trava. O caminho, se isso doer, é marcar um segundo
 coordenador no Django Admin, e não afrouxar a regra.
->>>>>>> feature/v3-processo-seletivo

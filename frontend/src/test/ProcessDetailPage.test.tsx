@@ -2,11 +2,7 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-<<<<<<< HEAD
-import { applyToProcess, getProcess } from '../api/processes'
-=======
 import { applyToProcess, getProcess, withdrawFromProcess } from '../api/processes'
->>>>>>> feature/v3-processo-seletivo
 import { ProcessDetailPage } from '../pages/ProcessDetailPage'
 import type { ProcessDetail } from '../types/process'
 import { httpError } from './http'
@@ -16,10 +12,7 @@ vi.mock('../api/processes', () => ({
   getProcesses: vi.fn(),
   getProcess: vi.fn(),
   applyToProcess: vi.fn(),
-<<<<<<< HEAD
-=======
   withdrawFromProcess: vi.fn(),
->>>>>>> feature/v3-processo-seletivo
 }))
 
 const process: ProcessDetail = {
@@ -123,8 +116,6 @@ describe('ProcessDetailPage', () => {
     expect(getProcess).toHaveBeenCalledTimes(1)
   })
 })
-<<<<<<< HEAD
-=======
 
 describe('cancelar a inscrição', () => {
   const inscrito = { ...process, already_applied: true }
@@ -204,4 +195,3 @@ describe('cancelar a inscrição', () => {
     ).toBeInTheDocument()
   })
 })
->>>>>>> feature/v3-processo-seletivo

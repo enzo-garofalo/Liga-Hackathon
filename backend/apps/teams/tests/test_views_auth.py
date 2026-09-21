@@ -158,8 +158,6 @@ def test_organizer_who_is_also_a_candidate_gets_in(api_client, django_user_model
         TOKEN_URL, {'email': 'ana@x.com', 'password': 'strongpass123'}, format='json'
     )
     assert r.status_code == 200
-<<<<<<< HEAD
-=======
 
 
 # ── Teto da bio ───────────────────────────────────────────────────
@@ -213,4 +211,3 @@ def test_the_limit_is_the_number_the_screens_promise():
     aplica.
     """
     assert BIO_MAX_LENGTH == 1500
->>>>>>> feature/v3-processo-seletivo

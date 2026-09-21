@@ -76,10 +76,6 @@ def process_stats(process):
         .annotate(total=Count('id'))
     )
     counts = {row['status']: row['total'] for row in rows}
-<<<<<<< HEAD
-    return {
-        'total': sum(counts.values()),
-=======
     desistiram = counts.get(ApplicationStatus.WITHDRAWN, 0)
     return {
         # Fora do total de propósito: quem cancelou a própria inscrição não é
@@ -87,15 +83,11 @@ def process_stats(process):
         # dia. Descartado continua contando: essa pessoa se inscreveu, quem
         # tirou foi a organização.
         'total': sum(counts.values()) - desistiram,
->>>>>>> feature/v3-processo-seletivo
         'in_progress': counts.get(ApplicationStatus.IN_PROGRESS, 0),
         'approved': counts.get(ApplicationStatus.APPROVED, 0),
         'rejected': counts.get(ApplicationStatus.REJECTED, 0),
         'discarded': counts.get(ApplicationStatus.DISCARDED, 0),
-<<<<<<< HEAD
-=======
         'withdrawn': desistiram,
->>>>>>> feature/v3-processo-seletivo
     }
 
 
@@ -105,8 +97,6 @@ def next_stage_order(process):
 
 
 def assert_stage_deletable(stage):
-<<<<<<< HEAD
-=======
     """Excluir etapa é coisa de rascunho.
 
     Publicado, o desenho do processo já foi mostrado a gente de fora: o
@@ -120,7 +110,6 @@ def assert_stage_deletable(stage):
             'Este processo já foi publicado. As etapas podem ser editadas, '
             'mas não excluídas.'
         )
->>>>>>> feature/v3-processo-seletivo
     if stage.current_applications.exists():
         raise ValidationError(
             'Há candidatos nesta etapa. Mova-os antes de excluí-la.'

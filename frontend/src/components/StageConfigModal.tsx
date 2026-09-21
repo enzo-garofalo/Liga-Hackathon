@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-import { Plus, Trash2 } from 'lucide-react'
-import { useState } from 'react'
-import type { EvaluationCriterion, Stage, StagePayload } from '../types/stage'
-=======
 import { Download, FileText, Paperclip, Plus, Trash2, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
@@ -12,7 +7,6 @@ import {
 } from '../api/stages'
 import type { EvaluationCriterion, Stage, StagePayload } from '../types/stage'
 import { saveBlob } from '../utils/download'
->>>>>>> feature/v3-processo-seletivo
 import { getApiError } from '../utils/errors'
 import { Button } from './ui/Button'
 import { Input } from './ui/Input'
@@ -32,8 +26,6 @@ function toIso(value: string) {
   return value ? new Date(value).toISOString() : null
 }
 
-<<<<<<< HEAD
-=======
 /**
  * Enunciado em PDF da etapa, no lugar do texto.
  *
@@ -192,21 +184,12 @@ function InstructionsFileField({
 }
 
 
->>>>>>> feature/v3-processo-seletivo
 interface Props {
   stage?: Stage
   onClose: () => void
   onSave: (payload: StagePayload) => void
   saving: boolean
   error: unknown
-<<<<<<< HEAD
-}
-
-export function StageConfigModal({ stage, onClose, onSave, saving, error }: Props) {
-  const [name, setName] = useState(stage?.name ?? '')
-  const [description, setDescription] = useState(stage?.description ?? '')
-  const [instructions, setInstructions] = useState(stage?.instructions ?? '')
-=======
   /** Chamado quando o PDF muda, para a lista de etapas recarregar. */
   onFileChange?: () => void
 }
@@ -226,16 +209,12 @@ export function StageConfigModal({
   const [formato, setFormato] = useState<'texto' | 'pdf'>(
     stage?.instructions_file_name ? 'pdf' : 'texto',
   )
->>>>>>> feature/v3-processo-seletivo
   const [startAt, setStartAt] = useState(toLocalInput(stage?.start_at ?? null))
   const [endAt, setEndAt] = useState(toLocalInput(stage?.end_at ?? null))
   const [weight, setWeight] = useState(String(stage?.weight ?? 0))
   const [acceptsLate, setAcceptsLate] = useState(stage?.accepts_late_submission ?? false)
   const [allowsUpload, setAllowsUpload] = useState(stage?.allows_file_upload ?? false)
-<<<<<<< HEAD
-=======
   const [anonima, setAnonima] = useState(stage?.anonymous_evaluation ?? false)
->>>>>>> feature/v3-processo-seletivo
   const [maxFiles, setMaxFiles] = useState(String(stage?.max_files ?? 1))
   const [fileTypes, setFileTypes] = useState<string[]>(stage?.allowed_file_types ?? ['pdf'])
   const [criteria, setCriteria] = useState<EvaluationCriterion[]>(
@@ -259,10 +238,7 @@ export function StageConfigModal({
       start_at: toIso(startAt),
       end_at: toIso(endAt),
       weight: Number(weight || 0),
-<<<<<<< HEAD
-=======
       anonymous_evaluation: anonima,
->>>>>>> feature/v3-processo-seletivo
       accepts_late_submission: acceptsLate,
       allows_file_upload: allowsUpload,
       max_files: allowsUpload ? Number(maxFiles || 1) : null,
@@ -313,23 +289,6 @@ export function StageConfigModal({
           />
         </div>
 
-<<<<<<< HEAD
-        <div className="flex flex-col gap-1">
-          <label htmlFor="stage-instructions" className="font-ui text-sm font-medium text-ink/80">
-            O que o candidato precisa fazer
-          </label>
-          <textarea
-            id="stage-instructions"
-            rows={6}
-            value={instructions}
-            onChange={(event) => setInstructions(event.target.value)}
-            placeholder="Enunciado, formato da entrega, prazos, regras. O candidato lê isto num botão na linha do tempo."
-            className="w-full rounded-xl border border-ink/20 bg-transparent px-3 py-2.5 font-ui text-sm text-ink placeholder:text-ink/40 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/30"
-          />
-          <p className="font-ui text-xs text-ink/55">
-            Só fica visível para quem já chegou nesta etapa.
-          </p>
-=======
         {/* O enunciado é texto OU arquivo: um substitui o outro na tela do
             candidato, então substitui aqui também. */}
         <div className="flex flex-col gap-2">
@@ -381,7 +340,6 @@ export function StageConfigModal({
               onChange={onFileChange}
             />
           )}
->>>>>>> feature/v3-processo-seletivo
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -409,8 +367,6 @@ export function StageConfigModal({
           Aceitar entrega após a data de término
         </label>
 
-<<<<<<< HEAD
-=======
         <div>
           <label className="flex items-center gap-2 font-ui text-sm text-ink/80">
             <input
@@ -429,7 +385,6 @@ export function StageConfigModal({
           </p>
         </div>
 
->>>>>>> feature/v3-processo-seletivo
         <Input
           label="Peso da etapa na nota final (%)"
           type="number"

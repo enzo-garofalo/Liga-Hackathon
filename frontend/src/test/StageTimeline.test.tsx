@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-import { render, screen, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
-import { StageTimeline } from '../components/StageTimeline'
-import type { TimelineStage } from '../types/application'
-=======
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -18,7 +11,6 @@ vi.mock('../api/stages', () => ({
   downloadStageInstructionsFile: vi.fn(),
 }))
 vi.mock('../utils/download', () => ({ saveBlob: vi.fn() }))
->>>>>>> feature/v3-processo-seletivo
 
 function stage(overrides: Partial<TimelineStage>): TimelineStage {
   return {
@@ -26,10 +18,7 @@ function stage(overrides: Partial<TimelineStage>): TimelineStage {
     name: 'Etapa',
     description: '',
     instructions: '',
-<<<<<<< HEAD
-=======
     instructions_file: null,
->>>>>>> feature/v3-processo-seletivo
     order: 1,
     start_at: null,
     end_at: null,
@@ -128,8 +117,6 @@ describe('instruções da etapa', () => {
     ).not.toBeInTheDocument()
   })
 })
-<<<<<<< HEAD
-=======
 
 // ── Enunciado em PDF ──────────────────────────────────────────────
 //
@@ -205,4 +192,3 @@ describe('StageTimeline com enunciado em PDF', () => {
     ).toBeInTheDocument()
   })
 })
->>>>>>> feature/v3-processo-seletivo

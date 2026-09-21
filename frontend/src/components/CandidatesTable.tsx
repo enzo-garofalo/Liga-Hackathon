@@ -7,10 +7,7 @@ const statusLabel: Record<ApplicationStatus, string> = {
   approved: 'Aprovado',
   rejected: 'Reprovado',
   discarded: 'Descartado',
-<<<<<<< HEAD
-=======
   withdrawn: 'Desistiu',
->>>>>>> feature/v3-processo-seletivo
 }
 
 const statusClass: Record<ApplicationStatus, string> = {
@@ -18,12 +15,9 @@ const statusClass: Record<ApplicationStatus, string> = {
   approved: 'bg-brand-green/10 text-brand-green',
   rejected: 'bg-red-500/10 text-red-600',
   discarded: 'bg-ink/[0.06] text-ink/60',
-<<<<<<< HEAD
-=======
   // Âmbar, e não o cinza do descarte: quem saiu foi o candidato, e o
   // organizador precisa ver a diferença na lista sem abrir o perfil.
   withdrawn: 'bg-amber-500/10 text-amber-700',
->>>>>>> feature/v3-processo-seletivo
 }
 
 function formatUpdated(iso: string) {
@@ -42,13 +36,6 @@ function formatUpdated(iso: string) {
 interface Props {
   rows: ApplicationRow[]
   selected: string[]
-<<<<<<< HEAD
-  onToggle: (id: string) => void
-  onToggleAll: () => void
-  onOpenProfile: (row: ApplicationRow) => void
-  onOpenEvaluation: (row: ApplicationRow) => void
-  loading?: boolean
-=======
   /** Ausente para quem não decide nada em massa: a coluna some junto. */
   onToggle?: (id: string) => void
   onToggleAll?: () => void
@@ -61,7 +48,6 @@ interface Props {
    */
   emptyTitle?: string
   emptyHint?: string
->>>>>>> feature/v3-processo-seletivo
 }
 
 export function CandidatesTable({
@@ -72,16 +58,12 @@ export function CandidatesTable({
   onOpenProfile,
   onOpenEvaluation,
   loading = false,
-<<<<<<< HEAD
-}: Props) {
-=======
   emptyTitle,
   emptyHint,
 }: Props) {
   // Caixa de seleção sem ação em massa é um controle que não leva a lugar
   // nenhum: o avaliador marcaria candidatos e não teria o que fazer com eles.
   const selecionavel = Boolean(onToggle && onToggleAll)
->>>>>>> feature/v3-processo-seletivo
   const allSelected = rows.length > 0 && selected.length === rows.length
 
   if (loading) {
@@ -92,17 +74,10 @@ export function CandidatesTable({
     return (
       <div className="dark-card rounded-[21px] p-8 text-center">
         <p className="font-display text-base font-semibold text-ink">
-<<<<<<< HEAD
-          Nenhum candidato neste filtro
-        </p>
-        <p className="mt-1 text-sm text-ink/68">
-          Ajuste a busca ou os filtros para ver outros candidatos.
-=======
           {emptyTitle ?? 'Nenhum candidato neste filtro'}
         </p>
         <p className="mt-1 text-sm text-ink/68">
           {emptyHint ?? 'Ajuste a busca ou os filtros para ver outros candidatos.'}
->>>>>>> feature/v3-processo-seletivo
         </p>
       </div>
     )
@@ -113,17 +88,6 @@ export function CandidatesTable({
       <table className="w-full min-w-[46rem] text-left">
         <thead>
           <tr className="border-b border-ink/10 text-xs uppercase tracking-wide text-ink/55">
-<<<<<<< HEAD
-            <th className="w-10 px-4 py-3">
-              <input
-                type="checkbox"
-                checked={allSelected}
-                onChange={onToggleAll}
-                className="accent-brand"
-                aria-label="Selecionar todos"
-              />
-            </th>
-=======
             {selecionavel && (
               <th className="w-10 px-4 py-3">
                 <input
@@ -135,7 +99,6 @@ export function CandidatesTable({
                 />
               </th>
             )}
->>>>>>> feature/v3-processo-seletivo
             <th className="px-3 py-3 font-medium">Nome</th>
             <th className="px-3 py-3 font-medium">Curso</th>
             <th className="px-3 py-3 font-medium">Etapa</th>
@@ -148,19 +111,6 @@ export function CandidatesTable({
         <tbody className="divide-y divide-ink/[0.08]">
           {rows.map((row) => (
             <tr key={row.id} className="text-sm transition-colors hover:bg-brand/[0.03]">
-<<<<<<< HEAD
-              <td className="px-4 py-3">
-                <input
-                  type="checkbox"
-                  checked={selected.includes(row.id)}
-                  onChange={() => onToggle(row.id)}
-                  className="accent-brand"
-                  aria-label={`Selecionar ${row.participant_name}`}
-                />
-              </td>
-              <td className="px-3 py-3 font-medium text-ink">{row.participant_name}</td>
-              <td className="px-3 py-3 text-ink/70">{row.course}</td>
-=======
               {selecionavel && (
                 <td className="px-4 py-3">
                   <input
@@ -174,7 +124,6 @@ export function CandidatesTable({
               )}
               <td className="px-3 py-3 font-medium text-ink">{row.participant_name}</td>
               <td className="px-3 py-3 text-ink/70">{row.course ?? '—'}</td>
->>>>>>> feature/v3-processo-seletivo
               <td className="px-3 py-3 text-ink/70">{row.current_stage_name ?? '—'}</td>
               <td className="px-3 py-3">
                 {row.final_score === null ? (

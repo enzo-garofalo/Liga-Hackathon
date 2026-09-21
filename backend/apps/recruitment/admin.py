@@ -8,10 +8,7 @@ from .models import (
     EvaluationCriterion,
     OrganizerProfile,
     Process,
-<<<<<<< HEAD
-=======
     ProcessOrganizer,
->>>>>>> feature/v3-processo-seletivo
     Stage,
     StageAssignment,
 )
@@ -108,8 +105,6 @@ class OrganizerProfileAdmin(admin.ModelAdmin):
     readonly_fields = ['id', 'created_at', 'updated_at']
 
 
-<<<<<<< HEAD
-=======
 @admin.register(ProcessOrganizer)
 class ProcessOrganizerAdmin(admin.ModelAdmin):
     # Quem foi chamado para cada processo. Coordenador não entra por aqui:
@@ -120,7 +115,6 @@ class ProcessOrganizerAdmin(admin.ModelAdmin):
     readonly_fields = ['id', 'created_at']
 
 
->>>>>>> feature/v3-processo-seletivo
 @admin.register(StageAssignment)
 class StageAssignmentAdmin(admin.ModelAdmin):
     list_display = ['stage', 'application', 'evaluator', 'created_at']

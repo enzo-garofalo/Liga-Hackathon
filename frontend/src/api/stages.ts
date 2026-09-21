@@ -19,8 +19,6 @@ export const reorderStages = (processId: string, order: string[]) =>
   client
     .patch<Stage[]>(`/admin/processes/${processId}/stages/reorder/`, { order })
     .then((r) => r.data)
-<<<<<<< HEAD
-=======
 
 /**
  * O enunciado em PDF anda por fora do payload da etapa: é multipart, e o resto
@@ -45,4 +43,3 @@ export const downloadStageInstructionsFile = (stageId: string) =>
       responseType: 'blob',
     })
     .then((r) => r.data)
->>>>>>> feature/v3-processo-seletivo

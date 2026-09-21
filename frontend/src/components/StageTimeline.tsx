@@ -1,15 +1,9 @@
-<<<<<<< HEAD
-import { BookOpen, Check, Circle, Loader2 } from 'lucide-react'
-import { useState } from 'react'
-import type { TimelineStage } from '../types/application'
-=======
 import { BookOpen, Check, Circle, Download, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { downloadStageInstructionsFile } from '../api/stages'
 import type { TimelineStage } from '../types/application'
 import { saveBlob } from '../utils/download'
 import { getApiError } from '../utils/errors'
->>>>>>> feature/v3-processo-seletivo
 import { Modal } from './ui/Modal'
 
 function formatDate(iso: string | null) {
@@ -42,8 +36,6 @@ function StageIcon({ state }: { state: TimelineStage['state'] }) {
   )
 }
 
-<<<<<<< HEAD
-=======
 /**
  * Enunciado em PDF da etapa.
  *
@@ -92,7 +84,6 @@ function BotaoEnunciadoPdf({ stage }: { stage: TimelineStage }) {
   )
 }
 
->>>>>>> feature/v3-processo-seletivo
 interface StageTimelineProps {
   stages: TimelineStage[]
   /**
@@ -132,49 +123,6 @@ export function StageTimeline({ stages, renderStageExtra }: StageTimelineProps) 
             </div>
 
             <div className={`flex-1 ${isLast ? 'pb-0' : 'pb-6'}`}>
-<<<<<<< HEAD
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h3
-                  className={`font-display text-base font-semibold ${
-                    stage.state === 'upcoming' ? 'text-ink/45' : 'text-ink'
-                  }`}
-                >
-                  {stage.name}
-                </h3>
-                {stage.state === 'current' && (
-                  <span className="rounded-full border border-brand/25 bg-brand/15 px-2 py-0.5 text-xs font-medium text-brand">
-                    Etapa atual
-                  </span>
-                )}
-                {(start || end) && (
-                  <span className="text-xs text-ink/60">
-                    {start && end ? `${start} – ${end}` : start || end}
-                  </span>
-                )}
-              </div>
-
-              {stage.description && (
-                <p
-                  className={`mt-1 text-sm leading-relaxed ${
-                    stage.state === 'upcoming' ? 'text-ink/40' : 'text-ink/70'
-                  }`}
-                >
-                  {stage.description}
-                </p>
-              )}
-
-              {stage.instructions && (
-                <button
-                  type="button"
-                  onClick={() => setLendo(stage)}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-brand/25 bg-brand/[0.06] px-3 py-1 font-ui text-xs font-medium text-brand transition-colors hover:bg-brand/10"
-                >
-                  <BookOpen className="h-3.5 w-3.5" />
-                  O que preciso fazer
-                </button>
-              )}
-
-=======
               {/* Texto à esquerda, ação à direita: o botão ficava embaixo da
                   descrição e passava despercebido. */}
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -228,7 +176,6 @@ export function StageTimeline({ stages, renderStageExtra }: StageTimelineProps) 
                 )}
               </div>
 
->>>>>>> feature/v3-processo-seletivo
               {renderStageExtra?.(stage)}
             </div>
           </li>

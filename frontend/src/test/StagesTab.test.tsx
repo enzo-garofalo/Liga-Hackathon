@@ -1,12 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-<<<<<<< HEAD
-import { createStage, deleteStage, listStages, updateStage } from '../api/stages'
-import { StagesTab } from '../components/StagesTab'
-import { listApplications } from '../api/adminApplications'
-import { makeRow, makeStage } from './fixtures'
-=======
 import {
   createStage,
   deleteStage,
@@ -20,7 +14,6 @@ import { StagesTab } from '../components/StagesTab'
 import { listApplications } from '../api/adminApplications'
 import { makeRow, makeStage } from './fixtures'
 import { saveBlob } from '../utils/download'
->>>>>>> feature/v3-processo-seletivo
 import { httpError } from './http'
 import { renderWithProviders } from './render'
 
@@ -30,15 +23,11 @@ vi.mock('../api/stages', () => ({
   updateStage: vi.fn(),
   deleteStage: vi.fn(),
   reorderStages: vi.fn(),
-<<<<<<< HEAD
-}))
-=======
   uploadStageInstructionsFile: vi.fn(),
   deleteStageInstructionsFile: vi.fn(),
   downloadStageInstructionsFile: vi.fn(),
 }))
 vi.mock('../utils/download', () => ({ saveBlob: vi.fn() }))
->>>>>>> feature/v3-processo-seletivo
 vi.mock('../api/adminApplications', () => ({
   listApplications: vi.fn(),
   getApplication: vi.fn(),
@@ -62,11 +51,7 @@ describe('StagesTab', () => {
   })
 
   it('mostra a etapa com participantes, peso e critérios', async () => {
-<<<<<<< HEAD
-    renderWithProviders(<StagesTab processId="proc-1" />)
-=======
     renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
->>>>>>> feature/v3-processo-seletivo
     expect(await screen.findByText('Resolução do Case')).toBeInTheDocument()
     expect(screen.getByText('3 candidatos')).toBeInTheDocument()
     expect(screen.getByText('35%')).toBeInTheDocument()
@@ -76,22 +61,14 @@ describe('StagesTab', () => {
 
   it('avisa quando não há etapa, porque publicar exige uma', async () => {
     vi.mocked(listStages).mockResolvedValue([])
-<<<<<<< HEAD
-    renderWithProviders(<StagesTab processId="proc-1" />)
-=======
     renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
->>>>>>> feature/v3-processo-seletivo
 
     expect(await screen.findByText('Nenhuma etapa configurada')).toBeInTheDocument()
     expect(screen.getByText(/só pode ser publicado com ao menos uma etapa/)).toBeInTheDocument()
   })
 
   it('cria etapa com critérios e pesos', async () => {
-<<<<<<< HEAD
-    renderWithProviders(<StagesTab processId="proc-1" />)
-=======
     renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Resolução do Case')
 
     await userEvent.click(screen.getByRole('button', { name: /nova etapa/i }))
@@ -112,11 +89,7 @@ describe('StagesTab', () => {
   })
 
   it('avisa quando os pesos não somam 100', async () => {
-<<<<<<< HEAD
-    renderWithProviders(<StagesTab processId="proc-1" />)
-=======
     renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Resolução do Case')
     await userEvent.click(screen.getByRole('button', { name: /editar/i }))
 
@@ -132,11 +105,7 @@ describe('StagesTab', () => {
     vi.mocked(listStages).mockResolvedValue([
       makeStage({ allows_file_upload: false, allowed_file_types: [] }),
     ])
-<<<<<<< HEAD
-    renderWithProviders(<StagesTab processId="proc-1" />)
-=======
     renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Resolução do Case')
     await userEvent.click(screen.getByRole('button', { name: /editar/i }))
 
@@ -149,11 +118,7 @@ describe('StagesTab', () => {
     vi.mocked(deleteStage).mockRejectedValue(
       httpError(400, ['Há candidatos nesta etapa. Mova-os antes de excluí-la.']),
     )
-<<<<<<< HEAD
-    renderWithProviders(<StagesTab processId="proc-1" />)
-=======
     renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Resolução do Case')
 
     await userEvent.click(screen.getByLabelText('Excluir Resolução do Case'))
@@ -188,21 +153,13 @@ describe('StagesTab — quem está em cada etapa', () => {
       'e você recebe um aviso por e-mail assim que isso acontecer.'
     vi.mocked(listStages).mockResolvedValue([makeStage({ description: longa })])
 
-<<<<<<< HEAD
-    renderWithProviders(<StagesTab processId="proc-1" />)
-=======
     renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
->>>>>>> feature/v3-processo-seletivo
     expect(await screen.findByText(longa)).toBeInTheDocument()
   })
 
   it('o card mostra a contagem; os nomes ficam atrás do botão', async () => {
     // Nome solto no card esticava a etapa e desalinhava a grade com muita gente.
-<<<<<<< HEAD
-    renderWithProviders(<StagesTab processId="proc-1" />)
-=======
     renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
->>>>>>> feature/v3-processo-seletivo
 
     const caseCard = (await screen.findByText('Resolução do Case')).closest(
       'div.dark-card',
@@ -219,11 +176,7 @@ describe('StagesTab — quem está em cada etapa', () => {
   })
 
   it('a lista de cada etapa traz só quem está nela', async () => {
-<<<<<<< HEAD
-    renderWithProviders(<StagesTab processId="proc-1" />)
-=======
     renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
->>>>>>> feature/v3-processo-seletivo
     const interviewCard = (await screen.findByText('Entrevista')).closest(
       'div.dark-card',
     ) as HTMLElement
@@ -250,11 +203,7 @@ describe('StagesTab — quem está em cada etapa', () => {
       results: muitos,
     })
 
-<<<<<<< HEAD
-    renderWithProviders(<StagesTab processId="proc-1" />)
-=======
     renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
->>>>>>> feature/v3-processo-seletivo
 
     const caseCard = (await screen.findByText('Resolução do Case')).closest(
       'div.dark-card',
@@ -270,11 +219,7 @@ describe('StagesTab — quem está em cada etapa', () => {
   })
 
   it('pede a lista inteira, não só a primeira página', async () => {
-<<<<<<< HEAD
-    renderWithProviders(<StagesTab processId="proc-1" />)
-=======
     renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findAllByRole('button', { name: /ver lista/i })
 
     expect(listApplications).toHaveBeenCalledWith(
@@ -290,11 +235,7 @@ describe('StagesTab — quem está em cada etapa', () => {
       previous: null,
       results: [],
     })
-<<<<<<< HEAD
-    renderWithProviders(<StagesTab processId="proc-1" />)
-=======
     renderWithProviders(<StagesTab processId="proc-1" processStatus="draft" />)
->>>>>>> feature/v3-processo-seletivo
 
     const caseCard = (await screen.findByText('Resolução do Case')).closest(
       'div.dark-card',
@@ -305,8 +246,6 @@ describe('StagesTab — quem está em cada etapa', () => {
     ).not.toBeInTheDocument()
   })
 })
-<<<<<<< HEAD
-=======
 
 // ── Enunciado em PDF da etapa ─────────────────────────────────────
 //
@@ -533,4 +472,3 @@ describe('StagesTab: processo publicado', () => {
     expect(screen.queryByText(/editadas, mas não excluídas/i)).not.toBeInTheDocument()
   })
 })
->>>>>>> feature/v3-processo-seletivo

@@ -3,11 +3,6 @@
 O layout vem de core/email_layout.py, o mesmo usado pelo hackathon.
 """
 
-<<<<<<< HEAD
-from django.utils import timezone
-
-from core.email_layout import badge, base_html, em, footnote, info_rows, p, send
-=======
 from django.conf import settings
 from django.utils import timezone
 
@@ -21,7 +16,6 @@ from core.email_layout import (
     p,
     send,
 )
->>>>>>> feature/v3-processo-seletivo
 
 _FOOTER = (
     'Liga de TI &mdash; Processo Seletivo &nbsp;&bull;&nbsp; '
@@ -213,8 +207,6 @@ def send_custom_communication(participant, communication):
         footer_text=_FOOTER,
     )
     send(subject, text, html, [participant.user.email])
-<<<<<<< HEAD
-=======
 
 
 def _nome_curto(user):
@@ -296,4 +288,3 @@ def send_organizer_invite(user, process, url=''):
         footer_text=_FOOTER,
     )
     send(subject, text, html, [user.email])
->>>>>>> feature/v3-processo-seletivo

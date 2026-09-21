@@ -21,10 +21,7 @@ const STATUSES: { value: ApplicationStatus | ''; label: string }[] = [
   { value: 'approved', label: 'Aprovados' },
   { value: 'rejected', label: 'Reprovados' },
   { value: 'discarded', label: 'Descartados' },
-<<<<<<< HEAD
-=======
   { value: 'withdrawn', label: 'Desistiram' },
->>>>>>> feature/v3-processo-seletivo
 ]
 
 const ORDERINGS = [
@@ -34,9 +31,6 @@ const ORDERINGS = [
   { value: '-updated_at', label: 'Atualização recente' },
 ]
 
-<<<<<<< HEAD
-export function CandidatesTab({ process }: { process: AdminProcessDetail }) {
-=======
 interface CandidatesTabProps {
   process: AdminProcessDetail
   /**
@@ -48,7 +42,6 @@ interface CandidatesTabProps {
 }
 
 export function CandidatesTab({ process, canDecide }: CandidatesTabProps) {
->>>>>>> feature/v3-processo-seletivo
   const [search, setSearch] = useState('')
   const [debounced, setDebounced] = useState('')
   const [stage, setStage] = useState('')
@@ -83,10 +76,6 @@ export function CandidatesTab({ process, canDecide }: CandidatesTabProps) {
   const communications = useCommunications(process.id)
 
   const rows = query.data?.results ?? []
-<<<<<<< HEAD
-  const lastStage = process.stages[process.stages.length - 1]
-  const courses = Array.from(new Set(rows.map((row) => row.course))).sort()
-=======
   // Fila vazia tem dois motivos bem diferentes: filtro que não achou nada, e
   // coordenação que ainda não distribuiu. Só o segundo precisa de explicação.
   const filtrando = Boolean(debounced || stage || status || course)
@@ -97,7 +86,6 @@ export function CandidatesTab({ process, canDecide }: CandidatesTabProps) {
   const courses = Array.from(
     new Set(rows.map((row) => row.course).filter((item): item is string => Boolean(item))),
   ).sort()
->>>>>>> feature/v3-processo-seletivo
 
   // Aprovar só vale para quem está na última etapa — o backend recusa o resto.
   const selectedRows = rows.filter((row) => selected.includes(row.id))
@@ -256,11 +244,7 @@ export function CandidatesTab({ process, canDecide }: CandidatesTabProps) {
       )}
 
       {/* Ações em massa */}
-<<<<<<< HEAD
-      {selected.length > 0 && (
-=======
       {canDecide && selected.length > 0 && (
->>>>>>> feature/v3-processo-seletivo
         <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-brand/25 bg-brand/[0.06] px-4 py-3">
           <span className="font-ui text-sm font-medium text-ink">
             {selected.length} candidato{selected.length === 1 ? '' : 's'} selecionado
@@ -324,14 +308,6 @@ export function CandidatesTab({ process, canDecide }: CandidatesTabProps) {
 
       <CandidatesTable
         rows={rows}
-<<<<<<< HEAD
-        selected={selected}
-        onToggle={toggle}
-        onToggleAll={toggleAll}
-        onOpenProfile={(row) => setProfileRow(row)}
-        onOpenEvaluation={(row) => setEvaluationRow(row)}
-        loading={query.isLoading}
-=======
         selected={canDecide ? selected : []}
         onToggle={canDecide ? toggle : undefined}
         onToggleAll={canDecide ? toggleAll : undefined}
@@ -346,7 +322,6 @@ export function CandidatesTab({ process, canDecide }: CandidatesTabProps) {
             ? 'A coordenação ainda não passou correções suas neste processo. Assim que passar, os candidatos aparecem aqui.'
             : undefined
         }
->>>>>>> feature/v3-processo-seletivo
       />
 
       {query.data && query.data.count > rows.length && (
@@ -362,13 +337,8 @@ export function CandidatesTab({ process, canDecide }: CandidatesTabProps) {
           scaleMax={process.score_max}
           nextStageName={nextStageOf(profileRow)?.name ?? null}
           deciding={bulk.isPending}
-<<<<<<< HEAD
-          onApprove={() => askDecision('approve', [profileRow])}
-          onReject={() => askDecision('reject', [profileRow])}
-=======
           onApprove={canDecide ? () => askDecision('approve', [profileRow]) : undefined}
           onReject={canDecide ? () => askDecision('reject', [profileRow]) : undefined}
->>>>>>> feature/v3-processo-seletivo
           onClose={() => setProfileRow(null)}
         />
       )}

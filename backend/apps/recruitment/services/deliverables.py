@@ -88,17 +88,6 @@ def delete(deliverable):
 
 
 def can_download(deliverable, user):
-<<<<<<< HEAD
-    """Dono do arquivo ou organizador.
-
-    Os arquivos não ficam em URL pública: são material de candidatura e o
-    caminho seria adivinhável. Todo acesso passa por esta checagem.
-    """
-    if user.is_staff:
-        return True
-    participant = getattr(user, 'participant', None)
-    return bool(participant and deliverable.application.participant_id == participant.id)
-=======
     """Dono do arquivo, coordenador, ou avaliador que pegou esta candidatura.
 
     Os arquivos não ficam em URL pública: são material de candidatura e o
@@ -133,4 +122,3 @@ def display_name(deliverable, hidden):
         return nome
     extensao = os.path.splitext(nome)[1]
     return (deliverable.application.code or 'Candidato') + extensao
->>>>>>> feature/v3-processo-seletivo

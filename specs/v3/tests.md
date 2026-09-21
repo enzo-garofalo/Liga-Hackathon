@@ -161,24 +161,11 @@ test_negative_score_is_rejected
 ```
 
 ### tests/test_anonymous_evaluation.py
-<<<<<<< HEAD
-=======
 O anonimato é marca da **etapa** (decisions.md §29).
->>>>>>> feature/v3-processo-seletivo
 ```python
 test_evaluator_sees_code_instead_of_name
 test_coordinator_sees_identity
 test_candidate_list_is_anonymous_for_evaluator
-<<<<<<< HEAD
-test_identity_is_visible_when_anonymity_is_off
-test_application_gets_sequential_code_on_apply
-test_superuser_sees_identity
-```
-
-### tests/test_assignments.py
-```python
-test_evaluator_grades_without_assignment
-=======
 test_identity_is_visible_when_the_stage_is_not_anonymous
 test_identity_appears_once_the_candidate_leaves_the_anonymous_stage
 test_application_gets_sequential_code_on_apply
@@ -273,7 +260,6 @@ A designação voltou a ser trava para quem não coordena.
 ```python
 test_evaluator_cannot_grade_without_assignment
 test_the_service_refuses_an_undistributed_correction
->>>>>>> feature/v3-processo-seletivo
 test_coordinator_grades_without_assignment
 test_auto_distribute_gives_two_evaluators_per_candidate
 test_auto_distribute_balances_workload
@@ -476,8 +462,6 @@ código para confirmar que algum teste acusa:
 | pílulas afirmando "Sem inscrição" durante erro | "erro da API mostra aviso" |
 | enviar assim que o arquivo é escolhido | "escolher o arquivo não envia nada", "o × troca o arquivo" |
 | tratar qualquer erro como "não encontrado" | "erro de servidor NÃO diz não encontrado" |
-<<<<<<< HEAD
-=======
 | pedido de senha revelando quais e-mails têm conta | backend: `test_pedido_de_email_desconhecido_responde_igual_e_nao_envia` |
 | endpoint aberto de senha sem teto de pedidos | backend: `test_pedido_em_excesso_e_barrado` |
 | senha nova sem as regras do Django | backend: `test_senha_fraca_e_recusada_e_a_antiga_continua` |
@@ -500,7 +484,6 @@ código para confirmar que algum teste acusa:
 | `can_withdraw` prometendo o que o endpoint recusa | backend: `test_can_withdraw_matches_what_the_endpoint_does` |
 | alerta de "não se inscreveu" escondido por candidatura cancelada | "quem cancelou a inscrição volta a ver o aviso" |
 | caminho de volta fixo em `/login` nas telas de senha | "quem veio como organizador volta para a entrada dele", "na tela de trocar a senha, o organizador volta pela porta que veio no link" |
->>>>>>> feature/v3-processo-seletivo
 | aprovar liberado em qualquer etapa | "aprovar fica desabilitado fora da última etapa" |
 | religar `SHOW_HACKATHON` no painel do organizador | "hackathon desativado: sem abas de equipe" |
 | comunicado dirigido perdendo os destinatários | "Enviar comunicado endereça os selecionados" |
@@ -636,8 +619,6 @@ pede a lista inteira, não só a primeira página
 etapa vazia não lista ninguém
 ```
 
-<<<<<<< HEAD
-=======
 ### Implementados (cargos do organizador)
 ```
 // OrganizersTab.test.tsx
@@ -682,7 +663,6 @@ distribuição), então as buscas são escopadas pela lista, que tem
 `aria-label="Organizadores deste processo"`. Uma busca solta acharia as duas e o teste
 quebraria por ambiguidade, não por regra errada.
 
->>>>>>> feature/v3-processo-seletivo
 Fixtures compartilhadas em `src/test/fixtures.ts`.
 
 ## Regressão do hackathon

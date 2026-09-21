@@ -37,15 +37,6 @@ def stage_with_candidates(process):
     return stage, applications
 
 
-<<<<<<< HEAD
-def test_evaluator_grades_without_assignment(
-    evaluator_client, process, stage_with_candidates
-):
-    """Designação distribui trabalho, não é permissão.
-
-    A trava anterior deixava todo avaliador que não fosse coordenador sem
-    conseguir salvar nota nenhuma, porque nunca houve tela para designar.
-=======
 def test_evaluator_cannot_grade_without_assignment(
     evaluator_client, process, stage_with_candidates
 ):
@@ -55,7 +46,6 @@ def test_evaluator_cannot_grade_without_assignment(
     interface, e o avaliador ficava sem conseguir salvar nota nenhuma. Com a
     aba de distribuição, a garantia de dois pareceres independentes volta a
     valer (decisions.md §29).
->>>>>>> feature/v3-processo-seletivo
     """
     stage, applications = stage_with_candidates
     criterion = stage.criteria.first()
@@ -68,9 +58,6 @@ def test_evaluator_cannot_grade_without_assignment(
         },
         format='json',
     )
-<<<<<<< HEAD
-    assert r.status_code == 200
-=======
     assert r.status_code == 404
 
 
@@ -96,7 +83,6 @@ def test_the_service_refuses_an_undistributed_correction(
             evaluator_user,
             [{'criterion': str(criterion.id), 'score': 4}],
         )
->>>>>>> feature/v3-processo-seletivo
 
 
 def test_coordinator_grades_without_assignment(

@@ -22,10 +22,7 @@ function stage(overrides: Partial<TimelineStage>): TimelineStage {
     name: 'Etapa',
     description: '',
     instructions: '',
-<<<<<<< HEAD
-=======
     instructions_file: null,
->>>>>>> feature/v3-processo-seletivo
     order: 1,
     start_at: null,
     end_at: null,
@@ -48,10 +45,7 @@ const application: ApplicationDetail = {
   stage_count: 2,
   submitted_at: '2026-09-02T12:00:00Z',
   updated_at: '2026-09-10T12:00:00Z',
-<<<<<<< HEAD
-=======
   can_withdraw: false,
->>>>>>> feature/v3-processo-seletivo
   highlight_message: '',
   stages: [
     stage({ id: 's1', name: 'Inscrição', order: 1, state: 'done' }),

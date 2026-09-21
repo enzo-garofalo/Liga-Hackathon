@@ -37,11 +37,6 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
 ## Regras de negócio — Processo Seletivo (v3)
 - Candidatura é individual. Não há equipes no seletivo.
 - Um candidato tem no máximo uma candidatura por processo.
-<<<<<<< HEAD
-- Processo segue `draft` → `published` → `closed`. Só `published` aparece ao candidato.
-- Processo só pode ser publicado se tiver pelo menos uma etapa.
-- Processo só pode ser excluído enquanto estiver em `draft`.
-=======
 - **O candidato cancela a própria inscrição enquanto o prazo de inscrição está aberto**, com
   confirmação na tela, e pode se inscrever de novo. Passado o prazo, nem uma coisa nem outra.
   A candidatura não é apagada: vira `withdrawn`, que conta como finalizada, mantém o código
@@ -55,7 +50,6 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
   candidato já leu o desenho do processo para decidir se se inscrevia, e o e-mail de
   confirmação lista as etapas. Editar continua liberado, inclusive publicado: é acertar
   o que foi combinado, não trocar por outro (decisions.md §26).
->>>>>>> feature/v3-processo-seletivo
 - Etapas são ordenadas. Cada etapa tem seus próprios critérios de avaliação.
 - Cada etapa tem barema com peso por critério; a nota da etapa é média ponderada.
 - A nota final é a média ponderada das etapas, pelo peso de cada uma.
@@ -64,17 +58,6 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
   significa ausência de entrega, não faz parte da escala.
 - Vários organizadores avaliam o mesmo candidato; a nota do critério é a média entre eles.
 - Médias são calculadas em service, nunca persistidas em campo.
-<<<<<<< HEAD
-- **Correção não é anônima nesta edição**: todo organizador vê a identidade do candidato
-  (decisions.md §23). O mecanismo de anonimato continua no código e liga pelo campo
-  `Process.anonymous_evaluation`.
-- Qualquer organizador avalia qualquer candidato. `StageAssignment` distribui o trabalho
-  entre corretores, mas **não é permissão**: designação ausente não bloqueia nota
-  (decisions.md §19).
-- Divergência acima do limiar do processo marca `needs_third_review`.
-- Aprovação final só é permitida para candidatos na última etapa.
-- Candidato nunca vê nota nem observação de avaliador.
-=======
 - **Dois cargos de organizador, com poderes diferentes** (decisions.md §29):
   **coordenador** (`OrganizerProfile.is_coordinator`, ou superusuário) monta o processo,
   chama quem ajuda, distribui as correções e decide resultado; **avaliador** entra a convite
@@ -114,7 +97,6 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
   `admin/stages/<id>/instructions-file/`, multipart, fora do payload JSON da etapa.
   Na tela do organizador os dois formatos **se substituem**, não convivem: o campo tem as
   opções Escrever e Anexar PDF. Com PDF, ele baixa, troca e remove ali (decisions.md §25).
->>>>>>> feature/v3-processo-seletivo
 - Entregáveis não ficam em URL pública: download passa por endpoint autenticado, liberado
   ao dono da candidatura e a organizadores. **Continua liberado depois que a etapa passa e
   depois da candidatura encerrar**: o candidato precisa poder reler o que entregou. Trocar
@@ -129,26 +111,17 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
   recado extra. Cada aviso diz o que aconteceu ("Você avançou para a etapa X", "não seguiu
   adiante"), nunca só "Resultado do processo" — e o texto guardado no histórico repete o que
   o candidato recebeu. Descarte é a única ação que não comunica.
-<<<<<<< HEAD
-- Todo organizador (`is_staff=True`) cria processo, move etapa e envia comunicado.
-  `role_title` é informativo. A única distinção de papel é `is_coordinator`: coordenador
-  vê a identidade na correção anônima e administra a distribuição de avaliadores.
-  **Superusuário conta como coordenador** (decisions.md §12).
-=======
 - `role_title` é informativo, não concede permissão. Quem concede é `is_coordinator`.
   **Superusuário conta como coordenador** (decisions.md §12). As checagens de cargo moram
   em `services/roles.py`: `is_coordinator`, `can_open_process`, `visible_processes`,
   `assigned_application_ids`, `can_evaluate` e a permissão `IsCoordinator`. Endpoint novo
   do organizador escolhe entre `IsCoordinator` (escrita) e a leitura de quem participa; a
   varredura em `tests/test_permissions.py` pega rota nova sozinha.
->>>>>>> feature/v3-processo-seletivo
 - O processo seletivo da Liga **já nasce criado** em ambiente novo: `ensure_selection_process`
   roda no `entrypoint.sh` e cria as 4 etapas com o barema de `apps/recruitment/blueprint.py`.
   É idempotente e **não altera processo existente** — roda a cada deploy, e sobrescrever
   desfaria o ajuste do organizador. Nasce em `draft`: publicar é decisão de gente
   (decisions.md §18). Alterar o barema é editar o blueprint, nunca duplicá-lo no seed.
-<<<<<<< HEAD
-=======
 - **Esqueci minha senha vale para as duas portas.** A conta é a mesma `User`: candidato e
   organizador pedem o link em `/forgot-password` e trocam em `/reset-password`. O token é o
   `default_token_generator` do Django, sem tabela nova, e por isso serve **uma vez só**:
@@ -158,7 +131,6 @@ Os arquivos em `specs/v1/` são histórico — não usar como referência (excet
   entrada certa. **A porta acompanha o caminho inteiro**: o link da tela do organizador leva
   `?area=organizador` e o link do e-mail sai com `&area=...`, senão todo "voltar" devolvia o
   organizador no login de candidato, que recusa a conta dele (decisions.md §27).
->>>>>>> feature/v3-processo-seletivo
 - Datas formatadas no backend para leitura humana (mensagens, e-mails) passam por
   `timezone.localtime()`. O banco guarda em UTC; sem converter, um prazo às 23:59 aparece
   como o dia seguinte (decisions.md §13).
@@ -226,14 +198,10 @@ processo seletivo.
 - Modal novo usa `components/ui/Modal.tsx` (decisions.md §16).
 - Todo campo de formulário precisa de rótulo associado (`htmlFor`/`id`). `ui/Input`,
   `ui/PasswordInput` e `ui/Select` já fazem isso sozinhos; `textarea` e `select` escritos à mão
-<<<<<<< HEAD
-  precisam do par manualmente (decisions.md §15).
-=======
   precisam do par manualmente (decisions.md §15). Ao testar isso, **não** usar
   `getByLabelText(/senha/i)`: o botão de revelar tem `aria-label="Revelar senha"` e casa com a
   busca mesmo com o campo solto do rótulo. Foi assim que o `id` faltando no `ui/PasswordInput`
   passou despercebido. Usar `/^senha/i`.
->>>>>>> feature/v3-processo-seletivo
 - Ao escrever teste de "X não aparece", confirmar que sem a regra X apareceria — um teste
   assim já passou despercebido (tests.md, "Verificação por sabotagem").
 - **Opacidade de classe Tailwind só em múltiplo de 5.** `bg-brand/12` não existe na escala

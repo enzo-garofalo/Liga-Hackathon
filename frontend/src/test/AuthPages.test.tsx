@@ -4,10 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { AdminLoginPage } from '../pages/AdminLoginPage'
 import { LoginPage } from '../pages/LoginPage'
 import { RegisterPage } from '../pages/RegisterPage'
-<<<<<<< HEAD
-=======
 import { BIO_MAX } from '../utils/perfil'
->>>>>>> feature/v3-processo-seletivo
 import { renderWithProviders } from './render'
 
 vi.mock('../api/auth', () => ({
@@ -39,20 +36,14 @@ describe('telas de conta', () => {
   it('o formulário de cadastro continua pedindo o perfil do candidato', () => {
     renderWithProviders(<RegisterPage />)
 
-<<<<<<< HEAD
-    for (const campo of [/e-mail/i, /senha/i, /nome completo/i, /curso/i, /semestre/i]) {
-=======
     // `/^senha/i` e nao `/senha/i`: o botao de revelar tem aria-label
     // "Revelar senha" e casaria junto com o campo.
     for (const campo of [/e-mail/i, /^senha/i, /nome completo/i, /curso/i, /semestre/i]) {
->>>>>>> feature/v3-processo-seletivo
       expect(screen.getByLabelText(campo)).toBeInTheDocument()
     }
     expect(screen.getByRole('button', { name: /criar conta/i })).toBeInTheDocument()
   })
 
-<<<<<<< HEAD
-=======
   it('o teto da bio é o mesmo número que o backend recusa', () => {
     // O par deste teste vive em test_views_auth.py, preso no mesmo número.
     // Sem um dos dois lados, mudar o teto aqui deixaria a tela prometendo
@@ -60,7 +51,6 @@ describe('telas de conta', () => {
     expect(BIO_MAX).toBe(1500)
   })
 
->>>>>>> feature/v3-processo-seletivo
   it('a bio tem rótulo associado ao campo', () => {
     // decisions.md §15: textarea escrito à mão precisa do par htmlFor/id na mão.
     renderWithProviders(<RegisterPage />)
@@ -71,16 +61,6 @@ describe('telas de conta', () => {
 
   it('a bio do cadastro tem o mesmo teto do perfil', async () => {
     // Sem o teto, quem se cadastra com bio longa não salva mais o perfil depois:
-<<<<<<< HEAD
-    // a edição recusa acima de 500 e a pessoa fica travada sem entender.
-    renderWithProviders(<RegisterPage />)
-
-    expect(screen.getByText('0/500')).toBeInTheDocument()
-
-    const bio = screen.getByLabelText(/bio/i)
-    await userEvent.type(bio, 'Curiosa por produto.')
-    expect(screen.getByText('20/500')).toBeInTheDocument()
-=======
     // a edição recusa acima do limite e a pessoa fica travada sem entender.
     renderWithProviders(<RegisterPage />)
 
@@ -118,7 +98,6 @@ describe('telas de conta', () => {
     const senha = screen.getByLabelText(/^senha/i)
     expect(senha.tagName).toBe('INPUT')
     expect(senha).toHaveAttribute('type', 'password')
->>>>>>> feature/v3-processo-seletivo
   })
 
   it('a tela do organizador é separada da do candidato', () => {

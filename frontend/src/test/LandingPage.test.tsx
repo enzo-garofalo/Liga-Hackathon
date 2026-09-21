@@ -3,10 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { getOpenProcess } from '../api/openProcess'
 import { LandingPage } from '../pages/LandingPage'
 import { LandingPageHackathon } from '../pages/LandingPageHackathon'
-<<<<<<< HEAD
-=======
 import { WHATSAPP_LINK } from '../links'
->>>>>>> feature/v3-processo-seletivo
 import { renderWithProviders } from './render'
 
 vi.mock('../api/openProcess', () => ({ getOpenProcess: vi.fn() }))
@@ -193,8 +190,6 @@ describe('LandingPageHackathon (preservada atrás da chave)', () => {
     expect(screen.queryByText(/wehandle/i)).not.toBeInTheDocument()
   })
 })
-<<<<<<< HEAD
-=======
 
 // ── Grupo no WhatsApp ─────────────────────────────────────────────
 //
@@ -240,4 +235,3 @@ describe('LandingPage: grupo no WhatsApp', () => {
     expect(link.querySelector('svg')).not.toBeNull()
   })
 })
->>>>>>> feature/v3-processo-seletivo

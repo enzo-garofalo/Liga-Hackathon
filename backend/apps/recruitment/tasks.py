@@ -60,8 +60,6 @@ def send_custom_communication(self, participant_id, communication_id) -> None:
         pk=communication_id
     )
     emails.send_custom_communication(_participant(participant_id), communication)
-<<<<<<< HEAD
-=======
 
 
 @shared_task(**_TASK_OPTS)
@@ -72,4 +70,3 @@ def send_organizer_invite(self, user_id, process_id, url='') -> None:
 
     user = get_user_model().objects.select_related('organizer_profile').get(pk=user_id)
     emails.send_organizer_invite(user, Process.objects.get(pk=process_id), url)
->>>>>>> feature/v3-processo-seletivo

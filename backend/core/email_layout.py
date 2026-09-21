@@ -73,8 +73,6 @@ def info_rows(rows, accent='#7132f5'):
     )
 
 
-<<<<<<< HEAD
-=======
 def button(label, url, color='#7132f5'):
     """Botão de ação. Tabela, e não um <a> com padding: no Outlook o padding do
     link é ignorado e o botão vira texto solto no meio do e-mail.
@@ -94,7 +92,6 @@ def button(label, url, color='#7132f5'):
     )
 
 
->>>>>>> feature/v3-processo-seletivo
 def footnote(text):
     return (
         f'<table cellpadding="0" cellspacing="0" border="0" width="100%">'

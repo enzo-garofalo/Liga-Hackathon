@@ -1,10 +1,7 @@
 """Correção anônima: o avaliador vê o código, não a pessoa."""
 
 import pytest
-<<<<<<< HEAD
-=======
 from django.core.files.uploadedfile import SimpleUploadedFile
->>>>>>> feature/v3-processo-seletivo
 
 from apps.recruitment.models import StageAssignment
 
@@ -20,11 +17,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def scenario(process, evaluator_user):
-<<<<<<< HEAD
-    stage = StageFactory(process=process, order=1)
-=======
     stage = StageFactory(process=process, order=1, anonymous_evaluation=True)
->>>>>>> feature/v3-processo-seletivo
     EvaluationCriterionFactory(stage=stage)
     application = ApplicationFactory(
         process=process,
@@ -69,14 +62,6 @@ def test_candidate_list_is_anonymous_for_evaluator(evaluator_client, process, sc
     assert r.data['results'][0]['participant_email'] is None
 
 
-<<<<<<< HEAD
-def test_identity_is_visible_when_anonymity_is_off(
-    evaluator_client, process, scenario
-):
-    """A Liga pode desligar o anonimato por processo."""
-    process.anonymous_evaluation = False
-    process.save()
-=======
 def test_identity_is_visible_when_the_stage_is_not_anonymous(
     evaluator_client, scenario
 ):
@@ -84,14 +69,11 @@ def test_identity_is_visible_when_the_stage_is_not_anonymous(
     stage = scenario['stage']
     stage.anonymous_evaluation = False
     stage.save(update_fields=['anonymous_evaluation'])
->>>>>>> feature/v3-processo-seletivo
 
     r = evaluator_client.get(detail_url(scenario['application'].id))
     assert r.data['participant_name'] == 'Ana Lima'
 
 
-<<<<<<< HEAD
-=======
 def test_identity_appears_once_the_candidate_leaves_the_anonymous_stage(
     evaluator_client, process, scenario
 ):
@@ -112,7 +94,6 @@ def test_identity_appears_once_the_candidate_leaves_the_anonymous_stage(
     assert r.data['participant_name'] == 'Ana Lima'
 
 
->>>>>>> feature/v3-processo-seletivo
 def test_application_gets_sequential_code_on_apply(candidate_client, process):
     from apps.recruitment.models import Application
 
@@ -149,8 +130,6 @@ def test_superuser_sees_identity(db, scenario):
     r = client.get(detail_url(scenario['application'].id))
     assert r.status_code == 200
     assert r.data['participant_name'] == 'Ana Lima'
-<<<<<<< HEAD
-=======
 
 
 # ── O nome do arquivo também é identidade ─────────────────────────
@@ -291,4 +270,3 @@ def test_the_sheet_is_not_anonymous_for_the_coordinator(admin_client, scenario):
     r = admin_client.get(detail_url(scenario['application'].id))
 
     assert r.data['anonymous'] is False
->>>>>>> feature/v3-processo-seletivo

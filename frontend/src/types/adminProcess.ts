@@ -7,11 +7,8 @@ export interface ProcessStats {
   approved: number
   rejected: number
   discarded: number
-<<<<<<< HEAD
-=======
   /** Fora de `total`: quem cancelou a própria inscrição não é inscrito. */
   withdrawn: number
->>>>>>> feature/v3-processo-seletivo
 }
 
 export interface AdminProcess {
@@ -27,10 +24,6 @@ export interface AdminProcess {
   score_min: number
   score_max: number
   divergence_threshold: string
-<<<<<<< HEAD
-  anonymous_evaluation: boolean
-=======
->>>>>>> feature/v3-processo-seletivo
   application_count: number
   stage_count: number
   created_at: string

@@ -158,8 +158,6 @@ def test_delete_empty_stage_succeeds(admin_client, process):
     assert admin_client.delete(stage_url(stage.id)).status_code == 204
 
 
-<<<<<<< HEAD
-=======
 # ── Publicado não perde etapa ─────────────────────────────────────
 #
 # O candidato lê as etapas antes de se inscrever, e o e-mail de confirmação
@@ -214,7 +212,6 @@ def test_closed_process_does_not_lose_stages_either(admin_client, process):
     assert Stage.objects.filter(id=stage.id).exists()
 
 
->>>>>>> feature/v3-processo-seletivo
 def test_reorder_stages(admin_client, process):
     first = StageFactory(process=process, order=1)
     second = StageFactory(process=process, order=2)

@@ -5,10 +5,7 @@ import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { AdminLoginPage } from './pages/AdminLoginPage'
 import { ApplicationDetailPage } from './pages/ApplicationDetailPage'
 import { DashboardPage } from './pages/DashboardPage'
-<<<<<<< HEAD
-=======
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
->>>>>>> feature/v3-processo-seletivo
 import { ManageProcessPage } from './pages/ManageProcessPage'
 import { SHOW_HACKATHON } from './featureFlags'
 import { LandingPage } from './pages/LandingPage'

@@ -7,10 +7,7 @@ from core.email_layout import (  # noqa: F401
     MONO as _MONO,
     badge as _badge,
     base_html as _base_html,
-<<<<<<< HEAD
-=======
     button as _button,
->>>>>>> feature/v3-processo-seletivo
     em as _em,
     footnote as _footnote,
     info_rows as _info_rows,

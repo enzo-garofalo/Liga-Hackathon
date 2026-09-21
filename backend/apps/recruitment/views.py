@@ -4,11 +4,7 @@ from django.contrib.auth import get_user_model
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
-<<<<<<< HEAD
-from rest_framework.exceptions import PermissionDenied, ValidationError
-=======
 from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
->>>>>>> feature/v3-processo-seletivo
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAdminUser
@@ -17,28 +13,19 @@ from rest_framework.views import APIView
 
 from apps.recruitment.models import (
     Application,
-<<<<<<< HEAD
-=======
     ApplicationStatus,
->>>>>>> feature/v3-processo-seletivo
     Communication,
     Deliverable,
     OrganizerProfile,
     Process,
-<<<<<<< HEAD
-=======
     ProcessOrganizer,
->>>>>>> feature/v3-processo-seletivo
     Stage,
     StageAssignment,
 )
 from apps.recruitment.serializers import (
     AdminApplicationDetailSerializer,
-<<<<<<< HEAD
-=======
     OrganizerInviteSerializer,
     ProcessOrganizerSerializer,
->>>>>>> feature/v3-processo-seletivo
     ApplicationListSerializer,
     BulkActionSerializer,
     CommunicationDetailSerializer,
@@ -60,20 +47,11 @@ from apps.recruitment.services.applications import (
     apply_to_process,
     published_processes,
     run_bulk_action,
-<<<<<<< HEAD
-=======
     withdraw_from_process,
->>>>>>> feature/v3-processo-seletivo
 )
 from apps.recruitment.services.assignments import (
     assign,
     auto_distribute,
-<<<<<<< HEAD
-    unassign,
-    workload,
-)
-from apps.recruitment.services.communications import send_communication
-=======
     board,
     set_evaluators,
     unassign,
@@ -87,23 +65,17 @@ from apps.recruitment.services.stage_files import (
 )
 from apps.recruitment.services.stage_files import clear_file as clear_stage_file
 from apps.recruitment.services.stage_files import set_file as set_stage_file
->>>>>>> feature/v3-processo-seletivo
 from apps.recruitment.services.deliverables import (
     assert_owner,
     can_download,
     delete as delete_deliverable,
-<<<<<<< HEAD
-=======
     display_name as deliverable_display_name,
->>>>>>> feature/v3-processo-seletivo
     upload as upload_deliverable,
 )
 from apps.recruitment.services.evaluations import (
     evaluation_summary,
     save_evaluation,
 )
-<<<<<<< HEAD
-=======
 from apps.recruitment.services.roles import (
     IsCoordinator,
     assigned_application_ids,
@@ -111,7 +83,6 @@ from apps.recruitment.services.roles import (
     is_coordinator,
     visible_processes,
 )
->>>>>>> feature/v3-processo-seletivo
 from apps.recruitment.services.processes import (
     assert_process_deletable,
     assert_process_editable,
@@ -125,8 +96,6 @@ from apps.recruitment.services.scoring import final_scores
 User = get_user_model()
 
 
-<<<<<<< HEAD
-=======
 class CoordinatorWrites:
     """Ler é de quem participa do processo; mudar é do coordenador.
 
@@ -174,7 +143,6 @@ def _applications_for_organizer(request):
     return queryset.filter(assignments__evaluator=request.user).distinct()
 
 
->>>>>>> feature/v3-processo-seletivo
 class ApplicationPagination(PageNumberPagination):
     """Paginação local do recruitment.
 
@@ -188,20 +156,6 @@ class ApplicationPagination(PageNumberPagination):
     max_page_size = 200
 
 
-<<<<<<< HEAD
-class AdminProcessListCreateView(generics.ListCreateAPIView):
-    serializer_class = ProcessSerializer
-    permission_classes = [IsAdminUser]
-    queryset = Process.objects.all()
-
-
-class AdminProcessDetailView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = ProcessDetailSerializer
-    permission_classes = [IsAdminUser]
-    queryset = Process.objects.all()
-    http_method_names = ['get', 'patch', 'delete', 'head', 'options']
-
-=======
 class AdminProcessListCreateView(CoordinatorWrites, generics.ListCreateAPIView):
     serializer_class = ProcessSerializer
 
@@ -216,7 +170,6 @@ class AdminProcessDetailView(CoordinatorWrites, generics.RetrieveUpdateDestroyAP
     def get_queryset(self):
         return visible_processes(self.request.user)
 
->>>>>>> feature/v3-processo-seletivo
     def perform_update(self, serializer):
         assert_process_editable(serializer.instance)
         serializer.save()
@@ -227,11 +180,7 @@ class AdminProcessDetailView(CoordinatorWrites, generics.RetrieveUpdateDestroyAP
 
 
 class AdminProcessPublishView(APIView):
-<<<<<<< HEAD
-    permission_classes = [IsAdminUser]
-=======
     permission_classes = [IsAdminUser, IsCoordinator]
->>>>>>> feature/v3-processo-seletivo
 
     def post(self, request, pk):
         process = get_object_or_404(Process, pk=pk)
@@ -245,11 +194,7 @@ class AdminProcessPublishView(APIView):
 
 
 class AdminProcessCloseView(APIView):
-<<<<<<< HEAD
-    permission_classes = [IsAdminUser]
-=======
     permission_classes = [IsAdminUser, IsCoordinator]
->>>>>>> feature/v3-processo-seletivo
 
     def post(self, request, pk):
         process = get_object_or_404(Process, pk=pk)
@@ -257,20 +202,11 @@ class AdminProcessCloseView(APIView):
         return Response(ProcessDetailSerializer(process).data)
 
 
-<<<<<<< HEAD
-class AdminStageListCreateView(generics.ListCreateAPIView):
-    serializer_class = StageSerializer
-    permission_classes = [IsAdminUser]
-
-    def get_process(self):
-        return get_object_or_404(Process, pk=self.kwargs['pk'])
-=======
 class AdminStageListCreateView(CoordinatorWrites, generics.ListCreateAPIView):
     serializer_class = StageSerializer
 
     def get_process(self):
         return _process_for_organizer(self.request, self.kwargs['pk'])
->>>>>>> feature/v3-processo-seletivo
 
     def get_queryset(self):
         return (
@@ -285,14 +221,6 @@ class AdminStageListCreateView(CoordinatorWrites, generics.ListCreateAPIView):
         serializer.save(process=process)
 
 
-<<<<<<< HEAD
-class AdminStageDetailView(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = StageSerializer
-    permission_classes = [IsAdminUser]
-    queryset = Stage.objects.prefetch_related('criteria')
-    http_method_names = ['get', 'patch', 'delete', 'head', 'options']
-
-=======
 class AdminStageDetailView(CoordinatorWrites, generics.RetrieveUpdateDestroyAPIView):
     serializer_class = StageSerializer
     http_method_names = ['get', 'patch', 'delete', 'head', 'options']
@@ -302,7 +230,6 @@ class AdminStageDetailView(CoordinatorWrites, generics.RetrieveUpdateDestroyAPIV
             process__in=visible_processes(self.request.user)
         ).prefetch_related('criteria')
 
->>>>>>> feature/v3-processo-seletivo
     def perform_update(self, serializer):
         assert_process_editable(serializer.instance.process)
         serializer.save()
@@ -314,11 +241,7 @@ class AdminStageDetailView(CoordinatorWrites, generics.RetrieveUpdateDestroyAPIV
 
 
 class AdminStageReorderView(APIView):
-<<<<<<< HEAD
-    permission_classes = [IsAdminUser]
-=======
     permission_classes = [IsAdminUser, IsCoordinator]
->>>>>>> feature/v3-processo-seletivo
 
     def patch(self, request, pk):
         process = get_object_or_404(Process, pk=pk)
@@ -328,8 +251,6 @@ class AdminStageReorderView(APIView):
 
 
 class AdminApplicationListView(generics.ListAPIView):
-<<<<<<< HEAD
-=======
     """Candidatos do processo.
 
     O coordenador vê o processo inteiro. O avaliador vê a própria fila: só as
@@ -338,7 +259,6 @@ class AdminApplicationListView(generics.ListAPIView):
     a lista toda enxerga quem entrou e quem saiu.
     """
 
->>>>>>> feature/v3-processo-seletivo
     serializer_class = ApplicationListSerializer
     permission_classes = [IsAdminUser]
     pagination_class = ApplicationPagination
@@ -351,17 +271,6 @@ class AdminApplicationListView(generics.ListAPIView):
     }
 
     def get_process(self):
-<<<<<<< HEAD
-        return get_object_or_404(Process, pk=self.kwargs['pk'])
-
-    def get_queryset(self):
-        params = self.request.query_params
-        queryset = (
-            Application.objects.filter(process=self.get_process())
-            .select_related('participant', 'participant__user', 'current_stage')
-        )
-
-=======
         return _process_for_organizer(self.request, self.kwargs['pk'])
 
     def get_queryset(self):
@@ -376,7 +285,6 @@ class AdminApplicationListView(generics.ListAPIView):
         if minha_fila is not None:
             queryset = queryset.filter(id__in=minha_fila)
 
->>>>>>> feature/v3-processo-seletivo
         if params.get('search'):
             queryset = queryset.filter(
                 participant__full_name__icontains=params['search']
@@ -453,8 +361,6 @@ class OpenProcessView(APIView):
         return Response(OpenProcessSerializer(process).data)
 
 
-<<<<<<< HEAD
-=======
 def _applied_process_ids(participant):
     """Processos em que o candidato está inscrito agora.
 
@@ -471,7 +377,6 @@ def _applied_process_ids(participant):
     )
 
 
->>>>>>> feature/v3-processo-seletivo
 class ProcessListView(generics.ListAPIView):
     """Processos publicados, para a seção 'Processos disponíveis'."""
 
@@ -483,19 +388,7 @@ class ProcessListView(generics.ListAPIView):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         participant = getattr(self.request.user, 'participant', None)
-<<<<<<< HEAD
-        context['applied_process_ids'] = (
-            set(
-                Application.objects.filter(
-                    participant=participant
-                ).values_list('process_id', flat=True)
-            )
-            if participant
-            else set()
-        )
-=======
         context['applied_process_ids'] = _applied_process_ids(participant)
->>>>>>> feature/v3-processo-seletivo
         return context
 
 
@@ -510,19 +403,7 @@ class ProcessDetailView(generics.RetrieveAPIView):
     def get_serializer_context(self):
         context = super().get_serializer_context()
         participant = getattr(self.request.user, 'participant', None)
-<<<<<<< HEAD
-        context['applied_process_ids'] = (
-            set(
-                Application.objects.filter(
-                    participant=participant
-                ).values_list('process_id', flat=True)
-            )
-            if participant
-            else set()
-        )
-=======
         context['applied_process_ids'] = _applied_process_ids(participant)
->>>>>>> feature/v3-processo-seletivo
         return context
 
 
@@ -537,8 +418,6 @@ class ProcessApplyView(APIView):
         )
 
 
-<<<<<<< HEAD
-=======
 class ProcessWithdrawView(APIView):
     """Cancelamento da própria inscrição, espelhando `apply/`."""
 
@@ -549,7 +428,6 @@ class ProcessWithdrawView(APIView):
         return Response(MyApplicationDetailSerializer(application).data)
 
 
->>>>>>> feature/v3-processo-seletivo
 class MyApplicationListView(generics.ListAPIView):
     serializer_class = MyApplicationListSerializer
 
@@ -580,36 +458,20 @@ class MyApplicationDetailView(generics.RetrieveAPIView):
 class AdminApplicationDetailView(generics.RetrieveAPIView):
     serializer_class = AdminApplicationDetailSerializer
     permission_classes = [IsAdminUser]
-<<<<<<< HEAD
-    queryset = Application.objects.select_related(
-        'participant', 'participant__user', 'current_stage', 'process'
-    ).prefetch_related('deliverables', 'current_stage__criteria')
-=======
 
     def get_queryset(self):
         return _applications_for_organizer(self.request)
->>>>>>> feature/v3-processo-seletivo
 
 
 class AdminEvaluationView(APIView):
     permission_classes = [IsAdminUser]
 
     def get(self, request, pk):
-<<<<<<< HEAD
-        application = get_object_or_404(Application, pk=pk)
-        return Response(evaluation_summary(application))
-
-    def post(self, request, pk):
-        application = get_object_or_404(
-            Application.objects.select_related('process'), pk=pk
-        )
-=======
         application = get_object_or_404(_applications_for_organizer(request), pk=pk)
         return Response(evaluation_summary(application))
 
     def post(self, request, pk):
         application = get_object_or_404(_applications_for_organizer(request), pk=pk)
->>>>>>> feature/v3-processo-seletivo
         payload = EvaluationInputSerializer(data=request.data)
         payload.is_valid(raise_exception=True)
 
@@ -625,11 +487,7 @@ class AdminEvaluationView(APIView):
 
 
 class AdminBulkActionView(APIView):
-<<<<<<< HEAD
-    permission_classes = [IsAdminUser]
-=======
     permission_classes = [IsAdminUser, IsCoordinator]
->>>>>>> feature/v3-processo-seletivo
 
     def post(self, request, pk):
         process = get_object_or_404(Process, pk=pk)
@@ -663,11 +521,7 @@ class AdminBulkActionView(APIView):
 
 
 class AdminCommunicationListCreateView(generics.ListCreateAPIView):
-<<<<<<< HEAD
-    permission_classes = [IsAdminUser]
-=======
     permission_classes = [IsAdminUser, IsCoordinator]
->>>>>>> feature/v3-processo-seletivo
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -719,11 +573,7 @@ class AdminCommunicationListCreateView(generics.ListCreateAPIView):
 
 class AdminCommunicationDetailView(generics.RetrieveAPIView):
     serializer_class = CommunicationDetailSerializer
-<<<<<<< HEAD
-    permission_classes = [IsAdminUser]
-=======
     permission_classes = [IsAdminUser, IsCoordinator]
->>>>>>> feature/v3-processo-seletivo
     queryset = Communication.objects.select_related(
         'process', 'audience_stage'
     ).prefetch_related('recipients')
@@ -732,12 +582,6 @@ class AdminCommunicationDetailView(generics.RetrieveAPIView):
 # ── Designação de avaliadores ─────────────────────────────────────
 
 
-<<<<<<< HEAD
-class AdminStageAssignmentView(APIView):
-    """Distribuição de correções de uma etapa entre os avaliadores."""
-
-    permission_classes = [IsAdminUser]
-=======
 class AdminProcessAssignmentView(APIView):
     """O quadro de distribuição do processo: candidatos por etapa.
 
@@ -791,7 +635,6 @@ class AdminStageAssignmentView(APIView):
     """Distribuição de correções de uma etapa entre os avaliadores."""
 
     permission_classes = [IsAdminUser, IsCoordinator]
->>>>>>> feature/v3-processo-seletivo
 
     def get(self, request, pk):
         stage = get_object_or_404(Stage, pk=pk)
@@ -833,11 +676,7 @@ class AdminStageAssignmentView(APIView):
 
 
 class AdminStageAutoDistributeView(APIView):
-<<<<<<< HEAD
-    permission_classes = [IsAdminUser]
-=======
     permission_classes = [IsAdminUser, IsCoordinator]
->>>>>>> feature/v3-processo-seletivo
 
     def post(self, request, pk):
         stage = get_object_or_404(Stage, pk=pk)
@@ -911,15 +750,6 @@ class DeliverableDownloadView(APIView):
         if not can_download(deliverable, request.user):
             raise PermissionDenied('Você não tem acesso a este arquivo.')
 
-<<<<<<< HEAD
-        return FileResponse(
-            deliverable.file.open('rb'),
-            as_attachment=True,
-            filename=os.path.basename(deliverable.file.name),
-        )
-
-
-=======
         # Numa etapa anônima o nome do arquivo também é identidade: sem
         # isto o avaliador baixaria "case-pedro-xavier.pdf".
         stage = deliverable.application.current_stage
@@ -1036,7 +866,6 @@ class AdminProcessOrganizerDetailView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
->>>>>>> feature/v3-processo-seletivo
 class AdminOrganizerProfileView(generics.RetrieveUpdateAPIView):
     """Perfil do organizador autenticado.
 

@@ -30,10 +30,6 @@ const COURSES = [
 ].map((course) => ({ value: course, label: course }))
 
 /** Mesmo teto da tela de perfil: os dois formulários editam o mesmo campo. */
-<<<<<<< HEAD
-const BIO_MAX = 500
-=======
->>>>>>> feature/v3-processo-seletivo
 
 interface FormShape {
   email: string
@@ -318,12 +314,9 @@ export function RegisterPage() {
                       <textarea
                         id="register-bio"
                         rows={4}
-<<<<<<< HEAD
-=======
                         // Trava a digitação no teto. Sem isto dava para escrever
                         // mil caracteres e só descobrir o limite ao enviar.
                         maxLength={BIO_MAX}
->>>>>>> feature/v3-processo-seletivo
                         {...register('bio', {
                           required: 'Conte um pouco sobre você.',
                           // Mesmo teto do perfil: sem ele, quem se cadastra com

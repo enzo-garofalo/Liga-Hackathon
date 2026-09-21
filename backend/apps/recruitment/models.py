@@ -46,11 +46,6 @@ class Process(models.Model):
     divergence_threshold = models.DecimalField(
         max_digits=4, decimal_places=2, default=Decimal('1.5')
     )
-<<<<<<< HEAD
-    # Correção anônima: avaliador vê só o código do candidato.
-    anonymous_evaluation = models.BooleanField(default=True)
-=======
->>>>>>> feature/v3-processo-seletivo
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -83,29 +78,23 @@ class Stage(models.Model):
     # botão, e o candidato só lê quando chega na etapa — ver
     # `ApplicationTimelineStageSerializer.get_instructions`.
     instructions = models.TextField(blank=True)
-<<<<<<< HEAD
-=======
     # Enunciado em arquivo, para a etapa em que o texto não basta: o case vem
     # como PDF, com formatação e anexos. Segue a mesma trava de `instructions`:
     # só baixa quem já chegou na etapa.
     instructions_file = models.FileField(
         upload_to='enunciados/%Y/%m/', blank=True
     )
->>>>>>> feature/v3-processo-seletivo
     order = models.PositiveSmallIntegerField()
     start_at = models.DateTimeField(null=True, blank=True)
     end_at = models.DateTimeField(null=True, blank=True)
     # Peso da etapa na nota final, em porcentagem (ex.: 35 para 35%).
     # Zero em todas as etapas significa peso igual entre elas.
     weight = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-<<<<<<< HEAD
-=======
     # Correção anônima desta etapa: o organizador que não for coordenador vê
     # o código do candidato, não a pessoa. Fica na etapa, e não no processo,
     # porque só o case precisa disso: no pitch e na entrevista o avaliador está
     # olhando para a pessoa de qualquer jeito (decisions.md §29).
     anonymous_evaluation = models.BooleanField(default=False)
->>>>>>> feature/v3-processo-seletivo
     accepts_late_submission = models.BooleanField(default=False)
     allows_file_upload = models.BooleanField(default=False)
     max_files = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -157,30 +146,21 @@ class ApplicationStatus:
     APPROVED = 'approved'
     REJECTED = 'rejected'
     DISCARDED = 'discarded'
-<<<<<<< HEAD
-=======
     # Desistência do próprio candidato, durante o período de inscrição.
     # Separado de DISCARDED de propósito: descarte é ação do organizador, e o
     # histórico ficaria mentindo sobre quem tomou a decisão.
     WITHDRAWN = 'withdrawn'
->>>>>>> feature/v3-processo-seletivo
     CHOICES = [
         (IN_PROGRESS, 'Em andamento'),
         (APPROVED, 'Aprovado'),
         (REJECTED, 'Reprovado'),
         (DISCARDED, 'Descartado'),
-<<<<<<< HEAD
-    ]
-
-    FINISHED = {APPROVED, REJECTED, DISCARDED}
-=======
         (WITHDRAWN, 'Desistiu'),
     ]
 
     # Finalizada: o organizador não move, não avalia e não aprova, e o
     # candidato não entrega mais arquivo.
     FINISHED = {APPROVED, REJECTED, DISCARDED, WITHDRAWN}
->>>>>>> feature/v3-processo-seletivo
 
 
 class Application(models.Model):
@@ -421,8 +401,6 @@ class OrganizerProfile(models.Model):
         return self.full_name or self.user.get_username()
 
 
-<<<<<<< HEAD
-=======
 class ProcessOrganizer(models.Model):
     """Organizador que o coordenador chamou para ajudar num processo.
 
@@ -469,7 +447,6 @@ class ProcessOrganizer(models.Model):
         return f'{self.user} @ {self.process.name}'
 
 
->>>>>>> feature/v3-processo-seletivo
 class StageAssignment(models.Model):
     """Avaliador designado para corrigir uma candidatura numa etapa.
 

@@ -9,10 +9,7 @@ import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { SHOW_HACKATHON } from '../featureFlags'
 import { useAdminProcesses } from '../hooks/useAdminProcesses'
-<<<<<<< HEAD
-=======
 import { useOrganizerProfile } from '../hooks/useOrganizerProfile'
->>>>>>> feature/v3-processo-seletivo
 import {
   useAdminParticipants,
   useAdminTeams,
@@ -621,14 +618,11 @@ export function AdminDashboardPage() {
   const [statusFilter, setStatusFilter] = useState<TeamStatus>('submitted')
   const [selectedParticipant, setSelectedParticipant] = useState<AdminParticipant | null>(null)
 
-<<<<<<< HEAD
-=======
   // Criar processo é do coordenador. O avaliador entra aqui para ver os
   // processos em que foi posto, e mais nada (decisions.md §29).
   const { query: profileQuery } = useOrganizerProfile()
   const coordena = profileQuery.data?.is_coordinator ?? false
 
->>>>>>> feature/v3-processo-seletivo
   // Hackathon: consultas desligadas junto com a interface dele.
   const approvedQuery = useAdminTeams('approved', SHOW_HACKATHON)
   const participantsQuery = useAdminParticipants(SHOW_HACKATHON)
@@ -656,19 +650,12 @@ export function AdminDashboardPage() {
               <UserRound className="h-4 w-4" />
               Meu perfil
             </Button>
-<<<<<<< HEAD
-            <Button onClick={() => setNewProcessOpen(true)}>
-              <Plus className="h-4 w-4" />
-              Novo processo
-            </Button>
-=======
             {coordena && (
               <Button onClick={() => setNewProcessOpen(true)}>
                 <Plus className="h-4 w-4" />
                 Novo processo
               </Button>
             )}
->>>>>>> feature/v3-processo-seletivo
           </div>
         </div>
 

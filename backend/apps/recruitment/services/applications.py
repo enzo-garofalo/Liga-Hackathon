@@ -35,8 +35,6 @@ def published_processes():
     return Process.objects.filter(status=ProcessStatus.PUBLISHED)
 
 
-<<<<<<< HEAD
-=======
 def has_reached(application, stage):
     """Se o candidato já chegou nesta etapa.
 
@@ -48,7 +46,6 @@ def has_reached(application, stage):
     return current is not None and stage.order <= current.order
 
 
->>>>>>> feature/v3-processo-seletivo
 # ── Texto das notificações ────────────────────────────────────────
 #
 # Convenção: a primeira linha é o resumo que aparece na lista do sino; o que vem
@@ -124,19 +121,6 @@ def apply_to_process(process, participant):
     if now > process.registration_end:
         raise ValidationError('As inscrições para este processo já encerraram.')
 
-<<<<<<< HEAD
-    if Application.objects.filter(process=process, participant=participant).exists():
-        raise ValidationError('Você já está inscrito neste processo seletivo.')
-
-    application = Application.objects.create(
-        process=process,
-        participant=participant,
-        current_stage=process.first_stage,
-        code=next_application_code(process),
-        status=ApplicationStatus.IN_PROGRESS,
-        submitted_at=now,
-    )
-=======
     existente = Application.objects.filter(
         process=process, participant=participant
     ).first()
@@ -164,7 +148,6 @@ def apply_to_process(process, participant):
             status=ApplicationStatus.IN_PROGRESS,
             submitted_at=now,
         )
->>>>>>> feature/v3-processo-seletivo
 
     notify(
         participant,
@@ -183,8 +166,6 @@ def apply_to_process(process, participant):
     return application
 
 
-<<<<<<< HEAD
-=======
 def can_withdraw(application):
     """Se dá para cancelar esta inscrição agora.
 
@@ -238,7 +219,6 @@ def withdraw_from_process(process, participant):
     return application
 
 
->>>>>>> feature/v3-processo-seletivo
 # ── Ações em massa do organizador ─────────────────────────────────
 
 MOVE_STAGE = 'move_stage'

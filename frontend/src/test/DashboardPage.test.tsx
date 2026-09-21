@@ -5,20 +5,13 @@ import { getMyApplications } from '../api/applications'
 import { getInfo } from '../api/info'
 import { listMyInvites } from '../api/invites'
 import { getMe } from '../api/me'
-<<<<<<< HEAD
-import { getProcesses } from '../api/processes'
-=======
 import { getProcesses, withdrawFromProcess } from '../api/processes'
->>>>>>> feature/v3-processo-seletivo
 import { getOpenTeams } from '../api/teams'
 import { DashboardPage } from '../pages/DashboardPage'
 import type { ApplicationSummary } from '../types/application'
 import type { MeProfile } from '../types/participant'
 import type { ProcessSummary } from '../types/process'
-<<<<<<< HEAD
-=======
 import { WHATSAPP_LINK } from '../links'
->>>>>>> feature/v3-processo-seletivo
 import { httpError } from './http'
 import { renderWithProviders } from './render'
 
@@ -27,10 +20,7 @@ vi.mock('../api/processes', () => ({
   getProcesses: vi.fn(),
   getProcess: vi.fn(),
   applyToProcess: vi.fn(),
-<<<<<<< HEAD
-=======
   withdrawFromProcess: vi.fn(),
->>>>>>> feature/v3-processo-seletivo
 }))
 vi.mock('../api/applications', () => ({
   getMyApplications: vi.fn(),
@@ -75,10 +65,7 @@ const application: ApplicationSummary = {
   stage_count: 4,
   submitted_at: '2026-08-02T12:00:00Z',
   updated_at: '2026-08-10T12:00:00Z',
-<<<<<<< HEAD
-=======
   can_withdraw: true,
->>>>>>> feature/v3-processo-seletivo
 }
 
 const openProcess: ProcessSummary = {
@@ -194,8 +181,6 @@ describe('DashboardPage', () => {
     })
   })
 })
-<<<<<<< HEAD
-=======
 
 // ── Quem criou conta mas não se inscreveu ─────────────────────────
 //
@@ -401,4 +386,3 @@ describe('DashboardPage: cancelar a inscrição', () => {
     ).not.toBeInTheDocument()
   })
 })
->>>>>>> feature/v3-processo-seletivo

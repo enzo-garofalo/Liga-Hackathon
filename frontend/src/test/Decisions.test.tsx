@@ -58,11 +58,7 @@ describe('Decisão sobre o candidato', () => {
   })
 
   it('a ficha oferece aprovar e reprovar', async () => {
-<<<<<<< HEAD
-    renderWithProviders(<CandidatesTab process={process} />)
-=======
     renderWithProviders(<CandidatesTab process={process} canDecide />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
     const dialog = await openProfile('Ana Lima')
 
@@ -71,11 +67,7 @@ describe('Decisão sobre o candidato', () => {
   })
 
   it('aprovar pede confirmação antes de agir', async () => {
-<<<<<<< HEAD
-    renderWithProviders(<CandidatesTab process={process} />)
-=======
     renderWithProviders(<CandidatesTab process={process} canDecide />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
     const dialog = await openProfile('Ana Lima')
 
@@ -88,11 +80,7 @@ describe('Decisão sobre o candidato', () => {
   })
 
   it('cancelar a confirmação não muda nada', async () => {
-<<<<<<< HEAD
-    renderWithProviders(<CandidatesTab process={process} />)
-=======
     renderWithProviders(<CandidatesTab process={process} canDecide />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
     const dialog = await openProfile('Ana Lima')
     await userEvent.click(within(dialog).getByRole('button', { name: /reprovar/i }))
@@ -109,11 +97,7 @@ describe('Decisão sobre o candidato', () => {
   })
 
   it('aprovar fora da última etapa avança para a próxima', async () => {
-<<<<<<< HEAD
-    renderWithProviders(<CandidatesTab process={process} />)
-=======
     renderWithProviders(<CandidatesTab process={process} canDecide />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
     const dialog = await openProfile('Ana Lima')
 
@@ -140,11 +124,7 @@ describe('Decisão sobre o candidato', () => {
         current_stage_name: 'Entrevista',
       }),
     )
-<<<<<<< HEAD
-    renderWithProviders(<CandidatesTab process={process} />)
-=======
     renderWithProviders(<CandidatesTab process={process} canDecide />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Bruno Reitano')
     const dialog = await openProfile('Bruno Reitano')
 
@@ -161,11 +141,7 @@ describe('Decisão sobre o candidato', () => {
   })
 
   it('reprovar pela ficha encerra a candidatura', async () => {
-<<<<<<< HEAD
-    renderWithProviders(<CandidatesTab process={process} />)
-=======
     renderWithProviders(<CandidatesTab process={process} canDecide />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
     const dialog = await openProfile('Ana Lima')
 
@@ -181,11 +157,7 @@ describe('Decisão sobre o candidato', () => {
   })
 
   it('ação em massa de reprovar também confirma', async () => {
-<<<<<<< HEAD
-    renderWithProviders(<CandidatesTab process={process} />)
-=======
     renderWithProviders(<CandidatesTab process={process} canDecide />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
 
     await userEvent.click(screen.getByLabelText('Selecionar Ana Lima'))
@@ -202,11 +174,7 @@ describe('Decisão sobre o candidato', () => {
     vi.mocked(getApplication).mockResolvedValue(
       makeApplicationDetail({ status: 'approved' }),
     )
-<<<<<<< HEAD
-    renderWithProviders(<CandidatesTab process={process} />)
-=======
     renderWithProviders(<CandidatesTab process={process} canDecide />)
->>>>>>> feature/v3-processo-seletivo
     await screen.findByText('Ana Lima')
     const dialog = await openProfile('Ana Lima')
 

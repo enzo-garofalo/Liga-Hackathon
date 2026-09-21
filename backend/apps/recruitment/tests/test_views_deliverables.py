@@ -188,11 +188,6 @@ def test_owner_can_download_own_file(candidate_client, scenario):
     assert r.status_code == 200
 
 
-<<<<<<< HEAD
-def test_organizer_can_download_candidate_file(
-    candidate_client, evaluator_client, scenario
-):
-=======
 def test_evaluator_downloads_the_file_distributed_to_them(
     candidate_client, evaluator_client, scenario
 ):
@@ -216,14 +211,11 @@ def test_evaluator_cannot_download_outside_their_queue(
 ):
     """O arquivo é justamente o que se quer ver: liberar tudo a todo organizador
     deixaria a distribuição decorativa."""
->>>>>>> feature/v3-processo-seletivo
     created = candidate_client.post(
         url(scenario['application'].id), {'file': pdf()}, format='multipart'
     )
 
     r = evaluator_client.get(created.data['download_url'])
-<<<<<<< HEAD
-=======
     assert r.status_code == 403
 
 
@@ -233,7 +225,6 @@ def test_coordinator_downloads_any_file(candidate_client, admin_client, scenario
     )
 
     r = admin_client.get(created.data['download_url'])
->>>>>>> feature/v3-processo-seletivo
     assert r.status_code == 200
 
 

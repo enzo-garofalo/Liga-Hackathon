@@ -1,10 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-<<<<<<< HEAD
-import { applyToProcess, getProcess } from '../api/processes'
-=======
 import { applyToProcess, getProcess, withdrawFromProcess } from '../api/processes'
->>>>>>> feature/v3-processo-seletivo
 import { retryUnlessClientError } from '../utils/errors'
 
 export function useProcess(id: string | undefined) {
@@ -29,8 +25,6 @@ export function useApplyToProcess(id: string | undefined) {
     },
   })
 }
-<<<<<<< HEAD
-=======
 
 /**
  * Cancela a própria inscrição.
@@ -51,4 +45,3 @@ export function useWithdrawFromProcess(id: string | undefined) {
     },
   })
 }
->>>>>>> feature/v3-processo-seletivo

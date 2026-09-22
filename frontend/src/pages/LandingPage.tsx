@@ -32,9 +32,8 @@ const STAGES = [
     n: '01',
     icon: FileText,
     name: 'Resolução do Case',
-    duration: '7 dias',
     summary:
-      'Um único case para todos, entregue em PDF de até 3 páginas. Não exige código nem conhecimento específico de programação.',
+      'Os candidatos receberão um desafio e deverão desenvolver uma proposta de solução. O prazo, o formato de entrega e as demais orientações serão comunicados antes do início da etapa.',
     observes: [
       'Compreensão do problema',
       'Pensamento crítico',
@@ -49,9 +48,8 @@ const STAGES = [
     n: '02',
     icon: Mic,
     name: 'Pitch',
-    duration: '5 min + 3 de perguntas',
     summary:
-      'Você apresenta e defende a solução que entregou no case, presencialmente na PUC-Campinas. Não é uma atividade nova.',
+      'Os candidatos poderão apresentar e defender a solução desenvolvida no case. O formato, a duração e as orientações dessa etapa serão informados com antecedência.',
     observes: [
       'Clareza da comunicação',
       'Capacidade de síntese',
@@ -67,7 +65,7 @@ const STAGES = [
     name: 'Entrevista',
     duration: 'Individual e estruturada',
     summary:
-      'Conversa para conhecer a pessoa por trás das etapas anteriores. Todos respondem a um conjunto semelhante de perguntas.',
+      'Uma conversa para conhecermos melhor o perfil, as motivações e as experiências de cada candidato, além de esclarecer dúvidas sobre a Liga e sua forma de atuação.',
     observes: [
       'Motivação',
       'Comprometimento',
@@ -123,11 +121,7 @@ const FAQS = [
   },
   {
     q: 'Quanto tempo dura o processo?',
-    a: 'Aproximadamente quatro semanas, da abertura das inscrições ao resultado final. O cronograma completo é divulgado antes da abertura.',
-  },
-  {
-    q: 'O pitch é presencial?',
-    a: 'Sim, o formato ideal é presencial na PUC-Campinas, porque a atuação na Liga envolve reuniões, eventos e contato com pessoas. O formato online existe como exceção, em situações justificadas.',
+    a: 'O cronograma está sendo definido. As datas, os prazos e as orientações de cada etapa serão comunicados com antecedência pelos canais oficiais da Liga e pela plataforma.',
   },
   {
     q: 'Onde acompanho minha candidatura?',
@@ -428,9 +422,9 @@ function AboutLiga() {
 function HowItWorks() {
   const steps = [
     { n: '01', icon: UserPlus, title: 'Inscrição', desc: 'Crie sua conta, preencha seu perfil e acompanhe tudo por aqui.' },
-    { n: '02', icon: FileText, title: 'Case', desc: 'Sete dias para entregar sua proposta em PDF de até 3 páginas.' },
-    { n: '03', icon: Mic, title: 'Pitch', desc: 'Cinco minutos para apresentar e três para responder a banca.' },
-    { n: '04', icon: MessagesSquare, title: 'Entrevista', desc: 'Conversa individual estruturada. O resultado final sai alguns dias depois.' },
+    { n: '02', icon: FileText, title: 'Case', desc: 'Receba o desafio, desenvolva sua proposta e envie a solução conforme as orientações divulgadas.' },
+    { n: '03', icon: Mic, title: 'Pitch', desc: 'Apresente sua proposta e converse com a equipe sobre as decisões tomadas durante a resolução.' },
+    { n: '04', icon: MessagesSquare, title: 'Entrevista', desc: 'Participe de uma conversa para conhecermos melhor seu perfil, suas motivações e seu interesse pela Liga.' },
   ]
 
   return (

@@ -155,33 +155,61 @@ def send_application_approved(participant, application):
 
 def send_application_rejected(participant, application):
     process = application.process
-    subject = f'[Liga de TI] Resultado do processo seletivo — {process.name}'
+
+    subject = (
+        f'[Liga de TI] Retorno sobre o processo seletivo — {process.name}'
+    )
 
     text = (
         f'Olá, {participant.full_name}.\n\n'
-        f'Agradecemos sua participação no {process.name}.\n\n'
-        'Sua candidatura não seguiu para a próxima etapa desta vez.\n\n'
-        'Esperamos você no próximo processo seletivo.\n\n'
-        'Liga de TI'
+        f'Agradecemos muito pelo seu interesse e pelo tempo dedicado ao '
+        f'{process.name}.\n\n'
+        'Após avaliarmos as candidaturas, sua candidatura não seguirá '
+        'para as próximas etapas desta edição.\n\n'
+        'Sabemos que participar de um processo seletivo envolve tempo, '
+        'dedicação e expectativa. Por isso, queremos reforçar que essa '
+        'decisão leva em conta o contexto, os critérios e o número de vagas '
+        'desta edição — e não resume o seu potencial.\n\n'
+        'Esperamos encontrar você nos próximos eventos e iniciativas da '
+        'Liga. Também será um prazer receber novamente sua candidatura em '
+        'futuras oportunidades.\n\n'
+        'Atenciosamente,\n'
+        'Equipe da Liga de TI e Empreendedorismo'
     )
+
     body = (
-        badge('Resultado', '#fdeaea', _RED)
+        badge('Processo seletivo', '#f1ecff', '#6437d6')
         + p(f'Olá, {em(participant.full_name)}.')
-        + p(f'Agradecemos de verdade sua participação no {em(process.name)}.')
-        + p('Sua candidatura não seguiu adiante nesta edição.')
+        + p(
+            f'Agradecemos muito pelo seu interesse e pelo tempo dedicado '
+            f'ao {em(process.name)}.'
+        )
+        + p(
+            'Após avaliarmos as candidaturas, sua candidatura não seguirá '
+            'para as próximas etapas desta edição.'
+        )
+        + p(
+            'Sabemos que participar de um processo seletivo envolve tempo, '
+            'dedicação e expectativa.'
+        )
         + footnote(
-            'Isso não diz respeito ao seu potencial — o número de vagas é '
-            'limitado. Esperamos você no próximo processo seletivo.'
+            'Essa decisão leva em conta o contexto, os critérios e o número '
+            'de vagas desta edição — e não resume o seu potencial. '
+            'Esperamos encontrar você nos próximos eventos e iniciativas '
+            'da Liga. Também será um prazer receber novamente sua '
+            'candidatura em futuras oportunidades.'
         )
     )
+
     html = base_html(
         subject,
-        f'Resultado da sua candidatura no {process.name}.',
-        'Resultado do processo seletivo',
+        f'Retorno sobre sua candidatura no {process.name}.',
+        'Obrigado por participar',
         body,
-        top_color=_RED,
+        top_color='#6437d6',
         footer_text=_FOOTER,
     )
+
     send(subject, text, html, [participant.user.email])
 
 

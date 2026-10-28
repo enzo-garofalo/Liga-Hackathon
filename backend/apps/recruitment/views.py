@@ -144,16 +144,25 @@ def _applications_for_organizer(request):
 
 
 class ApplicationPagination(PageNumberPagination):
-    """Paginação local do recruitment.
+    """Lista de candidaturas inteira, no formato paginado.
 
-    Definida na view e não em DEFAULT_PAGINATION_CLASS de propósito: paginar
-    globalmente mudaria o formato de resposta dos endpoints do hackathon e
-    quebraria o frontend em produção.
+    Já foi de 25 em 25, e a tela só buscava a primeira página: com 34 inscritos
+    o coordenador via 25 e não tinha como chegar nos outros. Um processo da Liga
+    tem dezenas de inscritos, não milhares, então a lista vem toda. O formato
+    (`count`, `next`, `previous`, `results`) fica, para o frontend não mudar.
+
+    Definida na view e não em DEFAULT_PAGINATION_CLASS de propósito: mudaria o
+    formato de resposta dos endpoints do hackathon e quebraria o frontend em
+    produção.
     """
 
-    page_size = 25
-    page_size_query_param = 'page_size'
-    max_page_size = 200
+    def paginate_queryset(self, queryset, request, view=None):
+        return list(queryset)
+
+    def get_paginated_response(self, data):
+        return Response(
+            {'count': len(data), 'next': None, 'previous': None, 'results': data}
+        )
 
 
 class AdminProcessListCreateView(CoordinatorWrites, generics.ListCreateAPIView):

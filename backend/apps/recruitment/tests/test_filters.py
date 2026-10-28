@@ -136,3 +136,17 @@ def test_row_exposes_participant_id_for_targeted_communication(
     r = admin_client.get(url(process.id, '?search=ana'))
     row = r.data['results'][0]
     assert str(row['participant']) == str(populated['ana'].participant_id)
+
+
+def test_list_has_no_page_limit(admin_client, process):
+    # Era de 25 em 25 e a tela só lia a primeira página: com 34 inscritos o
+    # coordenador via 25. A lista vem inteira.
+    stage = StageFactory(process=process, order=1)
+    ApplicationFactory.create_batch(34, process=process, current_stage=stage)
+
+    r = admin_client.get(url(process.id))
+
+    assert r.status_code == 200
+    assert r.data['count'] == 34
+    assert len(r.data['results']) == 34
+    assert r.data['next'] is None
